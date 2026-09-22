@@ -37,19 +37,28 @@ chcp 65001 | Out-Null
 
 $AvdName = 'pixel_8'
 
-$AvdTarget = 'system-images;android-36;google_apis;arm64-v8a'
+# Emulator guest image. x64 hosts run the x86_64 image with hardware
+# acceleration; ARM64 hosts get arm64-v8a (Assert-ArchCompatible overrides
+# this). Read via Get-SdkPackages so install sees the post-detection value.
+$script:AvdTarget = 'system-images;android-36;google_apis;x86_64'
 
-$SdkPackages = @(
+function Get-SdkPackages {
 
-    'platform-tools'
+    @(
 
-    'emulator'
+        'platform-tools'
 
-    $AvdTarget
+        'emulator'
 
-    'build-tools;36.1.0'
+        $script:AvdTarget
 
-)
+        'build-tools;36.1.0'
+
+        'platforms;android-36'
+
+    )
+
+}
 
 $MiseData = if ($env:MISE_DATA) { $env:MISE_DATA } else { "$env:LOCALAPPDATA\mise" }
 
@@ -62,6 +71,22 @@ function Write-Ok    { Write-Host "[OK]    $args" -ForegroundColor Green }
 function Write-Warn  { Write-Host "[WARN]  $args" -ForegroundColor Yellow }
 
 function Write-Error { Write-Host "[ERROR] $args" -ForegroundColor Red }
+
+# Render redirected native stderr (2>&1) as plain text. On both PowerShell 5.1
+# and 7.x, 2>&1 wraps each stderr line in an ErrorRecord; stringifying a bare
+# line can surface "System.Management.Automation.RemoteException" placeholders,
+# so pull Exception.Message instead and keep stdout lines as strings.
+function Get-NativeText {
+
+    process {
+
+        if ($_ -is [System.Management.Automation.ErrorRecord]) { $_.Exception.Message } else { [string]$_ }
+
+    }
+
+}
+
+function Write-LogLine { process { Write-Host "  $_" } }
 
 
 
@@ -375,6 +400,84 @@ function Ensure-LocalBinOnPath {
 
 
 
+# ── Ensure mise is activated in the shell profile ────────────────────────────
+
+# mise-managed tools (flutter, java, gradle, pnpm, ...) are only on PATH when
+# mise's activate hook runs at shell startup. The hook emits pure PowerShell,
+# parses on both 5.1 and 7.x (it just warns about chpwd on 5.1 — suppressed
+# via MISE_PWSH_CHPWD_WARNING), and puts $MISE_DATA\shims on PATH so every
+# tool resolves in new terminals.
+
+function Ensure-MiseActivation {
+
+    $activate = @(
+
+        '# LeafLens: mise activation (flutter/java/gradle/pnpm on PATH)'
+
+        'if (Get-Command mise -ErrorAction SilentlyContinue) {'
+
+        "    `$env:MISE_PWSH_CHPWD_WARNING = '0'"
+
+        '    Invoke-Expression ((& mise activate pwsh) -join [Environment]::NewLine)'
+
+        '}'
+
+    ) -join "`n"
+
+
+
+    $profileBase = Split-Path (Split-Path $PROFILE.CurrentUserAllHosts -Parent) -Parent
+
+    $profilePaths = @(
+
+        "$profileBase\WindowsPowerShell\profile.ps1"
+
+        "$profileBase\PowerShell\profile.ps1"
+
+    ) | Select-Object -Unique
+
+    $marker = 'LeafLens: mise activation'
+
+
+
+    foreach ($profilePath in $profilePaths) {
+
+
+
+        $profileDir = Split-Path $profilePath -Parent
+
+        if (-not (Test-Path $profileDir)) {
+
+            New-Item -ItemType Directory -Path $profileDir -Force | Out-Null
+
+        }
+
+        if (-not (Test-Path $profilePath -PathType Leaf)) {
+
+            New-Item -ItemType File -Path $profilePath -Force | Out-Null
+
+        }
+
+        $existing = Get-Content $profilePath -Raw -ErrorAction SilentlyContinue
+
+        if ($existing -match [Regex]::Escape($marker)) {
+
+            Write-Ok "mise activation already in $profilePath"
+
+        } else {
+
+            Add-Content -Path $profilePath -Value "`n$activate`n"
+
+            Write-Info "Added mise activation to $profilePath"
+
+        }
+
+    }
+
+}
+
+
+
 # ── Check architecture compatibility ────────────────────────────────────────
 
 $script:IsArm64 = $false
@@ -388,6 +491,8 @@ function Assert-ArchCompatible {
     if ($arch -ne 12) { return }  # Not ARM64, no issue
 
     $script:IsArm64 = $true
+
+    $script:AvdTarget = 'system-images;android-36;google_apis;arm64-v8a'
 
     Write-Warn "Windows ARM64 detected — Flutter 3.44.0 has no windows-arm64 build. Skipping Flutter (install it manually)."
 
@@ -582,6 +687,17 @@ function Install-SdkExtras {
 
 
 
+    # sdkmanager is a batch-launched Java console app that always prints a
+    # warning ("A restricted method in java.lang.System has been called") to
+    # stderr. With $ErrorActionPreference='Stop', those stderr lines become
+    # NativeCommandError records and kill the script, so every sdkmanager /
+    # avdmanager call below runs under 'Continue' and stderr is flattened to
+    # plain text instead of ErrorRecord objects.
+
+    $prevEap = $ErrorActionPreference
+
+    $ErrorActionPreference = 'Continue'
+
     Write-Info "Accepting SDK licenses..."
 
     # A plain PowerShell pipe into sdkmanager.bat (a batch-file-launched Java
@@ -591,31 +707,34 @@ function Install-SdkExtras {
     $licenseAnswers = Join-Path $env:TEMP 'leaflens_sdk_license_answers.txt'
     (1..20 | ForEach-Object { 'y' }) -join "`n" | Set-Content -Path $licenseAnswers -Encoding ascii -NoNewline
 
-    $prevEap = $ErrorActionPreference
-
-    $ErrorActionPreference = 'Continue'
-
     cmd /c "sdkmanager --licenses < `"$licenseAnswers`"" *>$null
-
-    $ErrorActionPreference = $prevEap
 
     Remove-Item -Path $licenseAnswers -ErrorAction SilentlyContinue
 
 
 
-    $packagesToInstall = $SdkPackages
+    $packagesToInstall = Get-SdkPackages
 
     if ($script:IsArm64) {
         # Google has never published a windows-arm64 emulator binary (verified
         # against the official repository2-3.xml: linux/x64, macosx/x64,
         # macosx/aarch64, windows/x64 only — no windows/aarch64). Installing
         # the emulator package or its arm64 system image is pointless here.
-        $packagesToInstall = $packagesToInstall | Where-Object { $_ -ne 'emulator' -and $_ -ne $AvdTarget }
+        $packagesToInstall = $packagesToInstall | Where-Object { $_ -ne 'emulator' -and $_ -ne $script:AvdTarget }
+    }
+
+    # The on-device x86_64 image (and the emulator itself) needs an
+    # acceleration backend on Windows. No WHPX/Hyper-V → install Google's
+    # AEHD (Android Emulator Hypervisor Driver) package via sdkmanager.
+    if (-not $script:IsArm64) {
+
+        $packagesToInstall += 'extras;google;Android_Emulator_Hypervisor_Driver'
+
     }
 
     foreach ($pkg in $packagesToInstall) {
 
-        $installed = sdkmanager --list 2>&1
+        $installed = (sdkmanager --list 2>&1 | Get-NativeText) -join "`n"
 
         if ($installed -match "^\s*$pkg\s+.*Installed") {
 
@@ -627,9 +746,94 @@ function Install-SdkExtras {
 
         Write-Info "Installing SDK package: $pkg..."
 
-        sdkmanager $pkg 2>&1 | ForEach-Object { Write-Host "  $_" }
+        sdkmanager $pkg 2>&1 | Get-NativeText | Write-LogLine
 
         Write-Ok "Installed: $pkg"
+
+    }
+
+    Install-EmulatorHypervisorDriver
+
+    $ErrorActionPreference = $prevEap
+
+}
+
+
+
+# ── Emulator hypervisor driver ───────────────────────────────────────────────
+
+function Install-EmulatorHypervisorDriver {
+
+    # No emulator at all on Windows ARM64 — nothing to accelerate.
+    if ($script:IsArm64) { return }
+
+    try {
+
+        # HypervisorPresent true → Hyper-V / WHPX is active; the emulator will
+        # use it directly and installing AEHD would conflict with it.
+        if ((Get-CimInstance Win32_ComputerSystem -ErrorAction Stop).HypervisorPresent) {
+
+            Write-Ok "Hypervisor present (Hyper-V / WHPX) — no emulator hypervisor driver needed"
+
+            return
+
+        }
+
+    } catch {
+
+        Write-Warn "Could not detect hypervisor status: $_"
+
+    }
+
+    try {
+
+        $svc = Get-Service -Name 'aEhSvc' -ErrorAction SilentlyContinue
+
+        if ($svc -and $svc.Status -eq 'Running') {
+
+            Write-Ok "Android Emulator Hypervisor Driver already running (aEhSvc)"
+
+            return
+
+        }
+
+    } catch {
+
+        Write-Warn "Could not query hypervisor driver service: $_"
+
+    }
+
+    $drvBat = Join-Path $env:ANDROID_HOME 'extras\google\Android_Emulator_Hypervisor_Driver\silent_install.bat'
+
+    if (-not (Test-Path "$drvBat" -PathType Leaf)) {
+
+        Write-Warn "Emulator hypervisor driver not found under ANDROID_HOME — the emulator will require manual acceleration setup"
+
+        return
+
+    }
+
+    Write-Info "Installing Android Emulator Hypervisor Driver (a UAC prompt will appear)..."
+
+    try {
+
+        $p = Start-Process -FilePath $drvBat -Verb RunAs -Wait -PassThru
+
+        $svc = Get-Service -Name 'aEhSvc' -ErrorAction SilentlyContinue
+
+        if ($svc -and $svc.Status -eq 'Running') {
+
+            Write-Ok "Android Emulator Hypervisor Driver installed and running"
+
+        } else {
+
+            Write-Warn "Driver install exited with code $($p.ExitCode) but the service is not running. Run as admin manually: $drvBat"
+
+        }
+
+    } catch {
+
+        Write-Warn "Elevated driver install was cancelled or failed: $($_.Exception.Message)"
 
     }
 
@@ -649,11 +853,17 @@ function Create-Avd {
 
     }
 
-    $avdList = avdmanager list avd -c 2>&1
+    $prevEap = $ErrorActionPreference
+
+    $ErrorActionPreference = 'Continue'
+
+    $avdList = (avdmanager list avd -c 2>&1 | Get-NativeText) -join "`n"
 
     if ($avdList -match "^${AvdName}$") {
 
         Write-Ok "AVD '${AvdName}' already exists"
+
+        $ErrorActionPreference = $prevEap
 
         return
 
@@ -661,9 +871,11 @@ function Create-Avd {
 
     Write-Info "Creating AVD '${AvdName}' (requires system-images;android-36)..."
 
-    'no' | avdmanager create avd -n $AvdName -k $AvdTarget -d pixel_8 -f 2>&1 | ForEach-Object { Write-Host "  $_" }
+    'no' | avdmanager create avd -n $AvdName -k $script:AvdTarget -d pixel_8 -f 2>&1 | Get-NativeText | Write-LogLine
 
     Write-Ok "AVD '${AvdName}' created"
+
+    $ErrorActionPreference = $prevEap
 
 }
 
@@ -674,6 +886,10 @@ function Create-Avd {
 function Verify-Setup {
 
     $ok = $true
+
+    $prevEap = $ErrorActionPreference
+
+    $ErrorActionPreference = 'Continue'
 
 
 
@@ -689,7 +905,7 @@ function Verify-Setup {
 
     if (-not $script:IsArm64) {
 
-        $avdCheck = avdmanager list avd -c 2>&1
+        $avdCheck = (avdmanager list avd -c 2>&1 | Get-NativeText) -join "`n"
 
         if ($avdCheck -notmatch "^${AvdName}$") {
 
@@ -708,6 +924,8 @@ function Verify-Setup {
         Write-Ok "All checks passed."
 
     }
+
+    $ErrorActionPreference = $prevEap
 
 }
 
@@ -735,7 +953,9 @@ function Main {
 
     Install-ScoopIfMissing
 
-    Install-Mise
+Install-Mise
+
+    Ensure-MiseActivation
 
 
 

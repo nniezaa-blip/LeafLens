@@ -11,13 +11,21 @@ set -euo pipefail
 
 # ── Config ──────────────────────────────────────────────────────────────────
 AVD_NAME="pixel_8"
-AVD_TARGET="system-images;android-36;google_apis;arm64-v8a"
-SDK_PACKAGES=(
-  "platform-tools"
-  "emulator"
-  "${AVD_TARGET}"
-  "build-tools;36.1.0"
-)
+# Emulator guest image. x64 hosts run x86_64 with hardware acceleration;
+# IS_ARM64 detection below overrides this to arm64-v8a on ARM64 hosts.
+AVD_TARGET="system-images;android-36;google_apis;x86_64"
+SDK_PACKAGES() {
+  echo "platform-tools"
+  if [[ "$IS_WINDOWS" == "true" && "$IS_ARM64" != "true" ]]; then
+    # x86_64 emulation needs an acceleration backend on Windows; WHPX often
+    # isn't enabled, so also fetch Google's AEHD driver package.
+    echo "extras;google;Android_Emulator_Hypervisor_Driver"
+  fi
+  echo "emulator"
+  echo "${AVD_TARGET}"
+  echo "build-tools;36.1.0"
+  echo "platforms;android-36"
+}
 
 # ── Colors ──────────────────────────────────────────────────────────────────
 GREEN='\033[0;32m'; YELLOW='\033[1;33m'; RED='\033[0;31m'; CYAN='\033[0;36m'; NC='\033[0m'
@@ -35,6 +43,8 @@ case "$OS" in
 esac
 if [[ "$(uname -m)" == "aarch64" || "$(uname -m)" == "arm64" ]]; then
   IS_ARM64=true
+  # ARM64 hosts can't accelerate x86_64 guest images — use the native arm64-v8a image.
+  AVD_TARGET="system-images;android-36;google_apis;arm64-v8a"
 fi
 
 if [[ "$OS" != "Linux" && "$OS" != "Darwin" && "$IS_WINDOWS" != "true" ]]; then
@@ -291,7 +301,7 @@ install_sdk_extras() {
 
   yes | sdkmanager --licenses 2>/dev/null || true
 
-  for pkg in "${SDK_PACKAGES[@]}"; do
+  for pkg in $(SDK_PACKAGES); do
     if sdkmanager --list 2>/dev/null | grep -qE "^[[:space:]]*${pkg}[[:space:]]+.*Installed"; then
       log_ok "SDK package already installed: ${pkg}"
       continue
@@ -300,6 +310,42 @@ install_sdk_extras() {
     sdkmanager "$pkg"
     log_ok "Installed: ${pkg}"
   done
+
+  install_emulator_hypervisor_driver
+}
+
+# ── Install emulator hypervisor driver (Windows only) ────────────────────────
+install_emulator_hypervisor_driver() {
+  [[ "$IS_WINDOWS" == "true" ]] || return
+  [[ "$IS_ARM64" == "true" ]] && return
+
+  local drv_bat="${ANDROID_HOME}/extras/google/Android_Emulator_Hypervisor_Driver/silent_install.bat"
+  if [[ ! -f "$drv_bat" ]]; then
+    log_warn "Emulator hypervisor driver not found — emulator will need manual acceleration setup."
+    return
+  fi
+
+  if sc query aEhSvc >/dev/null 2>&1 && [[ "$(sc query aEhSvc | grep -c RUNNING)" -ge 1 ]]; then
+    log_ok "Android Emulator Hypervisor Driver already running (aEhSvc)"
+    return
+  fi
+
+  log_info "Installing Android Emulator Hypervisor Driver (a UAC prompt will appear)..."
+  if command -v powershell >/dev/null 2>&1; then
+    local winpath
+    winpath="$(echo "${drv_bat}" | sed 's|/|\\|g')"
+    if powershell -NoProfile -Command "Start-Process -FilePath '${winpath}' -Verb RunAs -Wait"; then
+      if sc query aEhSvc >/dev/null 2>&1 && [[ "$(sc query aEhSvc | grep -c RUNNING)" -ge 1 ]]; then
+        log_ok "Android Emulator Hypervisor Driver installed and running"
+      else
+        log_warn "Driver install ran but aEhSvc is not running. Run as admin manually: ${drv_bat}"
+      fi
+    else
+      log_warn "Elevated driver install was cancelled or failed. Run as admin manually: ${drv_bat}"
+    fi
+  else
+    log_warn "powershell not found — install the driver manually as admin: ${drv_bat}"
+  fi
 }
 
 # ── Create AVD ──────────────────────────────────────────────────────────────
