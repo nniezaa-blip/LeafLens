@@ -87,7 +87,7 @@ class ApiClient {
     }
     if (response.statusCode != 200 && response.statusCode != 201) {
       final failure = ApiFailure(response.statusCode, response.body);
-      // 5xx → full report (toast + Sentry), others → silent (handled by UI).
+      // 5xx → full report (toast + metrics), others → silent (handled by UI).
       if (response.statusCode >= 500) {
         ErrorHandler.handle(failure);
       } else {

@@ -1,28 +1,20 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
-
 import 'package:lextari/core/errors/failures.dart';
 import 'package:lextari/shared/notifications/notification_service.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 
-/// Centralised error handler implementing the three-tier logging system.
+/// Centralised error handler implementing the two-tier logging system.
 ///
 /// **Tier 1 — User-facing:** Calls [NotificationService] so the user sees
 /// a meaningful message.
 ///
-/// **Tier 2 — Logging:** Sends 5xx and network failures to Sentry so
-/// developers can investigate.
-///
-/// **Tier 3 — Metrics:** Counts every failure type in memory so the
+/// **Tier 2 — Metrics:** Counts every failure type in memory so the
 /// dashboard can report "18 login failures since app start" for the thesis.
 ///
 /// ## When to use which method
 ///
-/// | Method | Shows toast | Logs to Sentry | Counts | Use case |
-/// |--------|------------|---------------|--------|----------|
-/// | [handle] | Yes | Yes (5xx/network) | Yes | Unexpected/transient errors (server down, network lost) |
-/// | [handleSilent] | No | Yes (5xx/network) | Yes | Expected errors with dedicated UI (inline form error, session expiry → redirect) |
+/// | Method | Shows toast | Counts | Use case |
+/// |--------|------------|--------|----------|
+/// | [handle] | Yes | Yes | Unexpected errors (server down, network lost) |
+/// | [handleSilent] | No | Yes | Expected errors with their own UI |
 class ErrorHandler {
   ErrorHandler._();
 
@@ -37,7 +29,7 @@ class ErrorHandler {
 
   // ── Public API ─────────────────────────────────────────
 
-  /// Full report: show user notification + log + count.
+  /// Full report: show user notification + count.
   ///
   /// Use this for errors the user should see and act on, e.g.:
   /// - "Server is not responding"
@@ -45,11 +37,10 @@ class ErrorHandler {
   /// - "Something went wrong, try again"
   static void handle(Failure failure) {
     _count(failure);
-    _log(failure);
     _notifyUser(failure);
   }
 
-  /// Silent report: log + count only.
+  /// Silent report: count only.
   ///
   /// Use this for expected errors that have their own UI handling:
   /// - Invalid credentials → login page shows inline error
@@ -57,7 +48,6 @@ class ErrorHandler {
   /// - Validation errors → form fields show individual messages
   static void handleSilent(Failure failure) {
     _count(failure);
-    _log(failure);
   }
 
   // ── Metrics ────────────────────────────────────────────
@@ -65,22 +55,6 @@ class ErrorHandler {
   static void _count(Failure failure) {
     final key = failure.runtimeType.toString();
     _errorCounts[key] = (_errorCounts[key] ?? 0) + 1;
-  }
-
-  // ── Logging (Sentry) ───────────────────────────────────
-
-  static void _log(Failure failure) {
-    // Only report actionable failures — don't spam Sentry with
-    // expected business-logic errors.
-    final shouldReport = switch (failure) {
-      ApiFailure(statusCode: final code) when code >= 500 => true,
-      NetworkFailure() => true,
-      _ => false,
-    };
-
-    if (shouldReport && !kDebugMode) {
-      unawaited(Sentry.captureException(failure));
-    }
   }
 
   // ── User-facing notification ──────────────────────────

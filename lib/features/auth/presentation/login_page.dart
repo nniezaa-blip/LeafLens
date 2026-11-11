@@ -83,7 +83,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       // Inline: stay on form so user can retry immediately.
       setState(() => _formError = e.message);
     } on Failure catch (e) {
-      // All other failures go through the central handler (toast + Sentry).
+      // All other failures go through the central handler (toast + metrics).
       ErrorHandler.handle(e);
     } on Exception catch (e) {
       ErrorHandler.handle(UnknownFailure(e.toString()));

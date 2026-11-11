@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lextari/core/config/app_config.dart';
-import 'package:lextari/core/init/sentry_init.dart';
 import 'package:lextari/core/router/app_router.dart';
 import 'package:lextari/shared/notifications/notification_service.dart';
 
@@ -16,7 +15,6 @@ Future<void> initApp() async {
   _initErrorHandlers();
   // 2. Load `.env` so configuration is available below.
   await AppConfig.load();
-  await _initSentry();
   // 3. The session is restored by LextariApp once the provider scope exists.
   _initNotifications();
   await _initStorage();
@@ -33,9 +31,6 @@ void _initErrorHandlers() {
     return true;
   };
 }
-
-/// Initialises Sentry error tracking from build-time SENTRY_DSN.
-Future<void> _initSentry() => initSentry();
 
 /// Wires NotificationService to the root navigator key.
 void _initNotifications() {
