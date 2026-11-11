@@ -61,6 +61,12 @@ class AppConfig {
     const String.fromEnvironment('GOOGLE_SERVER_CLIENT_ID'),
   );
 
+  /// Google iOS OAuth client ID (required by google_sign_in on iOS).
+  static String get googleIosClientId => _value(
+    'GOOGLE_IOS_CLIENT_ID',
+    const String.fromEnvironment('GOOGLE_IOS_CLIENT_ID'),
+  );
+
   /// Lextari auth Worker base URL (no trailing slash).
   static String get authUrl =>
       _value('AUTH_URL', const String.fromEnvironment('AUTH_URL'));

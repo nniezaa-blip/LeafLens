@@ -11,12 +11,17 @@ import 'package:lextari/features/auth/data/auth_api.dart';
 class GoogleSignInService {
   /// Creates the service; serverClientId defaults to
   /// [AppConfig.googleServerClientId].
-  GoogleSignInService({String? serverClientId})
-    : _serverClientId = serverClientId ?? AppConfig.googleServerClientId;
+  GoogleSignInService({String? serverClientId, String? iosClientId})
+    : _serverClientId = serverClientId ?? AppConfig.googleServerClientId,
+      _iosClientId = iosClientId ?? AppConfig.googleIosClientId;
 
   final String _serverClientId;
-  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  final String _iosClientId;
   bool _initialized = false;
+
+  /// Lazily resolved so an unconfigured iOS build never touches the plugin
+  /// (google_sign_in_ios throws when GIDClientID is absent from Info.plist).
+  GoogleSignIn get _googleSignIn => GoogleSignIn.instance;
 
   /// Whether a server client id is configured.
   bool get isConfigured => _serverClientId.isNotEmpty;
@@ -28,9 +33,17 @@ class GoogleSignInService {
     if (!isConfigured) {
       throw const AuthException('google_not_configured');
     }
+    if (defaultTargetPlatform == TargetPlatform.iOS && _iosClientId.isEmpty) {
+      throw const AuthException('google_not_configured');
+    }
 
     if (!_initialized) {
-      await _googleSignIn.initialize(serverClientId: _serverClientId);
+      await _googleSignIn.initialize(
+        clientId: defaultTargetPlatform == TargetPlatform.iOS
+            ? _iosClientId
+            : null,
+        serverClientId: _serverClientId,
+      );
       _initialized = true;
     }
 
