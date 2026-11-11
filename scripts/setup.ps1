@@ -2,7 +2,7 @@
 
 .SYNOPSIS
 
-    LeafLens — Project Setup Script (Windows)
+    Lextari — Project Setup Script (Windows)
 
 .DESCRIPTION
 
@@ -380,7 +380,7 @@ function Ensure-LocalBinOnPath {
 
     $existing = Get-Content $profilePath -Raw -ErrorAction SilentlyContinue
 
-    $header = "# Added by LeafLens setup script"
+    $header = "# Added by Lextari setup script"
 
 
 
@@ -412,7 +412,7 @@ function Ensure-MiseActivation {
 
     $activate = @(
 
-        '# LeafLens: mise activation (flutter/java/gradle/pnpm on PATH)'
+        '# Lextari: mise activation (flutter/java/gradle/pnpm on PATH)'
 
         'if (Get-Command mise -ErrorAction SilentlyContinue) {'
 
@@ -436,7 +436,7 @@ function Ensure-MiseActivation {
 
     ) | Select-Object -Unique
 
-    $marker = 'LeafLens: mise activation'
+    $marker = 'Lextari: mise activation'
 
 
 
@@ -704,7 +704,7 @@ function Install-SdkExtras {
     # console app) silently drops everything past the first line of stdin —
     # only the first license ever gets accepted. Routing through cmd's native
     # file-based `<` redirection delivers every line reliably.
-    $licenseAnswers = Join-Path $env:TEMP 'leaflens_sdk_license_answers.txt'
+    $licenseAnswers = Join-Path $env:TEMP 'lextari_sdk_license_answers.txt'
     (1..20 | ForEach-Object { 'y' }) -join "`n" | Set-Content -Path $licenseAnswers -Encoding ascii -NoNewline
 
     cmd /c "sdkmanager --licenses < `"$licenseAnswers`"" *>$null
@@ -939,7 +939,7 @@ function Main {
 
     Write-Host "╔══════════════════════════════════════════════════╗" -ForegroundColor Green
 
-    Write-Host "║        LeafLens — Environment Setup              ║" -ForegroundColor Green
+    Write-Host "║        Lextari — Environment Setup              ║" -ForegroundColor Green
 
     Write-Host "╚══════════════════════════════════════════════════╝" -ForegroundColor Green
 
