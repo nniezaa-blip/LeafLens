@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:leaflens/core/theme/app_colors.dart';
+import 'package:lextari/core/theme/app_colors.dart';
 
 /// Toggle switch pill used in the dashboard action row.
 ///
@@ -44,8 +44,19 @@ class ActionSwitch extends StatelessWidget {
           children: [
             const SizedBox(width: 19),
             Icon(icon, size: 26, color: AppColors.offBlack),
-            const Spacer(),
-            _ToggleTrack(label: label, value: value),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                label,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                  color: AppColors.offBlack,
+                ),
+              ),
+            ),
+            _ToggleTrack(value: value),
             const SizedBox(width: 15),
           ],
         ),
@@ -59,9 +70,8 @@ class ActionSwitch extends StatelessWidget {
 //
 
 class _ToggleTrack extends StatelessWidget {
-  const _ToggleTrack({required this.label, required this.value});
+  const _ToggleTrack({required this.value});
 
-  final String label;
   final bool value;
 
   @override
@@ -74,36 +84,20 @@ class _ToggleTrack extends StatelessWidget {
         color: AppColors.switchTrack,
         borderRadius: BorderRadius.circular(25),
       ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Positioned(
-            left: 6,
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 12,
-                color: AppColors.white,
-              ),
+      child: AnimatedAlign(
+        duration: const Duration(milliseconds: 200),
+        alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6),
+          child: Container(
+            width: 20,
+            height: 20,
+            decoration: const BoxDecoration(
+              color: AppColors.white,
+              shape: BoxShape.circle,
             ),
           ),
-          AnimatedAlign(
-            duration: const Duration(milliseconds: 200),
-            alignment: value ? Alignment.centerRight : Alignment.centerLeft,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6),
-              child: Container(
-                width: 20,
-                height: 20,
-                decoration: const BoxDecoration(
-                  color: AppColors.white,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

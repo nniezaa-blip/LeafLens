@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:leaflens/features/dashboard/presentation/widgets/action_switch.dart';
+import 'package:lextari/features/dashboard/presentation/widgets/action_switch.dart';
 
 void main() {
   group('ActionSwitch', () {

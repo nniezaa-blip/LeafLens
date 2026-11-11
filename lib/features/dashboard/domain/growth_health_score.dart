@@ -1,5 +1,5 @@
-import 'package:leaflens/features/dashboard/domain/sensor_key.dart';
-import 'package:leaflens/features/dashboard/domain/sensor_reading.dart';
+import 'package:lextari/features/dashboard/domain/sensor_key.dart';
+import 'package:lextari/features/dashboard/domain/sensor_reading.dart';
 
 /// Threshold ranges for Growth Health Score computation.
 /// Defaults are for fragile indoor plants. User-configurable per species.

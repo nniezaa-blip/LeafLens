@@ -25,10 +25,10 @@ class AuthGuard {
     final path = state.matchedLocation;
     final authenticated = isLoggedIn || currentToken != null;
 
-    // Splash is only shown on cold start — resolve immediately.
-    if (path == '/splash') {
-      return authenticated ? '/dashboard' : '/login';
-    }
+    // Splash is the first screen on launch — leave it alone so it can
+    // display; the screen itself routes onward once its timer elapses
+    // (to /login, which this guard then resolves for signed-in users).
+    if (path == '/splash') return null;
 
     final isPublic = path == '/login' || path == '/signup';
 

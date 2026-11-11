@@ -8,13 +8,13 @@ import 'package:toastification/toastification.dart';
 ///
 /// Place this as the outermost widget in [MaterialApp.router]:
 /// ```dart
-/// return LeafLensNotificationOverlay(
+/// return LextariNotificationOverlay(
 ///   child: MaterialApp.router(...),
 /// );
 /// ```
-class LeafLensNotificationOverlay extends StatelessWidget {
-  /// Creates a [LeafLensNotificationOverlay] with the given [child].
-  const LeafLensNotificationOverlay({required this.child, super.key});
+class LextariNotificationOverlay extends StatelessWidget {
+  /// Creates a [LextariNotificationOverlay] with the given [child].
+  const LextariNotificationOverlay({required this.child, super.key});
 
   /// The app tree that renders below the toast overlay.
   final Widget child;

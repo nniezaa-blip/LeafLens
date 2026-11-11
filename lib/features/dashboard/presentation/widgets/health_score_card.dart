@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:leaflens/core/theme/app_colors.dart';
-import 'package:leaflens/features/dashboard/presentation/widgets/mini_gauge.dart';
+import 'package:lextari/core/theme/app_colors.dart';
+import 'package:lextari/features/dashboard/presentation/widgets/mini_gauge.dart';
 
 /// Overall health score card displayed at the bottom of the sensor list.
 ///
@@ -40,7 +40,7 @@ class HealthScoreCard extends StatelessWidget {
       child: Stack(
         children: [
           Positioned(
-            left: 0,
+            left: 8,
             top: 0,
             bottom: 0,
             child: Center(
@@ -52,6 +52,7 @@ class HealthScoreCard extends StatelessWidget {
           ),
           _InfoSection(
             statusText: statusText,
+            gaugeColor: gaugeColor,
             warningText: warningText,
           ),
         ],
@@ -65,15 +66,30 @@ class HealthScoreCard extends StatelessWidget {
 //
 
 class _InfoSection extends StatelessWidget {
-  const _InfoSection({required this.statusText, this.warningText});
+  const _InfoSection({
+    required this.statusText,
+    required this.gaugeColor,
+    this.warningText,
+  });
 
   final String statusText;
+  final Color gaugeColor;
   final String? warningText;
+
+  /// Returns [gaugeColor] with boosted saturation, full opacity, and a
+  /// slightly darker tone so the warning line stays legible against the card.
+  Color get _warningColor {
+    final hsl = HSLColor.fromColor(gaugeColor);
+    return hsl
+        .withSaturation((hsl.saturation + 0.25).clamp(0.0, 1.0))
+        .withLightness((hsl.lightness * 0.7).clamp(0.0, 1.0))
+        .toColor();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      left: 160,
+      left: 168,
       right: 16,
       top: 20,
       bottom: 20,
@@ -96,18 +112,18 @@ class _InfoSection extends StatelessWidget {
               fontWeight: FontWeight.w600,
               fontStyle: FontStyle.italic,
               fontSize: 16,
-              color: AppColors.offBlack,
+              color: AppColors.darkGrey,
             ),
           ),
           if (warningText != null) ...[
             const SizedBox(height: 8),
             Text(
               warningText!,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.w700,
                 fontStyle: FontStyle.italic,
                 fontSize: 16,
-                color: AppColors.warningText,
+                color: _warningColor,
               ),
             ),
           ],

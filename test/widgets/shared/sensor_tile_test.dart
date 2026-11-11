@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:leaflens/features/dashboard/domain/sensor_key.dart';
-import 'package:leaflens/features/dashboard/domain/sensor_reading.dart';
-import 'package:leaflens/shared/widgets/sensor_tile.dart';
+import 'package:lextari/features/dashboard/domain/sensor_key.dart';
+import 'package:lextari/features/dashboard/domain/sensor_reading.dart';
+import 'package:lextari/shared/widgets/sensor_tile.dart';
 
 void main() {
   group('SensorTile', () {

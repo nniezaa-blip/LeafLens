@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
-import 'package:leaflens/core/theme/app_colors.dart';
+import 'package:lextari/core/theme/app_colors.dart';
 import 'package:toastification/toastification.dart';
 
-/// LeafLens branded toast widget.
+/// Lextari branded toast widget.
 ///
 /// Passed as the builder to toastification.showCustom via
 /// NotificationService. Renders a white card with a 4px coloured
 /// left accent bar, icon, title + description, and a close button.
-class LeafLensToast extends StatelessWidget {
-  /// Creates a [LeafLensToast] with the given display properties.
-  const LeafLensToast({
+class LextariToast extends StatelessWidget {
+  /// Creates a [LextariToast] with the given display properties.
+  const LextariToast({
     required this.holder,
     required this.title,
     required this.type,

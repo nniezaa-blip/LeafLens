@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:leaflens/features/dashboard/presentation/widgets/sensor_card.dart';
+import 'package:lextari/features/dashboard/presentation/widgets/sensor_card.dart';
 
 void _noop() {}
 
@@ -128,6 +128,50 @@ void main() {
       );
 
       expect(find.byType(CustomPaint), findsAtLeast(1));
+    });
+
+    testWidgets('hides More link when onMoreTap is null', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: SensorCard(
+              sensorName: 'Water Level',
+              value: 45,
+              unit: 'cm',
+              unitIcon: Icons.waves,
+              statusText: 'Water level is low',
+              gaugeColor: Colors.orange,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('More'), findsNothing);
+    });
+
+    testWidgets('invokes onMoreTap when More is tapped', (tester) async {
+      var tapped = false;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SensorCard(
+              sensorName: 'Temperature',
+              value: 26,
+              unit: '°C',
+              unitIcon: Icons.thermostat,
+              statusText: 'Temperature is normal',
+              gaugeColor: Colors.green,
+              onMoreTap: () => tapped = true,
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('More'));
+      await tester.pump();
+
+      expect(tapped, isTrue);
     });
   });
 }

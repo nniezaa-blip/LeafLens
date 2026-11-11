@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:leaflens/features/dashboard/domain/growth_health_score.dart';
-import 'package:leaflens/features/dashboard/domain/sensor_key.dart';
-import 'package:leaflens/features/dashboard/domain/sensor_reading.dart';
+import 'package:lextari/features/dashboard/domain/growth_health_score.dart';
+import 'package:lextari/features/dashboard/domain/sensor_key.dart';
+import 'package:lextari/features/dashboard/domain/sensor_reading.dart';
 
 void main() {
   group('GrowthHealthScore.compute', () {

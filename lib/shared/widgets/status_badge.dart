@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:leaflens/features/dashboard/domain/growth_health_score.dart';
+import 'package:lextari/features/dashboard/domain/growth_health_score.dart';
 
 /// Small colored chip showing the health status label.
 class StatusBadge extends StatelessWidget {

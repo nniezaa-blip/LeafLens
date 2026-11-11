@@ -1,4 +1,4 @@
-import 'package:leaflens/core/config/app_config.dart';
+import 'package:lextari/core/config/app_config.dart';
 
 /// Single telemetry data point with staleness tracking.
 class SensorReading {
@@ -10,8 +10,12 @@ class SensorReading {
     required this.unit,
   });
 
-  /// Creates a [SensorReading] from a ThingsBoard JSON telemetry entry.
-  factory SensorReading.fromTbJson(Map<String, dynamic> json, String unit) {
+  /// Creates a [SensorReading] from a normalised telemetry entry
+  /// (`{ ts, value }`) as sent by the FastAPI gateway.
+  factory SensorReading.fromTelemetryJson(
+    Map<String, dynamic> json,
+    String unit,
+  ) {
     return SensorReading(
       value: double.parse(json['value'] as String),
       recordedAt: DateTime.fromMillisecondsSinceEpoch(json['ts'] as int),

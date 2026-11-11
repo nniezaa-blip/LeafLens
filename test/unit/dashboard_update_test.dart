@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leaflens/features/dashboard/domain/dashboard_update.dart';
+import 'package:lextari/features/dashboard/domain/dashboard_update.dart';
 
 void main() {
   group('DashboardUpdate', () {

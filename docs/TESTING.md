@@ -1,4 +1,4 @@
-# LeafLens Testing Guide
+# Lextari Testing Guide
 
 **98 active tests + 2 skipped = 100 total. All passing.**
 
@@ -56,7 +56,7 @@ test/
       app_button_test.dart                11 tests
       background_ellipse_test.dart         5 tests
       health_gauge_test.dart               6 tests
-      leaf_lens_logo_test.dart             1 test
+      lextari_logo_test.dart             1 test
       offline_banner_test.dart             2 tests
       sensor_error_boundary_test.dart      3 tests
       sensor_tile_test.dart                6 tests
@@ -82,7 +82,7 @@ For domain logic with zero Flutter imports. Fastest tests — milliseconds.
 
 ```dart
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leaflens/features/dashboard/domain/growth_health_score.dart';
+import 'package:lextari/features/dashboard/domain/growth_health_score.dart';
 
 void main() {
   group('GrowthHealthScore.compute', () {

@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-import 'package:leaflens/core/theme/app_colors.dart';
-import 'package:leaflens/core/theme/app_typography.dart';
-import 'package:leaflens/features/auth/data/leaf_lens_auth.dart';
-import 'package:leaflens/features/dashboard/presentation/widgets/action_switch.dart';
-import 'package:leaflens/features/dashboard/presentation/widgets/health_score_card.dart';
-import 'package:leaflens/features/dashboard/presentation/widgets/sensor_card.dart';
+import 'package:lextari/core/theme/app_colors.dart';
+import 'package:lextari/core/theme/app_typography.dart';
+import 'package:lextari/features/auth/data/lextari_auth.dart';
+import 'package:lextari/features/auth/data/user_profile_provider.dart';
+import 'package:lextari/features/auth/domain/user_profile.dart';
+import 'package:lextari/features/dashboard/presentation/widgets/action_switch.dart';
+import 'package:lextari/features/dashboard/presentation/widgets/health_score_card.dart';
+import 'package:lextari/features/dashboard/presentation/widgets/sensor_card.dart';
+import 'package:lextari/features/stats/presentation/trend_metric.dart';
+import 'package:lextari/features/stats/presentation/trend_metric_provider.dart';
+import 'package:lextari/shared/widgets/user_avatar.dart';
 
 /// Main dashboard screen showing live sensor readings, action toggles,
 /// and the overall Growth Health Score.
@@ -23,16 +29,24 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   bool _waterOn = false;
   bool _refillOn = false;
 
-  Future<void> _logout() => LeafLensAuth.signOut();
+  Future<void> _logout() => LextariAuth.signOut();
+
+  /// Deep-links to the 30-day trends tab with [metric] preselected.
+  void _openTrend(TrendMetric metric) {
+    ref.read(selectedTrendMetricProvider.notifier).select(metric);
+    context.go('/stats');
+  }
 
   @override
   Widget build(BuildContext context) {
+    final profile = ref.watch(currentUserProfileProvider);
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(22, 24, 22, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _GreetingHeader(onAvatarTap: _logout),
+          _GreetingHeader(profile: profile, onAvatarTap: _logout),
           const SizedBox(height: 16),
           _ActionSwitchesRow(
             mistOn: _mistOn,
@@ -62,27 +76,36 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   unitIcon: Icons.thermostat,
                   statusText: 'Temperature is normal',
                   gaugeColor: AppColors.gaugeGreen,
-                  onMoreTap: () {},
+                  onMoreTap: () => _openTrend(TrendMetric.temperature),
                 ),
                 const SizedBox(height: 12),
                 SensorCard(
                   sensorName: 'Humidity',
                   value: 64,
-                  unit: '%',
+                  unit: 'RH',
                   unitIcon: Icons.water_drop_outlined,
                   statusText: 'Perfect Environment',
                   gaugeColor: AppColors.gaugeGreen,
-                  onMoreTap: () {},
+                  onMoreTap: () => _openTrend(TrendMetric.humidity),
                 ),
                 const SizedBox(height: 12),
                 SensorCard(
                   sensorName: 'Soil Moisture',
                   value: 90,
                   unit: '%',
-                  unitIcon: Icons.water_drop,
+                  unitIcon: Icons.grass,
                   statusText: 'Saturated',
                   gaugeColor: AppColors.redAlert,
-                  onMoreTap: () {},
+                  onMoreTap: () => _openTrend(TrendMetric.moisture),
+                ),
+                const SizedBox(height: 12),
+                const SensorCard(
+                  sensorName: 'Water Level',
+                  value: 45,
+                  unit: 'cm',
+                  unitIcon: Icons.waves,
+                  statusText: 'Water level is low',
+                  gaugeColor: AppColors.gaugeOrange,
                 ),
               ],
             ),
@@ -98,15 +121,20 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 //
 
 class _GreetingHeader extends StatelessWidget {
-  const _GreetingHeader({required this.onAvatarTap});
+  const _GreetingHeader({required this.profile, required this.onAvatarTap});
 
+  final UserProfile profile;
   final VoidCallback onAvatarTap;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        _Avatar(onTap: onAvatarTap),
+        UserAvatar(
+          profile: profile,
+          fontSize: 32,
+          onTap: onAvatarTap,
+        ),
         const SizedBox(width: 16),
         Expanded(
           child: Column(
@@ -119,9 +147,9 @@ class _GreetingHeader extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 2),
-              const Text(
-                'Aishah Abdul Aziz',
-                style: TextStyle(
+              Text(
+                profile.name,
+                style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 18,
                   color: AppColors.offBlack,
@@ -140,37 +168,6 @@ class _GreetingHeader extends StatelessWidget {
     if (hour < 17) return 'Good Afternoon';
     if (hour < 21) return 'Good Evening';
     return 'Good Night';
-  }
-}
-
-class _Avatar extends StatelessWidget {
-  const _Avatar({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 52,
-        height: 51,
-        decoration: const BoxDecoration(
-          color: AppColors.mediumGreen,
-          shape: BoxShape.circle,
-        ),
-        child: const Center(
-          child: Text(
-            'A',
-            style: TextStyle(
-              fontWeight: FontWeight.w400,
-              fontSize: 32,
-              color: AppColors.white,
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }
 

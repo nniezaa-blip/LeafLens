@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:leaflens/shared/widgets/background_ellipse.dart';
+import 'package:lextari/shared/widgets/background_ellipse.dart';
 
 import '../../helpers/test_asset_bundle.dart';
 

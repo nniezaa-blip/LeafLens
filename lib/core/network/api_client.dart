@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-import 'package:leaflens/core/config/app_config.dart';
-import 'package:leaflens/core/errors/error_handler.dart';
-import 'package:leaflens/core/errors/failures.dart';
+import 'package:lextari/core/config/app_config.dart';
+import 'package:lextari/core/errors/error_handler.dart';
+import 'package:lextari/core/errors/failures.dart';
 
 /// HTTP client for FastAPI backend.
 ///

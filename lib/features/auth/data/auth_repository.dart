@@ -1,14 +1,14 @@
-import 'package:leaflens/core/errors/failures.dart';
-import 'package:leaflens/core/network/api_client.dart';
-import 'package:leaflens/features/auth/data/leaf_lens_auth.dart';
+import 'package:lextari/core/errors/failures.dart';
+import 'package:lextari/core/network/api_client.dart';
+import 'package:lextari/features/auth/data/lextari_auth.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 part 'auth_repository.g.dart';
 
-/// Repository for LeafLens user auth through LeafLensAuth.
+/// Repository for Lextari user auth through LextariAuth.
 ///
-/// The rest of the app calls this, not LeafLensAuth directly.
+/// The rest of the app calls this, not LextariAuth directly.
 class AuthRepository {
   /// Creates an [AuthRepository] backed by the given [ApiClient].
   AuthRepository(this._api);
@@ -18,7 +18,7 @@ class AuthRepository {
   /// Throws [AuthFailure] with a user-friendly message on failure.
   Future<void> login(String email, String password) async {
     try {
-      final token = await LeafLensAuth.signInWithPassword(
+      final token = await LextariAuth.signInWithPassword(
         email: email,
         password: password,
       );
@@ -34,7 +34,7 @@ class AuthRepository {
   /// Throws [AuthFailure] with a user-friendly message on failure.
   Future<void> register(String email, String password) async {
     try {
-      final token = await LeafLensAuth.signUp(
+      final token = await LextariAuth.signUp(
         email: email,
         password: password,
       );
@@ -48,7 +48,7 @@ class AuthRepository {
 
   /// Logout — clears the Supabase session and API token.
   Future<void> logout() async {
-    await LeafLensAuth.signOut();
+    await LextariAuth.signOut();
     _api.token = null;
   }
 
@@ -77,7 +77,7 @@ class AuthRepository {
   /// Supabase `AuthException.code` → user-friendly message.
   /// Codes taken from `gotrue`'s `ErrorCode` enum (the full list Supabase
   /// documents at the URL above); only codes reachable from
-  /// [LeafLensAuth.signInWithPassword]/[LeafLensAuth.signUp] are mapped.
+  /// [LextariAuth.signInWithPassword]/[LextariAuth.signUp] are mapped.
   static const _codeMessages = {
     'email_exists': 'This email is already registered.',
     'user_already_exists': 'This email is already registered.',

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:leaflens/core/router/auth_guard.dart';
-import 'package:leaflens/features/auth/data/leaf_lens_auth.dart';
-import 'package:leaflens/features/auth/presentation/login_page.dart';
-import 'package:leaflens/features/auth/presentation/signup_page.dart';
-import 'package:leaflens/features/dashboard/data/dashboard_providers.dart';
-import 'package:leaflens/features/dashboard/presentation/dashboard_screen.dart';
-import 'package:leaflens/features/dashboard/presentation/dashboard_shell.dart';
-import 'package:leaflens/features/settings/presentation/settings_screen.dart';
-import 'package:leaflens/features/splash/presentation/splash_screen.dart';
-import 'package:leaflens/features/stats/presentation/stats_screen.dart';
+import 'package:lextari/core/router/auth_guard.dart';
+import 'package:lextari/features/auth/data/lextari_auth.dart';
+import 'package:lextari/features/auth/presentation/login_page.dart';
+import 'package:lextari/features/auth/presentation/signup_page.dart';
+import 'package:lextari/features/dashboard/data/dashboard_providers.dart';
+import 'package:lextari/features/dashboard/presentation/dashboard_screen.dart';
+import 'package:lextari/features/dashboard/presentation/dashboard_shell.dart';
+import 'package:lextari/features/settings/presentation/settings_screen.dart';
+import 'package:lextari/features/splash/presentation/splash_screen.dart';
+import 'package:lextari/features/stats/presentation/stats_screen.dart';
 
-/// Centralised GoRouter configuration for LeafLens.
+/// Centralised GoRouter configuration for Lextari.
 ///
 /// Wraps all routing logic in one place. Screens never import GoRouter
 /// directly — they use GoRouterHelper extensions from context instead.
@@ -22,19 +22,36 @@ class AppRouter {
   /// Root navigator key shared with NotificationService.
   static final rootNavigatorKey = GlobalKey<NavigatorState>();
 
+  /// Rebuilds nothing — ticks whenever auth state changes so the single
+  /// [GoRouter] instance re-runs its redirect without being recreated.
+  /// Recreating the router would reset navigation to [appRouterInitialLocation]
+  /// and bounce users back to the splash after login.
+  static final _authRefreshProvider = Provider<ValueNotifier<int>>((ref) {
+    final ticks = ValueNotifier<int>(0);
+    ref
+      ..onDispose(ticks.dispose)
+      ..listen(authStateProvider, (_, _) => ticks.value++);
+    return ticks;
+  });
+
+  /// First screen shown when the app cold starts.
+  static const String appRouterInitialLocation = '/splash';
+
   /// GoRouter provider wired to auth state.
   static final provider = Provider<GoRouter>((ref) {
-    final auth = ref.watch(authStateProvider);
-
     return GoRouter(
       navigatorKey: rootNavigatorKey,
-      initialLocation: '/splash',
+      initialLocation: appRouterInitialLocation,
+      refreshListenable: ref.watch(_authRefreshProvider),
       redirect: (context, state) {
-        final isLoggedIn = auth.value != null;
+        // Read the latest session directly instead of capturing it at
+        // build time, so the router never needs to be recreated.
+        final streamToken = ref.read(authStateProvider).value;
+        final sessionToken = LextariAuth.accessToken;
         return AuthGuard.call(
           state: state,
-          isLoggedIn: isLoggedIn,
-          currentToken: LeafLensAuth.accessToken,
+          isLoggedIn: sessionToken != null || streamToken != null,
+          currentToken: sessionToken,
         );
       },
       routes: [

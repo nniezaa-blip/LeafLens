@@ -1,15 +1,15 @@
-# LeafLens Project Structure
+# Lextari Project Structure
 
 ## Architecture: Google MVVM
 
-LeafLens follows Google's official MVVM architecture pattern for Flutter apps.
+Lextari follows Google's official MVVM architecture pattern for Flutter apps.
 See: https://docs.flutter.dev/app-architecture/guide
 
 **Key layers:**
 - **Views** — `presentation/` screens (widgets, no business logic)
 - **ViewModels** — Riverpod providers in `data/` (state + logic)
 - **Repositories** — `data/` files (source of truth)
-- **Services** — External API wrappers (`leaf_lens_auth.dart`, `api_client.dart`)
+- **Services** — External API wrappers (`lextari_auth.dart`, `api_client.dart`)
 - **Core** — Shared infrastructure (config, errors, router, theme)
 - **Shared** — Cross-cutting concerns (notifications, reusable widgets)
 - **Domain** — Pure Dart models and algorithms (no Flutter imports)
@@ -89,7 +89,7 @@ Think of it as a house:
 ```
 lib/
 ├── main.dart                              # Entry point only: void main(), init calls, runApp()
-├── app.dart                               # LeafLensApp widget only: theme + router + overlay
+├── app.dart                               # LextariApp widget only: theme + router + overlay
 ├── core/
 │   ├── config/
 │   │   └── app_config.dart                # API URL, Supabase config, stale threshold, Hive box name
@@ -98,7 +98,7 @@ lib/
 │   │   └── error_handler.dart             # 3-tier: toast + Sentry + metrics
 │   ├── init/
 │   │   ├── sentry_init.dart               # initSentry() — Sentry error tracking setup
-│   │   └── leaf_lens_auth_init.dart       # initLeafLensAuth() — Supabase client setup
+│   │   └── lextari_auth_init.dart       # initLextariAuth() — Supabase client setup
 │   ├── network/
 │   │   ├── api_client.dart                # HTTP client → FastAPI
 │   │   └── ws_client.dart                 # WebSocket client → FastAPI
@@ -114,7 +114,7 @@ lib/
 │   │   ├── data/
 │   │   │   ├── auth_repository.dart       # AuthRepository + @riverpod providers (ViewModel)
 │   │   │   ├── auth_repository.g.dart     # Generated
-│   │   │   └── leaf_lens_auth.dart        # Service: Supabase auth wrapper (static API)
+│   │   │   └── lextari_auth.dart        # Service: Supabase auth wrapper (static API)
 │   │   └── presentation/
 │   │       ├── login_page.dart            # View: ConsumerStatefulWidget — Form + email/password
 │   │       └── signup_page.dart           # View: ConsumerStatefulWidget — 4 fields + terms
@@ -146,7 +146,7 @@ lib/
     │   ├── app_text_field.dart             # Themed outlined input with floating label
     │   ├── app_button.dart                 # 4 variants + loading state
     │   ├── background_ellipse.dart         # Configurable decorative SVG
-    │   ├── leaf_lens_logo.dart             # Brand leaf illustration SVG
+    │   ├── lextari_logo.dart             # Brand leaf illustration SVG
     │   ├── health_gauge.dart               # Circular gauge (CustomPaint)
     │   ├── sensor_tile.dart                # Sensor value + skeleton + stale indicator
     │   ├── status_badge.dart               # Colored chip
@@ -154,8 +154,8 @@ lib/
     │   └── offline_banner.dart             # Connectivity banner
     └── notifications/
         ├── notification_service.dart       # Toastification wrapper
-        ├── leaf_lens_notification_overlay.dart  # ToastificationWrapper root widget
-        ├── leaf_lens_toast.dart            # Custom branded toast widget
+        ├── lextari_notification_overlay.dart  # ToastificationWrapper root widget
+        ├── lextari_toast.dart            # Custom branded toast widget
         └── app_dialog.dart                # Modal dialog utility
 ```
 
@@ -168,7 +168,7 @@ lib/
 | View (screen) | `lib/features/{name}/presentation/` | `lib/features/auth/presentation/login_page.dart` |
 | ViewModel (providers) | `lib/features/{name}/data/` | `lib/features/dashboard/data/dashboard_providers.dart` |
 | Repository | `lib/features/{name}/data/` | `lib/features/auth/data/auth_repository.dart` |
-| Service | `lib/features/{name}/data/` | `lib/features/auth/data/leaf_lens_auth.dart` |
+| Service | `lib/features/{name}/data/` | `lib/features/auth/data/lextari_auth.dart` |
 | Domain model | `lib/features/{name}/domain/` | `lib/features/dashboard/domain/sensor_reading.dart` |
 | Pure algorithm | `lib/features/{name}/domain/` | `lib/features/dashboard/domain/growth_health_score.dart` |
 | Shared widget | `lib/shared/widgets/` | `lib/shared/widgets/app_button.dart` |
@@ -213,7 +213,7 @@ The MVVM layers in this project map to Flutter as follows:
 │                     Service Layer                           │
 │   External API wrappers (Supabase, FastAPI HTTP/WS)         │
 │   Stateless, static methods                                 │
-│   Examples: leaf_lens_auth.dart, api_client.dart            │
+│   Examples: lextari_auth.dart, api_client.dart            │
 └─────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────┐

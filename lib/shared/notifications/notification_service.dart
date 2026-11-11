@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import 'package:leaflens/shared/notifications/leaf_lens_toast.dart';
+import 'package:lextari/shared/notifications/lextari_toast.dart';
 import 'package:toastification/toastification.dart';
 
 /// Application-level notification service.
 ///
 /// Wraps toastification.showCustom so the rest of the app never imports
-/// toastification directly. Uses [LeafLensToast] for consistent branding.
+/// toastification directly. Uses [LextariToast] for consistent branding.
 ///
 /// Must be initialized once with [init] before any other method is called.
 class NotificationService {
@@ -38,7 +38,7 @@ class NotificationService {
       context: ctx,
       alignment: Alignment.topCenter,
       autoCloseDuration: autoCloseDuration,
-      builder: (context, holder) => LeafLensToast(
+      builder: (context, holder) => LextariToast(
         holder: holder,
         title: title,
         description: description,

@@ -1,9 +1,9 @@
-# LeafLens — Frontend Design System & Project Documentation
+# Lextari — Frontend Design System & Project Documentation
 
-> **Project:** LeafLens — AI-Powered Plant Health Monitoring  
+> **Project:** Lextari — AI-Powered Plant Health Monitoring  
 > **Stack:** Flutter (Material 3) + Riverpod (3.x) + GoRouter + freezed + json_serializable + flutter_svg  
 > **Codegen:** freezed, json_serializable, riverpod_generator via build_runner  
-> **Architecture:** ESP32 → ThingsBoard → FastAPI → Flutter (BLE-provisioned)  
+> **Architecture:** ESP32 → FavorIoT → FastAPI → Flutter (BLE-provisioned)  
 > **Last updated:** 28 May 2026
 
 ---
@@ -76,12 +76,12 @@ All tokenized in `lib/core/theme/app_typography.dart`. Per-screen custom styles 
 ```
 lib/
 ├── main.dart                           # Entry point — init Sentry/Supabase/Hive, runApp()
-├── app.dart                            # LeafLensApp — theme + router + notification overlay
+├── app.dart                            # LextariApp — theme + router + notification overlay
 ├── core/
 │   ├── config/app_config.dart           # Build-time config via --dart-define-from-file
 │   ├── init/
 │   │   ├── sentry_init.dart
-│   │   └── leaf_lens_auth_init.dart
+│   │   └── lextari_auth_init.dart
 │   ├── network/
 │   │   ├── api_client.dart              # HTTP client for FastAPI
 │   │   └── ws_client.dart               # WebSocket client
@@ -99,7 +99,7 @@ lib/
 │   ├── auth/
 │   │   ├── data/
 │   │   │   ├── auth_repository.dart     # AuthRepository + @riverpod providers
-│   │   │   └── leaf_lens_auth.dart      # Supabase auth wrapper
+│   │   │   └── lextari_auth.dart      # Supabase auth wrapper
 │   │   └── presentation/
 │   │       ├── login_page.dart
 │   │       └── signup_page.dart
@@ -130,7 +130,7 @@ lib/
     │   ├── app_text_field.dart
     │   ├── app_button.dart
     │   ├── background_ellipse.dart
-    │   ├── leaf_lens_logo.dart
+    │   ├── lextari_logo.dart
     │   ├── health_gauge.dart
     │   ├── sensor_tile.dart
     │   ├── status_badge.dart
@@ -138,7 +138,7 @@ lib/
     │   └── offline_banner.dart
     └── notifications/
         ├── notification_service.dart    # Toastification wrapper
-        ├── leaf_lens_notification_overlay.dart
+        ├── lextari_notification_overlay.dart
         └── app_dialog.dart
 ```
 
@@ -158,8 +158,8 @@ Generated files (`.g.dart` and `.freezed.dart`) are committed to the repo.
 |-------|---------|--------|
 | 1 | Green background | `Scaffold(backgroundColor: lightGreenBg)` |
 | 2 | Decorative SVG | `BackgroundEllipse()` — 90% × 90%, bottomRight |
-| 3 | Leaf logo | `LeafLensLogo()` |
-| 4 | "LEAFLENS" + tagline | `Text` (SemiBold 28px, white) |
+| 3 | Leaf logo | `LextariLogo()` |
+| 4 | "LEXTARI" + tagline | `Text` (SemiBold 28px, white) |
 | 5 | "Get Started" button | `FilledButton` with `StadiumBorder` |
 
 ### 3.2 Login Page
@@ -221,7 +221,7 @@ if (isLoggedIn && (path == '/login' || path == '/signup')) return '/dashboard';
 | File | Used By |
 |------|---------|
 | `assets/images/splash_ellipse.svg` | `BackgroundEllipse` (splash) |
-| `assets/images/splash_illustration.svg` | `LeafLensLogo` |
+| `assets/images/splash_illustration.svg` | `LextariLogo` |
 | `assets/images/google_logo.svg` | Google Sign-In buttons |
 
 ---
@@ -261,7 +261,7 @@ if (isLoggedIn && (path == '/login' || path == '/signup')) return '/dashboard';
 | `AppTextField` | hint, obscureText, controller, validator, keyboardType, icons | Normal, error |
 | `AppButton` | label, onPressed, variant (4), loading, icon, width | Normal, disabled, loading |
 | `BackgroundEllipse` | assetPath, widthFactor, heightFactor, alignment, fit | — |
-| `LeafLensLogo` | — | SVG render |
+| `LextariLogo` | — | SVG render |
 
 ### Dashboard Widgets (in `features/dashboard/presentation/widgets/`)
 

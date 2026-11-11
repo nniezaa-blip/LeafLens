@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leaflens/features/dashboard/domain/water_system_state.dart';
+import 'package:lextari/features/dashboard/domain/water_system_state.dart';
 
 void main() {
   group('WaterSystemState', () {

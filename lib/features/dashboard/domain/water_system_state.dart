@@ -1,8 +1,8 @@
 /// Read-only view of the autonomous water system state.
 ///
-/// ESP32 #2 publishes water_level telemetry and sets shared
-/// attributes (refill_active, safety_lockout) that Flutter reads
-/// via ThingsBoard attribute subscription.
+/// ESP32 #2 publishes water_level telemetry plus actuator flags
+/// (refill_active, safety_lockout) to FavorIoT. FastAPI tracks the
+/// latest values and streams them to Flutter.
 class WaterSystemState {
   /// Creates a [WaterSystemState] snapshot.
   const WaterSystemState({

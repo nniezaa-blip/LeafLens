@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leaflens/shared/notifications/leaf_lens_toast.dart';
+import 'package:lextari/shared/notifications/lextari_toast.dart';
 import 'package:toastification/toastification.dart';
 
 void main() {
-  group('LeafLensToast', () {
-    LeafLensToast buildToast({
+  group('LextariToast', () {
+    LextariToast buildToast({
       String title = 'Test Title',
       String? description,
       ToastificationType type = ToastificationType.info,
@@ -16,7 +16,7 @@ void main() {
         builder: (context, holder) => const SizedBox(),
         alignment: Alignment.topCenter,
       );
-      return LeafLensToast(
+      return LextariToast(
         holder: holder,
         title: title,
         description: description,

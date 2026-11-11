@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:leaflens/core/router/auth_guard.dart';
+import 'package:lextari/core/router/auth_guard.dart';
 
 /// Builds a minimal GoRouterState for testing.
 ///
@@ -32,30 +32,30 @@ GoRouterState _state(String location) {
 
 void main() {
   group('AuthGuard', () {
-    group('splash redirect', () {
-      test('redirects to /login when unauthenticated', () {
+    group('splash', () {
+      test('is never redirected when unauthenticated', () {
         final result = AuthGuard.call(
           state: _state('/splash'),
           isLoggedIn: false,
         );
-        expect(result, '/login');
+        expect(result, isNull);
       });
 
-      test('redirects to /dashboard when authenticated via stream', () {
+      test('is never redirected when authenticated via stream', () {
         final result = AuthGuard.call(
           state: _state('/splash'),
           isLoggedIn: true,
         );
-        expect(result, '/dashboard');
+        expect(result, isNull);
       });
 
-      test('redirects to /dashboard when authenticated via token', () {
+      test('is never redirected when authenticated via token', () {
         final result = AuthGuard.call(
           state: _state('/splash'),
           isLoggedIn: false,
           currentToken: 'some-token',
         );
-        expect(result, '/dashboard');
+        expect(result, isNull);
       });
     });
 

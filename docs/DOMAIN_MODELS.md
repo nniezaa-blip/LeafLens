@@ -1,4 +1,4 @@
-# LeafLens Domain Models
+# Lextari Domain Models
 
 All domain types in `lib/features/dashboard/domain/` and `lib/features/auth/domain/`.
 
@@ -17,14 +17,14 @@ enum SensorKey {
 }
 ```
 
-| Value | `tbKey` | `unit` | Source |
-|-------|---------|--------|--------|
+| Value | `telemetryKey` | `unit` | Source |
+|-------|----------------|--------|--------|
 | `soilMoisture` | `soil_moisture` | `%` | ESP32 #1 |
 | `temperature` | `temperature` | `°C` | ESP32 #1 |
 | `humidity` | `humidity` | `%` | ESP32 #1 |
 | `waterLevel` | `water_level` | `%` | ESP32 #2 |
 
-Static method `SensorKey.fromTbKey(String key)` resolves a ThingsBoard telemetry key to the enum value.
+Static method `SensorKey.fromTelemetryKey(String key)` resolves a FavorIoT telemetry key to the enum value.
 
 ---
 
@@ -47,10 +47,11 @@ class SensorReading {
 ### Factory
 
 ```dart
-factory SensorReading.fromTbJson(Map<String, dynamic> json, String unit)
+factory SensorReading.fromTelemetryJson(Map<String, dynamic> json, String unit)
 ```
 
-Parses ThingsBoard telemetry format `{ ts: 1234567890, value: "28.5" }`.
+Parses the normalised telemetry format `{ ts: 1234567890, value: "28.5" }`
+produced by the FastAPI gateway from FavorIoT streams.
 
 ### Staleness
 
@@ -218,4 +219,6 @@ class WaterSystemState {
 }
 ```
 
-Maps to ThingsBoard shared attributes `pump_active`, `mist_active`, `refill_active`, `safety_lockout`.
+Reflects the actuator flags `pump_active`, `mist_active`, `refill_active`,
+`safety_lockout`. FavorIoT has no shared attributes, so FastAPI tracks the
+latest values in `device_state` and streams them to Flutter.

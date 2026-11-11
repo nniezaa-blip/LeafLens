@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Consistent text field for LeafLens forms.
+/// Consistent text field for Lextari forms.
 /// Uses outlined border with floating label.
 class AppTextField extends StatelessWidget {
   /// Creates an [AppTextField] with the given [hint] and optional styling.

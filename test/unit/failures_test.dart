@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leaflens/core/errors/failures.dart';
+import 'package:lextari/core/errors/failures.dart';
 
 void main() {
   group('Failure classes', () {

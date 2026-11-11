@@ -6,8 +6,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 /// imports a specific auth SDK directly.
 ///
 /// Must be initialized once with [init] before any other method is called.
-class LeafLensAuth {
-  LeafLensAuth._();
+class LextariAuth {
+  LextariAuth._();
 
   /// Initialise with the provider's [url] and [publishableKey].
   /// Call once from main after WidgetsFlutterBinding.ensureInitialized.
@@ -53,6 +53,15 @@ class LeafLensAuth {
   }
 
   // ── Session ─────────────────────────────────────────────
+
+  /// The signed-in user, or null when signed out / not initialised.
+  static User? get currentUser {
+    try {
+      return _client.auth.currentUser;
+    } on Object {
+      return null;
+    }
+  }
 
   /// Current access token, or null if not logged in.
   static String? get accessToken => _client.auth.currentSession?.accessToken;

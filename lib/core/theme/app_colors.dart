@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// LEAFLENS Design System — Colors
+/// LEXTARI Design System — Colors
 /// Extracted from Figma: figma.com/design/RlSmZaAAWSPq09kAFXUcmU
 class AppColors {
   AppColors._();

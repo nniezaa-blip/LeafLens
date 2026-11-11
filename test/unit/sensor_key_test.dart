@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leaflens/features/dashboard/domain/sensor_key.dart';
+import 'package:lextari/features/dashboard/domain/sensor_key.dart';
 
 void main() {
   group('SensorKey', () {
@@ -7,46 +7,58 @@ void main() {
       expect(SensorKey.values.length, 4);
     });
 
-    test('soilMoisture has correct tbKey and unit', () {
-      expect(SensorKey.soilMoisture.tbKey, 'soil_moisture');
+    test('soilMoisture has correct telemetryKey and unit', () {
+      expect(SensorKey.soilMoisture.telemetryKey, 'soil_moisture');
       expect(SensorKey.soilMoisture.unit, '%');
     });
 
-    test('temperature has correct tbKey and unit', () {
-      expect(SensorKey.temperature.tbKey, 'temperature');
+    test('temperature has correct telemetryKey and unit', () {
+      expect(SensorKey.temperature.telemetryKey, 'temperature');
       expect(SensorKey.temperature.unit, '°C');
     });
 
-    test('humidity has correct tbKey and unit', () {
-      expect(SensorKey.humidity.tbKey, 'humidity');
+    test('humidity has correct telemetryKey and unit', () {
+      expect(SensorKey.humidity.telemetryKey, 'humidity');
       expect(SensorKey.humidity.unit, '%');
     });
 
-    test('waterLevel has correct tbKey and unit', () {
-      expect(SensorKey.waterLevel.tbKey, 'water_level');
+    test('waterLevel has correct telemetryKey and unit', () {
+      expect(SensorKey.waterLevel.telemetryKey, 'water_level');
       expect(SensorKey.waterLevel.unit, '%');
     });
 
-    group('fromTbKey', () {
+    group('fromTelemetryKey', () {
       test('resolves soil_moisture', () {
-        expect(SensorKey.fromTbKey('soil_moisture'), SensorKey.soilMoisture);
+        expect(
+          SensorKey.fromTelemetryKey('soil_moisture'),
+          SensorKey.soilMoisture,
+        );
       });
 
       test('resolves temperature', () {
-        expect(SensorKey.fromTbKey('temperature'), SensorKey.temperature);
+        expect(
+          SensorKey.fromTelemetryKey('temperature'),
+          SensorKey.temperature,
+        );
       });
 
       test('resolves humidity', () {
-        expect(SensorKey.fromTbKey('humidity'), SensorKey.humidity);
+        expect(
+          SensorKey.fromTelemetryKey('humidity'),
+          SensorKey.humidity,
+        );
       });
 
       test('resolves water_level', () {
-        expect(SensorKey.fromTbKey('water_level'), SensorKey.waterLevel);
+        expect(
+          SensorKey.fromTelemetryKey('water_level'),
+          SensorKey.waterLevel,
+        );
       });
 
       test('throws StateError for unknown key', () {
         expect(
-          () => SensorKey.fromTbKey('unknown'),
+          () => SensorKey.fromTelemetryKey('unknown'),
           throwsA(isA<StateError>()),
         );
       });

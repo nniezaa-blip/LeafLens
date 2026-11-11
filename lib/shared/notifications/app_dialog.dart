@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'package:leaflens/core/theme/app_colors.dart';
+import 'package:lextari/core/theme/app_colors.dart';
 
-/// Standardised LeafLens modal dialog.
+/// Standardised Lextari modal dialog.
 ///
 /// Use this instead of raw [AlertDialog] to ensure consistent theming,
 /// typography, and button placement across the app.

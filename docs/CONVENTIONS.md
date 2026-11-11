@@ -1,4 +1,4 @@
-# LeafLens Coding Conventions
+# Lextari Coding Conventions
 
 ---
 
@@ -72,12 +72,12 @@ Comments explain **WHY**, not **WHAT**. The code already says what it does.
 
 ```dart
 // GOOD — explains non-obvious intent
-// 504 = device offline, command queued by TB. Not an error.
+// 504 = device offline, command queued. Not an error.
 if (response.statusCode == 504) return {'queued': true};
 
 // BAD — restating what the code does
 // If the response status code is 504, it means the device is offline
-// and the command has been queued by ThingsBoard.
+// and the command has been queued.
 ```
 
 Rules:
@@ -90,7 +90,7 @@ Rules:
 
 1. Dart/Flutter SDK (`dart:convert`, `package:flutter/...`)
 2. Third-party (`package:flutter_riverpod/...`, `package:go_router/...`)
-3. Project (`package:leaflens/...`), grouped by feature
+3. Project (`package:lextari/...`), grouped by feature
 
 Blank line between groups.
 

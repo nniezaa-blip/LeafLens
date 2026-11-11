@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-/// LeafLens brand logo — used on splash, login, and app bar.
-class LeafLensLogo extends StatelessWidget {
+/// Lextari brand logo — used on splash, login, and app bar.
+class LextariLogo extends StatelessWidget {
   // final double width;
   // final double height;
 
-  /// Creates a [LeafLensLogo] widget.
-  const LeafLensLogo({
+  /// Creates a [LextariLogo] widget.
+  const LextariLogo({
     super.key,
     // this.width = 156,
     // this.height = 202,

@@ -1,28 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leaflens/shared/notifications/leaf_lens_notification_overlay.dart';
+import 'package:lextari/shared/notifications/lextari_notification_overlay.dart';
 import 'package:toastification/toastification.dart';
 
 void main() {
-  group('LeafLensNotificationOverlay', () {
+  group('LextariNotificationOverlay', () {
     testWidgets('renders child widget', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: LeafLensNotificationOverlay(
+          home: LextariNotificationOverlay(
             child: Scaffold(
-              body: Text('Hello LeafLens'),
+              body: Text('Hello Lextari'),
             ),
           ),
         ),
       );
 
-      expect(find.text('Hello LeafLens'), findsOneWidget);
+      expect(find.text('Hello Lextari'), findsOneWidget);
     });
 
     testWidgets('wraps child with ToastificationWrapper', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: LeafLensNotificationOverlay(
+          home: LextariNotificationOverlay(
             child: Scaffold(
               body: Text('Content'),
             ),
@@ -36,7 +36,7 @@ void main() {
     testWidgets('child is inside ToastificationWrapper', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: LeafLensNotificationOverlay(
+          home: LextariNotificationOverlay(
             child: Scaffold(
               body: Text('Nested'),
             ),

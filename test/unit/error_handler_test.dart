@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leaflens/core/errors/error_handler.dart';
-import 'package:leaflens/core/errors/failures.dart';
+import 'package:lextari/core/errors/error_handler.dart';
+import 'package:lextari/core/errors/failures.dart';
 
 void main() {
   // ErrorHandler._errorCounts is private and static — no way to reset

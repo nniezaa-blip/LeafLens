@@ -1,4 +1,4 @@
-# LeafLens Widget Library
+# Lextari Widget Library
 
 Shared widgets in `lib/shared/widgets/` and dashboard-specific widgets in `lib/features/dashboard/presentation/widgets/`.
 
@@ -72,12 +72,12 @@ Must be placed **without** `SafeArea` — decorative elements need to bleed to s
 
 ---
 
-### LeafLensLogo
+### LextariLogo
 
 Brand logo — leaf illustration SVG.
 
 ```dart
-const LeafLensLogo()
+const LextariLogo()
 ```
 
 Renders `assets/images/splash_illustration.svg` at natural size.

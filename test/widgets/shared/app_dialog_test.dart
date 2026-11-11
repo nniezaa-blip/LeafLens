@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leaflens/shared/notifications/app_dialog.dart';
+import 'package:lextari/shared/notifications/app_dialog.dart';
 
 void main() {
   group('showAppDialog', () {

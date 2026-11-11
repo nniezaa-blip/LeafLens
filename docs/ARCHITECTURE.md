@@ -1,30 +1,31 @@
-# LeafLens Architecture
+# Lextari Architecture
 
-> **System:** LeafLens — AI-Powered Plant Health Monitoring  
+> **System:** Lextari — AI-Powered Plant Health Monitoring  
+> **Cloud IoT platform:** FavorIoT  
 > **Thesis:** Available on request
 
 ---
 
 ## Flutter Architecture (MVVM)
 
-LeafLens follows Google's recommended [MVVM architecture pattern](https://docs.flutter.dev/app-architecture/guide). The app is organized into feature modules with a clear separation of concerns: **Views** (Flutter widgets) → **ViewModels** (Riverpod providers) → **Repositories** → **Services**. The domain layer is omitted for LeafLens's scope — domain logic lives directly in providers.
+Lextari follows Google's recommended [MVVM architecture pattern](https://docs.flutter.dev/app-architecture/guide). The app is organized into feature modules with a clear separation of concerns: **Views** (Flutter widgets) → **ViewModels** (Riverpod providers) → **Repositories** → **Services**. The domain layer is omitted for Lextari's scope — domain logic lives directly in providers.
 
 ### Directory Structure
 
 ```
 lib/
 ├── main.dart                              # Entry point only
-├── app.dart                               # LeafLensApp widget only
+├── app.dart                               # LextariApp widget only
 ├── core/
 │   ├── config/app_config.dart
 │   ├── errors/failures.dart, error_handler.dart
-│   ├── init/sentry_init.dart, leaf_lens_auth_init.dart
+│   ├── init/sentry_init.dart, lextari_auth_init.dart
 │   ├── network/api_client.dart, ws_client.dart
 │   ├── router/app_router.dart, auth_guard.dart
 │   └── theme/app_theme.dart, app_colors.dart, app_typography.dart
 ├── features/
 │   ├── auth/
-│   │   ├── data/auth_repository.dart, leaf_lens_auth.dart
+│   │   ├── data/auth_repository.dart, lextari_auth.dart
 │   │   └── presentation/login_page.dart, signup_page.dart
 │   ├── dashboard/
 │   │   ├── data/dashboard_providers.dart
@@ -32,8 +33,8 @@ lib/
 │   │   └── presentation/dashboard_screen.dart
 │   └── splash/presentation/splash_screen.dart
 └── shared/
-    ├── widgets/app_text_field.dart, app_button.dart, background_ellipse.dart, leaf_lens_logo.dart, health_gauge.dart, sensor_tile.dart, status_badge.dart, sensor_error_boundary.dart, offline_banner.dart
-    └── notifications/notification_service.dart, leaf_lens_notification_overlay.dart, leaf_lens_toast.dart, app_dialog.dart
+    ├── widgets/app_text_field.dart, app_button.dart, background_ellipse.dart, lextari_logo.dart, health_gauge.dart, sensor_tile.dart, status_badge.dart, sensor_error_boundary.dart, offline_banner.dart
+    └── notifications/notification_service.dart, lextari_notification_overlay.dart, lextari_toast.dart, app_dialog.dart
 ```
 
 ### Key Principles
@@ -41,81 +42,115 @@ lib/
 - **Feature-first organization:** Each feature (`auth`, `dashboard`, `splash`) contains its own `data/`, `domain/`, and `presentation/` layers.
 - **Core is shared infrastructure:** `core/` holds config, error handling, networking, routing, and theming used across all features.
 - **Shared is reusable UI:** `shared/` contains widgets and notification utilities that multiple features depend on.
-- **main.dart is minimal:** Only bootstraps the app. `app.dart` owns the `LeafLensApp` widget. Feature screens live in `features/*/presentation/`.
+- **main.dart is minimal:** Only bootstraps the app. `app.dart` owns the `LextariApp` widget. Feature screens live in `features/*/presentation/`.
 - **Screens folder eliminated:** No top-level `screens/` directory. Each screen belongs to its feature module.
 
-## Device Provisioning (BLE Onboarding)
+## IoT Platform (FavorIoT)
 
-The ESP32 ships with base firmware broadcasting a BLE signal. No static IP, no hardcoded Wi-Fi. The user never sees a ThingsBoard token, Docker port, or admin credential — FastAPI handles all of that server-side.
+Lextari uses **FavorIoT** as the cloud IoT middleware: device management, telemetry ingestion (REST / MQTT / CoAP), scalable storage, dashboards, and **RPC (downlink)** for actuator commands.
 
 ```
-┌─────────────┐   (1) BLE: Wi-Fi creds + user_id   ┌─────────────┐
-│   Flutter   │ ────────────────────────────────→   │    ESP32    │
-│     App     │                                     │  (base FW)  │
-└─────────────┘                                     └──────┬──────┘
-                                                           │ (2) connects to Wi-Fi
-                                           (3) POST /api/v1/devices/register
-                                               { mac_address, user_id, device_name }
-                                                           │
-                                                           ▼
-                                                   ┌─────────────┐
-                                                   │   FastAPI   │ →(4a) POST /api/device → ThingsBoard
-                                                   │   Backend   │ ←(4b) GET /api/device/{id}/credentials
-                                                   │             │   saves user_id ↔ device_id to PostgreSQL
-                                                   └──────┬──────┘
-                                                           │ (5) HTTP response: { thingsboard_token }
-                                                           ▼
-                                                   ┌─────────────┐
-                                                   │    ESP32    │ saves token to flash (Preferences.h)
-                                                   └──────┬──────┘
-                                                           │ (6) MQTT with token
-                                                           ▼
-                                                   ┌─────────────┐
-                                                   │ ThingsBoard │ receives telemetry stream
-                                                   └─────────────┘
+┌─────────────┐   MQTT: {token}/v2/streams   ┌─────────────┐
+│   ESP32     │ ───────────────────────────→ │  FavorIoT   │
+│  (2 units)  │ ←─── MQTT: {token}/v2/rpc ── │   Platform  │
+└─────────────┘                              └──────┬──────┘
+                                                    │ REST (apikey header)
+                                                    ▼
+                                             ┌─────────────┐
+                                             │   FastAPI   │ ──→ PostgreSQL
+                                             │   Backend   │
+                                             └──────┬──────┘
+                                                    │ REST / WS
+                                                    ▼
+                                             ┌─────────────┐
+                                             │   Flutter   │
+                                             │     App     │
+                                             └─────────────┘
 ```
 
-**Token ownership:** ThingsBoard auto-generates the device access token when the device is created (step 4a). FastAPI retrieves it via a second call (step 4b) and forwards it to ESP32. FastAPI never generates tokens — it only retrieves what ThingsBoard created.
+**Hard rule:** Flutter **never** talks to FavorIoT directly. FastAPI is the sole gateway and holds the account-wide **FavorIoT API key** server-side. Flutter authenticates via Supabase and FastAPI proxies FavorIoT data.
 
-**No TB Customers needed:** Since Flutter never talks to ThingsBoard directly, there is no need to create a ThingsBoard Customer per app user. Devices live under the tenant. FastAPI owns the tenant admin JWT server-side and maps `user_id → tb_device_id` in PostgreSQL.
+### Credentials
+
+| Credential | Scope | Held by | Used as |
+|-----------|-------|---------|---------|
+| **FavorIoT API key** | Whole account | FastAPI (server env `FAVORIOT_API_KEY`) | `apikey:` HTTP header |
+| **Device access token** | One device | ESP32 flash | MQTT username + password |
+| **Supabase JWT** | One app user | Flutter → FastAPI | `Authorization: Bearer` |
+
+FavorIoT's API key is account-wide, so it is the highest-value secret in the
+system. It must never be shipped in the app or sent to a device.
+
+---
+
+## Device Provisioning
+
+Devices are **pre-registered in the FavorIoT console** by an admin before they
+reach a user. That yields a `device_developer_id` (e.g. `lextari-env@plantuser`)
+and a device **access token**. The app then links the device to a user and
+delivers Wi-Fi + credentials over BLE.
+
+```
+Admin (one-time, FavorIoT console)
+  └─ Create device → device_developer_id + device access token
+
+User onboarding
+  1. Flutter ──POST /api/v1/devices/link──→ FastAPI   (user JWT)
+                  { device_developer_id, device_name }
+  2. FastAPI  ──GET /v2/devices/{id}──→ FavorIoT      (verify it exists)
+  3. FastAPI  ──INSERT──→ PostgreSQL  (user_id ↔ platform_device_id)
+  4. Flutter  ──BLE──→ ESP32   Wi-Fi creds + device_developer_id + access token
+  5. ESP32    ──Wi-Fi──→ Home router
+  6. ESP32    ──MQTT {token}/v2/streams──→ FavorIoT   (telemetry begins)
+```
 
 ### Step by Step
 
 | Step | From | To | Data | Protocol |
 |------|------|----|------|----------|
-| 1 | Flutter app | ESP32 | Wi-Fi SSID + password, user_id | BLE |
-| 2 | ESP32 | Home router | Wi-Fi connection | Wi-Fi |
-| 3 | ESP32 | FastAPI | `{ mac_address, user_id, device_name }` | HTTP POST |
-| 4a | FastAPI | ThingsBoard | Create device | REST API |
-| 4b | FastAPI | ThingsBoard | GET device credentials (token) | REST API |
-| 4c | FastAPI | PostgreSQL | Save `user_id ↔ tb_device_id` | SQL |
-| 5 | FastAPI | ESP32 | `{ thingsboard_token }` | HTTP response |
-| 6 | ESP32 | ThingsBoard | Telemetry stream | MQTT |
+| 0 | Admin | FavorIoT | Create device, capture credentials | Console |
+| 1 | Flutter | FastAPI | `{ device_developer_id, device_name }` + user JWT | HTTP POST |
+| 2 | FastAPI | FavorIoT | Verify device exists | REST (apikey) |
+| 3 | FastAPI | PostgreSQL | Save `user_id ↔ platform_device_id` | SQL |
+| 4 | Flutter | ESP32 | Wi-Fi SSID + password, `device_developer_id`, access token | BLE |
+| 5 | ESP32 | Home router | Wi-Fi connection | Wi-Fi |
+| 6 | ESP32 | FavorIoT | Publish telemetry to `{token}/v2/streams` | MQTT |
 
-**Why this works anywhere:** ESP32 makes an outbound connection to your public ThingsBoard server. No port forwarding. Works on 4G/5G, any network.
+**Why this works anywhere:** the ESP32 makes an outbound MQTT connection to
+FavorIoT's public broker. No port forwarding. Works on 4G/5G, any network.
+
+**Why admin pre-registration:** FavorIoT's device access token is generated and
+viewed in the console (there is no documented server-side endpoint to mint one
+during a request), so provisioning is split: admin creates the device once,
+the app links and configures it.
 
 ---
 
 ## Steady State Data Flow
 
 ```
-ESP32 ──MQTT──→ ThingsBoard ←──REST/WS──→ FastAPI ──REST/WS──→ Flutter
+ESP32 ──MQTT──→ FavorIoT ←──REST (apikey)──→ FastAPI ──REST/WS──→ Flutter
+FastAPI ──REST /v2/rpc──→ FavorIoT ──MQTT {token}/v2/rpc──→ ESP32
 ```
 
-Flutter never talks to ThingsBoard directly. All TB credentials stay on the FastAPI server. Flutter authenticates via Supabase (user accounts) and FastAPI proxies ThingsBoard data using a tenant admin JWT.
-
 When Flutter requests data:
-1. FastAPI verifies the Supabase JWT → extracts `user_id`
-2. PostgreSQL lookup → gets `tb_device_id`
-3. FastAPI queries ThingsBoard using tenant admin JWT
-4. Returns data to Flutter
+1. FastAPI verifies the Supabase JWT → extracts `user_id`.
+2. PostgreSQL lookup → `platform_device_id`(s) for that user.
+3. FastAPI queries FavorIoT (`GET /v2/devices/{id}/streams`) with the account
+   API key.
+4. FastAPI computes GHS + evaluates alarms, and returns data to Flutter.
+
+Data delivery to Flutter:
+- **REST** — initial snapshot, history, RPC.
+- **WebSocket** — live `DashboardUpdate` stream from FastAPI. (FavorIoT does
+  not document a WebSocket transport, so FastAPI owns the WS fan-out.)
 
 | Layer | Technology | Role |
 |-------|-----------|------|
 | Hardware | 2× ESP32 + sensors + actuators | Data collection, actuation |
-| Cloud | ThingsBoard | Telemetry storage, device management, alarms, RPC |
+| Cloud | FavorIoT | Telemetry ingest/storage, device registry, dashboards, RPC |
 | Auth | Supabase | User accounts, sessions, JWT issuance |
-| Backend | FastAPI + PostgreSQL | Device mapping, GHS computation, TB proxy |
+| Backend | FastAPI + PostgreSQL | Device mapping, state, alarms, GHS, FavorIoT proxy |
 | Mobile | Flutter | Dashboard UI, offline mode, BLE provisioning |
 
 ---
@@ -124,19 +159,21 @@ When Flutter requests data:
 
 | What | Where | Why |
 |------|-------|-----|
-| User accounts | Supabase (PostgreSQL) | Supabase handles registration, login, JWT issuance, session refresh |
-| User ↔ device mapping | PostgreSQL (FastAPI) | FastAPI knows which TB device belongs to which user |
-| Telemetry (soil, temp, humidity, water level) | ThingsBoard | Time-series storage, MQTT ingestion, alarm rules |
-| Device config (thresholds, actuator state) | ThingsBoard shared attributes | RPC commands, no extra DB needed |
-| Alarms (low water, critical health) | ThingsBoard rule engine | Built-in, no alarm logic to write |
-| Growth Health Score | FastAPI (Python) | Reads telemetry from TB API, computes, returns to Flutter |
+| User accounts | Supabase (PostgreSQL) | Registration, login, JWT, session refresh |
+| User ↔ device mapping | PostgreSQL (FastAPI) | Which FavorIoT device belongs to which user |
+| Telemetry (soil, temp, humidity, water level) | FavorIoT | Time-series storage + MQTT ingestion |
+| Actuator state (pump/mist/refill/lockout) | PostgreSQL (FastAPI) | FavorIoT has no shared attributes — FastAPI tracks last state |
+| Alarms (low water, critical health) | PostgreSQL (FastAPI) | FavorIoT documents no rule engine — FastAPI evaluates thresholds |
+| Growth Health Score | FastAPI (Python) | Reads telemetry from FavorIoT, computes, returns to Flutter |
 
-FastAPI + PostgreSQL is minimal on purpose:
-- Device registration and mapping
-- TB proxy (Flutter asks FastAPI → FastAPI asks ThingsBoard)
-- GHS computation (reads from ThingsBoard API)
+FastAPI + PostgreSQL is intentionally small:
+- Device registration/linking and mapping
+- Actuator-state tracking (replaces FavorIoT shared attributes)
+- Alarm evaluation (replaces a rule engine)
+- FavorIoT proxy + GHS computation
 
-Sensor data is never stored in PostgreSQL. Alarm logic is never written in Python. ThingsBoard handles all IoT plumbing.
+Sensor **time-series** data is never duplicated in PostgreSQL. Only the latest
+actuator state and derived alarms are stored.
 
 ---
 
@@ -146,16 +183,16 @@ One user can own multiple ESP32 setups (multiple plants, multiple rooms). The ma
 
 ```
 PostgreSQL — devices table
-┌─────────────┬──────────────────────────────────────┬──────────────┐
-│ user_id     │ tb_device_id                         │ device_name  │
-├─────────────┼──────────────────────────────────────┼──────────────┤
-│ user_001    │ xxxx-xxxx-xxxx-xxxx-xxxx-aaaa        │ Living Room  │
-│ user_001    │ xxxx-xxxx-xxxx-xxxx-xxxx-bbbb        │ Balcony      │
-│ user_002    │ xxxx-xxxx-xxxx-xxxx-xxxx-cccc        │ Kitchen      │
-└─────────────┴──────────────────────────────────────┴──────────────┘
+┌─────────────┬──────────────────────────────┬──────────────┐
+│ user_id     │ platform_device_id           │ device_name  │
+├─────────────┼──────────────────────────────┼──────────────┤
+│ user_001    │ lextari-env@user001          │ Living Room  │
+│ user_001    │ lextari-env2@user001         │ Balcony      │
+│ user_002    │ lextari-env@user002          │ Kitchen      │
+└─────────────┴──────────────────────────────┴──────────────┘
 ```
 
-FastAPI fetches all `tb_device_id`s for the user, queries each from ThingsBoard in parallel, and returns them together.
+FastAPI fetches all `platform_device_id`s for the user, queries each from FavorIoT in parallel, and returns them together.
 
 ---
 
@@ -163,21 +200,25 @@ FastAPI fetches all `tb_device_id`s for the user, queries each from ThingsBoard 
 
 | Layer | Approach |
 |-------|----------|
-| ESP32 → TB (MQTT) | ThingsBoard handles millions of concurrent MQTT connections |
-| ThingsBoard storage | Purpose-built IoT time-series DB — no custom storage layer needed |
-| FastAPI | Stateless — horizontal scaling behind nginx / Traefik / ALB |
-| PostgreSQL | User accounts + device mappings only — row count stays small |
+| ESP32 → FavorIoT (MQTT) | FavorIoT handles large concurrent MQTT fleets |
+| FavorIoT storage | Purpose-built IoT storage — no custom time-series DB needed |
+| FastAPI | Stateless — horizontal scaling behind nginx |
+| PostgreSQL | Accounts + mappings + latest state + alarms — row count stays small |
 | GHS computation | Stateless pure computation — scales with FastAPI instances |
 
-Real-time telemetry is delivered over WebSocket (persistent connection). The FastAPI proxy adds one connection setup cost, not a per-message round trip.
+Real-time telemetry is delivered to Flutter over WebSocket (persistent
+connection). FastAPI polls/subscribes FavorIoT and fans out one stream per
+device to all subscribed clients.
 
-At higher load: multiple FastAPI instances behind a gateway, one ThingsBoard WebSocket connection per device fanned out to all subscribing Flutter clients, Redis caching for historical TB queries.
+At higher load: multiple FastAPI instances behind a gateway, async polling with
+caching (Redis) for FavorIoT queries, and a single upstream connection per
+device fanned out to Flutter clients.
 
 ---
 
 ## Hardware
 
-### ESP32 #1 — Environmental (leaflens-env)
+### ESP32 #1 — Environmental (lextari-env)
 
 | Component | Purpose |
 |-----------|---------|
@@ -186,7 +227,7 @@ At higher load: multiple FastAPI instances behind a gateway, one ThingsBoard Web
 | Water pump | Irrigation |
 | Mist maker | Humidity control |
 
-### ESP32 #2 — Water Management (leaflens-water)
+### ESP32 #2 — Water Management (lextari-water)
 
 | Component | Purpose |
 |-----------|---------|
@@ -203,7 +244,10 @@ At higher load: multiple FastAPI instances behind a gateway, one ThingsBoard Web
 | `humidity` | ESP32 #1 | % |
 | `water_level` | ESP32 #2 | % |
 
-### Shared Attributes (ESP32-writable)
+### Actuator Flags (device-reported)
+
+FavorIoT has no shared attributes, so the ESP32 reports actuator state as part
+of its telemetry payload. FastAPI stores the latest values in `device_state`.
 
 | Key | Type | Description |
 |-----|------|-------------|
@@ -216,28 +260,28 @@ At higher load: multiple FastAPI instances behind a gateway, one ThingsBoard Web
 
 ## Authentication
 
-Flutter uses **Supabase** for user authentication. Supabase handles registration, login, session persistence, and token refresh. The rest of the app never imports the Supabase SDK directly — `LeafLensAuth` wraps it.
+Flutter uses **Supabase** for user authentication. Supabase handles registration, login, session persistence, and token refresh. The rest of the app never imports the Supabase SDK directly — `LextariAuth` wraps it.
 
 | Layer | Who | Token | Flows |
 |-------|-----|-------|-------|
 | App user | Flutter → Supabase | Supabase JWT (auto-refreshed) | register / login / logout |
-| FastAPI proxy | Flutter → FastAPI → ThingsBoard | Supabase JWT (verified server-side) | Data fetch, RPC commands |
-| ThingsBoard | FastAPI → ThingsBoard | TB tenant admin JWT | Proxy calls, never leaves server |
-| ESP32 | ESP32 → ThingsBoard | TB device access token | MQTT only, provisioned once |
+| FastAPI proxy | Flutter → FastAPI | Supabase JWT (verified server-side) | Data fetch, RPC commands |
+| FavorIoT | FastAPI → FavorIoT | FavorIoT API key (`apikey` header) | Proxy calls, never leaves server |
+| ESP32 | ESP32 → FavorIoT | Device access token | MQTT only, provisioned once |
 
-### LeafLensAuth (Supabase wrapper)
+### LextariAuth (Supabase wrapper)
 
-**File:** `lib/features/auth/data/leaf_lens_auth.dart`
+**File:** `lib/features/auth/data/lextari_auth.dart`
 
 Wraps `supabase_flutter` so no other file imports it directly. All methods are static.
 
 ```
-LeafLensAuth.init(url, anonKey)          // Called once from main.dart
-LeafLensAuth.signInWithPassword(...)     // Returns access token
-LeafLensAuth.signUp(...)                 // Returns access token (or null if email confirmation required)
-LeafLensAuth.signOut()                   // Clears session
-LeafLensAuth.onAuthChange               // Stream<AuthState> — emits on login, logout, token refresh
-LeafLensAuth.accessToken                // Current token, or null
+LextariAuth.init(url, publishableKey)   // Called once from main.dart
+LextariAuth.signInWithPassword(...)     // Returns access token
+LextariAuth.signUp(...)                 // Returns access token (or null if email confirmation required)
+LextariAuth.signOut()                   // Clears session
+LextariAuth.onAuthChange                // Stream<AuthState> — emits on login, logout, token refresh
+LextariAuth.accessToken                 // Current token, or null
 ```
 
 ### GoRouter Auth Guard
@@ -256,7 +300,9 @@ class AppRouter {
         redirect: (context, state) => _ref.read(authGuardProvider)(context, state),
       );
 }
+```
 
+```dart
 // lib/core/router/auth_guard.dart
 final authGuardProvider = Provider<GoRouterRedirect>((ref) {
   final auth = ref.watch(authStateProvider);
@@ -273,10 +319,10 @@ final authGuardProvider = Provider<GoRouterRedirect>((ref) {
 
 ### Session Lifecycle
 
-1. Login → `AuthRepository.login()` → calls `LeafLensAuth.signInWithPassword()` → Supabase returns JWT → token set on `ApiClient`
+1. Login → `AuthRepository.login()` → calls `LextariAuth.signInWithPassword()` → Supabase returns JWT → token set on `ApiClient`
 2. `authStateProvider` (StreamProvider) emits new token → GoRouter detects auth → redirects to `/dashboard`
 3. App restart → Supabase restores session from its internal storage → `authStateProvider` emits current token automatically
-4. Logout → `LeafLensAuth.signOut()` → stream emits null → GoRouter redirects to `/login`
+4. Logout → `LextariAuth.signOut()` → stream emits null → GoRouter redirects to `/login`
 
 ### Build-time Configuration
 
@@ -290,15 +336,41 @@ flutter run --dart-define-from-file=.env
 flutter build apk --dart-define-from-file=.env
 ```
 
-All four values (`API_URL`, `WS_URL`, `SUPABASE_URL`,
+All four client values (`API_URL`, `WS_URL`, `SUPABASE_URL`,
 `SUPABASE_ANON_KEY`) are required — the app won't compile without
-them. Same for `SENTRY_DSN` (optional).
+them. Same for `SENTRY_DSN` (optional). `FAVORIOT_API_KEY` is **server-side
+only** and never appears in the app.
 
 ---
 
-## ThingsBoard Data Model
+## FavorIoT Data Model
 
-### Alarm Rules
+### Telemetry ingest
+
+Device → FavorIoT (MQTT): publish to topic `{device-access-token}/v2/streams`:
+
+```json
+{
+  "device_developer_id": "lextari-env@plantuser",
+  "data": {
+    "soil_moisture": 45.2,
+    "temperature": 27.4,
+    "humidity": 58.0,
+    "water_level": 72.5
+  }
+}
+```
+
+### Historical read
+
+FastAPI → FavorIoT (REST):
+
+```
+GET https://apiv2.favoriot.com/v2/devices/{device_developer_id}/streams?max=1&order=desc
+apikey: <FAVORIOT_API_KEY>
+```
+
+### Alarms (FastAPI-evaluated)
 
 | Alarm | Condition | Severity |
 |-------|-----------|----------|
@@ -309,7 +381,7 @@ them. Same for `SENTRY_DSN` (optional).
 | TempHigh | temperature > 35 | MAJOR |
 | MoistureEmpty | soil_moisture < 10 | CRITICAL |
 
-### RPC Commands
+### RPC Commands (downlink)
 
 | Method | Action |
 |--------|--------|
@@ -317,6 +389,18 @@ them. Same for `SENTRY_DSN` (optional).
 | `triggerMisting` | Activates mist maker |
 | `triggerRefill` | Opens solenoid valve |
 | `setThreshold` | Updates sensor thresholds |
+
+FastAPI sends an RPC via `POST https://apiv2.favoriot.com/v2/rpc`; the device
+receives it by subscribing to MQTT topic `{device-access-token}/v2/rpc`:
+
+```json
+{
+  "params": {
+    "device_developer_id": "lextari-water@plantuser",
+    "method": "triggerRefill"
+  }
+}
+```
 
 ---
 

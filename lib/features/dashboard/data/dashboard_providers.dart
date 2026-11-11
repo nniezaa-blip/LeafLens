@@ -1,8 +1,8 @@
-import 'package:leaflens/core/network/api_client.dart';
-import 'package:leaflens/core/network/ws_client.dart';
-import 'package:leaflens/features/auth/data/auth_repository.dart';
-import 'package:leaflens/features/auth/data/leaf_lens_auth.dart';
-import 'package:leaflens/features/dashboard/domain/dashboard_update.dart';
+import 'package:lextari/core/network/api_client.dart';
+import 'package:lextari/core/network/ws_client.dart';
+import 'package:lextari/features/auth/data/auth_repository.dart';
+import 'package:lextari/features/auth/data/lextari_auth.dart';
+import 'package:lextari/features/dashboard/domain/dashboard_update.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'dashboard_providers.g.dart';
@@ -68,7 +68,7 @@ Stream<DashboardUpdate> dashboardStream(Ref ref) {
 /// Emits the current access token (null if not logged in).
 @Riverpod(keepAlive: true)
 Stream<String?> authState(Ref ref) {
-  return LeafLensAuth.onAuthChange.map((data) {
+  return LextariAuth.onAuthChange.map((data) {
     final token = data.session?.accessToken;
     ref.read(apiClientProvider).token = token;
     return token;

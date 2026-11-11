@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:leaflens/core/errors/error_handler.dart';
-import 'package:leaflens/core/errors/failures.dart';
-import 'package:leaflens/core/theme/app_colors.dart';
-import 'package:leaflens/core/utils/validators.dart';
-import 'package:leaflens/features/auth/data/auth_repository.dart';
-import 'package:leaflens/shared/widgets/app_text_field.dart';
+import 'package:lextari/core/errors/error_handler.dart';
+import 'package:lextari/core/errors/failures.dart';
+import 'package:lextari/core/theme/app_colors.dart';
+import 'package:lextari/core/utils/validators.dart';
+import 'package:lextari/features/auth/data/auth_repository.dart';
+import 'package:lextari/shared/widgets/app_text_field.dart';
 
 extension on BuildContext {
   ColorScheme get colors => Theme.of(this).colorScheme;

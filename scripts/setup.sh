@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# LeafLens — Project Setup Script (Linux / macOS / Windows Git Bash)
+# Lextari — Project Setup Script (Linux / macOS / Windows Git Bash)
 # =============================================================================
 # Installs mise, project toolchain, Android SDK extras, creates an emulator,
 # and adds adb/emulator to PATH in the appropriate shell RC file.
@@ -139,7 +139,7 @@ ensure_local_bin_on_path() {
   touch "$rc_file"
   if ! grep -Fxq "$entry" "$rc_file" 2>/dev/null; then
     echo "" >> "$rc_file"
-    echo "# Added by LeafLens setup script" >> "$rc_file"
+    echo "# Added by Lextari setup script" >> "$rc_file"
     echo "$entry" >> "$rc_file"
     log_info "Added to ${rc_file}: ${entry}"
   else
@@ -366,7 +366,7 @@ create_avd() {
 main() {
   echo ""
   echo -e "${GREEN}╔══════════════════════════════════════════════════╗${NC}"
-  echo -e "${GREEN}║        LeafLens — Environment Setup              ║${NC}"
+  echo -e "${GREEN}║        Lextari — Environment Setup              ║${NC}"
   echo -e "${GREEN}╚══════════════════════════════════════════════════╝${NC}"
   echo ""
 

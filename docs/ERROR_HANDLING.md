@@ -1,4 +1,4 @@
-# LeafLens Error Handling & Notification System
+# Lextari Error Handling & Notification System
 
 > **Three-tier system:** User-facing notifications → Sentry logging → In-memory metrics  
 > **Introduced:** 27 May 2026  

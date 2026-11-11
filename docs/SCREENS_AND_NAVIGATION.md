@@ -1,4 +1,4 @@
-# LeafLens Screens & Navigation
+# Lextari Screens & Navigation
 
 **Routes defined in:** `lib/core/router/app_router.dart`
 
@@ -35,9 +35,9 @@ Scaffold(lightGreenBg)
         └── _SplashContent
             └── Center → Column
                 ├── Spacer(flex: 4)
-                ├── LeafLensLogo()
+                ├── LextariLogo()
                 ├── SizedBox(height: 12)
-                ├── _BrandHeader     ← "LEAFLENS" + "Smarter Care for Healthier Plants"
+                ├── _BrandHeader     ← "LEXTARI" + "Smarter Care for Healthier Plants"
                 ├── Spacer(flex: 2)
                 ├── _GetStartedButton  ← navigates to /login
                 └── Spacer(flex: 1)
@@ -47,7 +47,7 @@ Scaffold(lightGreenBg)
 
 - Decorative ellipse (`BackgroundEllipse`) is **not** in `SafeArea` — needs to bleed to screen edge on notched devices
 - No GoRouter redirect logic checks splash — it's always public
-- `LeafLensLogo` renders `assets/images/splash_illustration.svg`
+- `LextariLogo` renders `assets/images/splash_illustration.svg`
 - `BackgroundEllipse` renders `assets/images/splash_ellipse.svg`
 
 ---

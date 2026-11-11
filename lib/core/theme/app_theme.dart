@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:leaflens/core/theme/app_colors.dart';
-import 'package:leaflens/core/theme/app_typography.dart';
+import 'package:lextari/core/theme/app_colors.dart';
+import 'package:lextari/core/theme/app_typography.dart';
 
-/// LeafLens application theme configuration.
+/// Lextari application theme configuration.
 ///
 /// Defines the Material 3 light theme with customised colour scheme,
 /// typography, card styles, button styles, input decoration, chips,
@@ -10,7 +10,7 @@ import 'package:leaflens/core/theme/app_typography.dart';
 class AppTheme {
   AppTheme._();
 
-  /// The light theme used throughout the LeafLens app.
+  /// The light theme used throughout the Lextari app.
   static ThemeData get light {
     final colorScheme = ColorScheme.fromSeed(
       seedColor: AppColors.mediumGreen,

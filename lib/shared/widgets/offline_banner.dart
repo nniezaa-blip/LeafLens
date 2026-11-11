@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:leaflens/features/dashboard/data/dashboard_providers.dart';
+import 'package:lextari/features/dashboard/data/dashboard_providers.dart';
 
 /// Banner shown at the top of the dashboard when the user is offline.
 ///

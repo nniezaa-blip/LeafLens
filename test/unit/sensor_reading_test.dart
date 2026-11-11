@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leaflens/core/config/app_config.dart';
-import 'package:leaflens/features/dashboard/domain/sensor_reading.dart';
+import 'package:lextari/core/config/app_config.dart';
+import 'package:lextari/features/dashboard/domain/sensor_reading.dart';
 
 void main() {
   group('SensorReading', () {
@@ -17,14 +17,14 @@ void main() {
       expect(reading.unit, '%');
     });
 
-    group('fromTbJson', () {
-      test('parses ThingsBoard JSON entry', () {
+    group('fromTelemetryJson', () {
+      test('parses normalised telemetry entry', () {
         final ts = now.millisecondsSinceEpoch;
         final json = {
           'value': '55.3',
           'ts': ts,
         };
-        final reading = SensorReading.fromTbJson(json, '°C');
+        final reading = SensorReading.fromTelemetryJson(json, '°C');
         expect(reading.value, 55.3);
         expect(
           reading.recordedAt.millisecondsSinceEpoch,
@@ -38,7 +38,7 @@ void main() {
           'value': '42',
           'ts': 1700000000000,
         };
-        final reading = SensorReading.fromTbJson(json, '%');
+        final reading = SensorReading.fromTelemetryJson(json, '%');
         expect(reading.value, 42.0);
       });
     });

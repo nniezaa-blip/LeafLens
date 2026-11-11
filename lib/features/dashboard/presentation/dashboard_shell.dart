@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:leaflens/core/theme/app_colors.dart';
-import 'package:leaflens/features/dashboard/presentation/dashboard_screen.dart';
-import 'package:leaflens/features/settings/presentation/settings_screen.dart';
-import 'package:leaflens/features/stats/presentation/stats_screen.dart';
-import 'package:leaflens/shared/widgets/background_ellipse.dart';
+import 'package:lextari/core/theme/app_colors.dart';
+import 'package:lextari/features/dashboard/presentation/dashboard_screen.dart';
+import 'package:lextari/features/settings/presentation/settings_screen.dart';
+import 'package:lextari/features/stats/presentation/stats_screen.dart';
+import 'package:lextari/shared/widgets/background_ellipse.dart';
 
 /// App-level shell wrapping dashboard tabs with persistent green background,
 /// ellipse, floating bottom nav bar, and draggable carousel.
@@ -47,6 +47,12 @@ class _DashboardShellState extends State<DashboardShell>
 
   bool _isForward = true;
   int _previousIndex = 0;
+
+  /// Exact branch index requested by a nav-bar tap, if any.
+  ///
+  /// When set, the slide animation and commit land on this index rather than
+  /// the adjacent index derived from the drag direction.
+  int? _tapTargetIndex;
 
   /// Active settle tween — non-null while the settle animation is running.
   Tween<double>? _settleTween;
@@ -89,9 +95,14 @@ class _DashboardShellState extends State<DashboardShell>
     super.dispose();
   }
 
+  /// Index of the trends tab, whose charts consume horizontal drags so the
+  /// carousel swipe is disabled there to let users pan the charts instead.
+  static const _statsIndex = 1;
+
   @override
   Widget build(BuildContext context) {
     final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final swipeEnabled = widget.navigationShell.currentIndex != _statsIndex;
 
     return Scaffold(
       body: Stack(
@@ -99,9 +110,9 @@ class _DashboardShellState extends State<DashboardShell>
           const BackgroundEllipse(),
           GestureDetector(
             behavior: HitTestBehavior.translucent,
-            onHorizontalDragStart: _handleDragStart,
-            onHorizontalDragUpdate: _handleDragUpdate,
-            onHorizontalDragEnd: _handleDragEnd,
+            onHorizontalDragStart: swipeEnabled ? _handleDragStart : null,
+            onHorizontalDragUpdate: swipeEnabled ? _handleDragUpdate : null,
+            onHorizontalDragEnd: swipeEnabled ? _handleDragEnd : null,
             child: SafeArea(child: _buildAnimatedChild()),
           ),
           Positioned(
@@ -154,13 +165,15 @@ class _DashboardShellState extends State<DashboardShell>
         ),
         Transform.translate(
           offset: enteringOffset,
-          child: _pageForIndex(
-            _isForward ? _previousIndex + 1 : _previousIndex - 1,
-          ),
+          child: _pageForIndex(_incomingIndex),
         ),
       ],
     );
   }
+
+  /// Index of the page sliding in during the current transition.
+  int get _incomingIndex =>
+      _tapTargetIndex ?? (_isForward ? _previousIndex + 1 : _previousIndex - 1);
 
   void _onControllerTick() {
     final tween = _settleTween;
@@ -188,6 +201,7 @@ class _DashboardShellState extends State<DashboardShell>
     _isDragActive = true;
     _dragDirectionLocked = false;
     _dragStartDx = details.localPosition.dx;
+    _tapTargetIndex = null;
     _controller.stop();
     _settleTween = null;
   }
@@ -260,7 +274,7 @@ class _DashboardShellState extends State<DashboardShell>
   }
 
   void _commitTabSwitch() {
-    final newIndex = _isForward ? _previousIndex + 1 : _previousIndex - 1;
+    final newIndex = _incomingIndex;
 
     widget.navigationShell.goBranch(newIndex);
 
@@ -268,6 +282,7 @@ class _DashboardShellState extends State<DashboardShell>
       _previousIndex = newIndex;
       _dragOffset = 0;
       _isDragActive = false;
+      _tapTargetIndex = null;
     });
   }
 
@@ -281,6 +296,7 @@ class _DashboardShellState extends State<DashboardShell>
 
     _isForward = targetIndex > currentIndex;
     _previousIndex = currentIndex;
+    _tapTargetIndex = targetIndex;
     _dragOffset = 0;
     _isDragActive = true;
 

@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-import 'package:leaflens/core/errors/failures.dart';
-import 'package:leaflens/shared/notifications/notification_service.dart';
+import 'package:lextari/core/errors/failures.dart';
+import 'package:lextari/shared/notifications/notification_service.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 /// Centralised error handler implementing the three-tier logging system.

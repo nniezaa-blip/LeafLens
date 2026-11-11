@@ -1,4 +1,4 @@
-# LeafLens
+# Lextari
 
 <img src="https://img.shields.io/badge/version-1.0.0+1-5BC0DE?style=flat-square" alt="Version">&nbsp;
 <img src="https://img.shields.io/github/stars/mishoshup/LeafLens?style=flat-square&label=stars&color=5BC0DE" alt="Stars">&nbsp;
@@ -9,7 +9,7 @@
 <img src="https://img.shields.io/badge/Flutter-3.12-5BC0DE?style=flat-square&logo=flutter&logoColor=white" alt="Flutter">&nbsp;
 <img src="https://img.shields.io/badge/Dart-3.11-5BC0DE?style=flat-square&logo=dart&logoColor=white" alt="Dart">&nbsp;
 <img src="https://img.shields.io/badge/Riverpod-3.x-5BC0DE?style=flat-square" alt="Riverpod">&nbsp;
-<img src="https://img.shields.io/badge/ThingsBoard-IoT-5BC0DE?style=flat-square" alt="ThingsBoard">
+<img src="https://img.shields.io/badge/FavorIoT-IoT-5BC0DE?style=flat-square" alt="FavorIoT">
 
 **AI-Powered Mobile Application for Intelligent Plant Health Monitoring**
 
@@ -20,7 +20,7 @@ Final Year Project — Bachelor of Computer Science, IIUM
 
 ## Overview
 
-LeafLens monitors indoor plant health through a dual-ESP32 sensor system,
+Lextari monitors indoor plant health through a dual-ESP32 sensor system,
 presents a unified **Growth Health Score (GHS)** on a Flutter mobile app, and
 autonomously manages water refill so plants survive even when you're away.
 
@@ -34,40 +34,38 @@ autonomously manages water refill so plants survive even when you're away.
 
 ## Architecture
 
-LeafLens is a **three-tier system** with **BLE-based device provisioning**:
+Lextari is a **three-tier system** with **BLE-based device provisioning**:
 
 ```
 Provisioning (one-time BLE setup)
 
-  1. Flutter ──BLE──→ ESP32          Wi-Fi creds + user_id
+  0. Admin  ──console──→ FavorIoT       create device → device_developer_id + token
+  1. Flutter ──BLE──→ ESP32            Wi-Fi creds + device_developer_id + token
   2. ESP32 connects to Wi-Fi
-  3. ESP32  ──POST──→ FastAPI        /api/v1/devices/register
-  4. FastAPI ─────→ ThingsBoard     create device, retrieve token
-  5. FastAPI ─────→ PostgreSQL      save user_id ↔ device_id
-  6. FastAPI ─────→ ESP32           ThingsBoard device token
-  7. ESP32 stores token in flash
-  8. ESP32  ──MQTT──→ ThingsBoard   telemetry stream begins
+  3. ESP32  ──MQTT──→ FavorIoT         telemetry stream begins
+  4. Flutter ──POST──→ FastAPI         /api/v1/devices/link (verify + map)
+  5. FastAPI ─────→ PostgreSQL         save user_id ↔ platform_device_id
 
 ───────────────────────────────────────────────────────────
 
 Steady State
 
-  ESP32 ──MQTT──→ ThingsBoard ←──REST/WS──→ FastAPI ──REST/WS──→ Flutter
+  ESP32 ──MQTT──→ FavorIoT ←──REST──→ FastAPI ──REST/WS──→ Flutter
+  FastAPI ──RPC──→ FavorIoT ──MQTT──→ ESP32
 ```
 
 | Layer | Technology | Role |
 |-------|-----------|------|
 | **Provisioning** | BLE (ESP32 firmware) | One-click Wi-Fi setup, no IP/port typing |
 | **Hardware** | 2× ESP32, soil moisture, DHT, ultrasonic, pump, mist maker, solenoid valve | Sensor data collection + actuation |
-| **Cloud** | ThingsBoard IoT Platform (global/public) | Telemetry storage, device management, alarms, RPC |
-| **Backend** | FastAPI (Python) | Device registration, GHS computation, ThingsBoard proxy |
+| **Cloud** | FavorIoT IoT Platform (global SaaS) | Telemetry ingest/storage, device management, RPC |
+| **Backend** | FastAPI (Python) | Device linking, GHS computation, FavorIoT proxy, alarms |
 | **Auth** | Supabase | User accounts, sessions, JWT issuance |
 | **Mobile** | Flutter + Riverpod (MVVM) + GoRouter | Dashboard UI, charts, offline mode, BLE provisioning UI |
 
-**Flutter never talks to ThingsBoard directly.** The FastAPI backend sits as a
-gateway — all ThingsBoard credentials stay on the server. The Flutter app
-authenticates via Supabase and FastAPI proxies ThingsBoard data using a tenant
-admin JWT.
+**Flutter never talks to FavorIoT directly.** The FastAPI backend sits as a
+gateway — the FavorIoT API key stays on the server. The Flutter app
+authenticates via Supabase and FastAPI proxies FavorIoT data.
 
 ---
 
@@ -75,14 +73,39 @@ admin JWT.
 
 Detailed docs for every aspect of the project in `docs/`:
 
+### Requirements & planning
+
 | Doc | Covers |
 |-----|--------|
-| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | BLE provisioning, steady-state data flow, auth layers, ESP32 hardware, ThingsBoard data model |
+| [`docs/PRODUCT_REQUIREMENTS.md`](docs/PRODUCT_REQUIREMENTS.md) | Problem statement, personas, functional + non-functional requirements, success metrics |
+| [`docs/TECHNICAL_REQUIREMENTS.md`](docs/TECHNICAL_REQUIREMENTS.md) | Stack + versions, platform/backend/hardware requirements, telemetry + config contract |
+| [`docs/APP_FLOW.md`](docs/APP_FLOW.md) | End-to-end user journeys: launch, auth, BLE provisioning, dashboard, RPC, offline |
+| [`docs/DESIGN_BRIEF.md`](docs/DESIGN_BRIEF.md) | Design vision, brand, colour/type system, layout principles, screen intent |
+| [`docs/BACKEND_SCHEMA.md`](docs/BACKEND_SCHEMA.md) | PostgreSQL schema, FavorIoT entities, FastAPI REST + WebSocket contract |
+| [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md) | Phased delivery, milestones, status, demo-risk mitigations |
+
+### Security
+
+| Doc | Covers |
+|-----|--------|
+| [`docs/AUTH.md`](docs/AUTH.md) | Identity model, token lifecycle, guard, authorization boundary, error mapping |
+| [`docs/SECURITY.md`](docs/SECURITY.md) | Security principles, trust boundaries, transport, secrets, controls, known gaps |
+| [`docs/DATA_SECURITY.md`](docs/DATA_SECURITY.md) | Data classification, PII, encryption, retention, privacy commitments |
+| [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md) | STRIDE analysis, assets, trust boundaries, risk summary, deep-dives |
+| [`docs/SECURITY_CHECKLIST.md`](docs/SECURITY_CHECKLIST.md) | Actionable pre-release security gates |
+
+### Engineering reference
+
+| Doc | Covers |
+|-----|--------|
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | BLE provisioning, steady-state data flow, auth layers, ESP32 hardware, FavorIoT data model |
 | [`docs/ERROR_HANDLING.md`](docs/ERROR_HANDLING.md) | 3-tier notification system: toast overlays, inline errors, modal dialogs, Sentry logging, error metrics |
 | [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md) | Directory layout, file responsibilities, codegen workflow |
-| [`docs/SCREENS_AND_NAVIGATION.md`](docs/SCREENS_AND_NAVIGATION.md) | All 4 routes, screen layouts, GoRouter auth redirect |
+| [`docs/SCREENS_AND_NAVIGATION.md`](docs/SCREENS_AND_NAVIGATION.md) | All routes, screen layouts, GoRouter auth redirect |
+| [`docs/FRONTEND_DESIGN_SYSTEM.md`](docs/FRONTEND_DESIGN_SYSTEM.md) | Design tokens (colours, typography), screens, shared widgets |
 | [`docs/WIDGET_LIBRARY.md`](docs/WIDGET_LIBRARY.md) | All 9 shared widgets with constructor props and states |
 | [`docs/DOMAIN_MODELS.md`](docs/DOMAIN_MODELS.md) | Data models, GHS algorithm reference, thresholds |
+| [`docs/NETWORKING.md`](docs/NETWORKING.md) | Docker Compose stack, ports, traffic flow, secrets |
 | [`docs/TESTING.md`](docs/TESTING.md) | Test pyramid, running tests, writing patterns (unit/widget/flow/skip) |
 | [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md) | Code style, naming, state management, error handling |
 
@@ -100,7 +123,7 @@ Thesis document available on request (not in this repo).
 | Xcode | Latest | macOS only — required for iOS/macOS builds |
 | Java JDK | 17–21 | AGP 8.11.1 requires Java 17–21. Java 22+ breaks Gradle. |
 | Python 3.10+ | (backend only) | For FastAPI analytics server |
-| ThingsBoard | v3.6+ | Cloud or local instance |
+| FavorIoT account | v2 API | Cloud IoT platform (devices registered in console) |
 
 ---
 
@@ -109,8 +132,8 @@ Thesis document available on request (not in this repo).
 ### 1. Clone and install dependencies
 
 ```bash
-git clone <repo-url> leaflens
-cd leaflens
+git clone <repo-url> lextari
+cd lextari
 flutter pub get
 ```
 
@@ -240,7 +263,7 @@ flutter test -v
 |------|-------|---------------|
 | `test/widgets/shared/app_text_field_test.dart` | 7 | Hint, icons, obscure, input, controller, keyboard type |
 | `test/widgets/shared/background_ellipse_test.dart` | 5 | SVG render, alignment, width/height factors, custom params |
-| `test/widgets/shared/leaf_lens_logo_test.dart` | 1 | SVG render without error |
+| `test/widgets/shared/lextari_logo_test.dart` | 1 | SVG render without error |
 | `test/widgets/shared/status_badge_test.dart` | 6 | All 5 HealthStatus labels, all render without error |
 | `test/widgets/shared/health_gauge_test.dart` | 6 | Score %, status labels, CustomPaint, custom size, all statuses |
 | `test/widgets/shared/sensor_tile_test.dart` | 6 | Value display, skeleton (null), stale indicator, age label |
@@ -270,7 +293,7 @@ flutter test -v
 ```
 lib/
   main.dart                           # Entry point only: void main(), init calls, runApp()
-  app.dart                            # LeafLensApp widget: theme + router + notification overlay
+  app.dart                            # LextariApp widget: theme + router + notification overlay
 
   core/
     config/
@@ -280,7 +303,7 @@ lib/
       error_handler.dart              # 3-tier: toast + Sentry + metrics
     init/
       sentry_init.dart                # initSentry() — Sentry error tracking setup
-      leaf_lens_auth_init.dart        # initLeafLensAuth() — Supabase client setup
+      lextari_auth_init.dart        # initLextariAuth() — Supabase client setup
     network/
       api_client.dart                 # HTTP client → FastAPI
       ws_client.dart                  # WebSocket client → FastAPI
@@ -297,7 +320,7 @@ lib/
       data/
         auth_repository.dart          # AuthRepository + @riverpod providers
         auth_repository.g.dart        # Generated
-        leaf_lens_auth.dart           # Service: Supabase auth wrapper (static API)
+        lextari_auth.dart           # Service: Supabase auth wrapper (static API)
       presentation/
         login_page.dart               # View: Form + email/password + Google stub
         signup_page.dart              # View: 4 fields + terms + Google stub
@@ -322,7 +345,7 @@ lib/
       app_text_field.dart             # Themed outlined input
       app_button.dart                 # 4 variants + loading
       background_ellipse.dart         # Configurable decorative SVG
-      leaf_lens_logo.dart             # Brand leaf SVG
+      lextari_logo.dart             # Brand leaf SVG
       health_gauge.dart               # Circular gauge (CustomPaint)
       sensor_tile.dart                # Sensor value + skeleton + stale
       status_badge.dart               # Colored chip
@@ -330,8 +353,8 @@ lib/
       offline_banner.dart             # Connectivity banner
     notifications/
       notification_service.dart       # Toastification wrapper
-      leaf_lens_notification_overlay.dart  # ToastificationWrapper root widget
-      leaf_lens_toast.dart            # Custom branded toast
+      lextari_notification_overlay.dart  # ToastificationWrapper root widget
+      lextari_toast.dart            # Custom branded toast
       app_dialog.dart                 # Modal dialog utility
 
 test/
@@ -342,7 +365,7 @@ test/
       app_text_field_test.dart           # 7 tests
       app_button_test.dart               # 11 tests
       background_ellipse_test.dart       # 5 tests
-      leaf_lens_logo_test.dart           # 1 test
+      lextari_logo_test.dart           # 1 test
       health_gauge_test.dart             # 6 tests
       sensor_tile_test.dart              # 6 tests
       status_badge_test.dart             # 6 tests
@@ -533,7 +556,7 @@ because `MaterialApp` wraps with its own asset bundle internally.
 
 ## Related Repositories
 
-- **FastAPI Backend:** [link] — Python analytics, GHS computation, ThingsBoard proxy
+- **FastAPI Backend:** [link] — Python analytics, GHS computation, FavorIoT proxy
 - **ESP32 Firmware:** [link] — MQTT telemetry, actuator control, refill logic
 - **Thesis Report:** [link] — Full methodology, UAT results, diagrams
 

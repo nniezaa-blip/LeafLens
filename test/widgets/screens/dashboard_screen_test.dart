@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:leaflens/features/dashboard/presentation/dashboard_screen.dart';
-import 'package:leaflens/features/dashboard/presentation/widgets/action_switch.dart';
+import 'package:lextari/features/auth/data/user_profile_provider.dart';
+import 'package:lextari/features/auth/domain/user_profile.dart';
+import 'package:lextari/features/dashboard/presentation/dashboard_screen.dart';
+import 'package:lextari/features/dashboard/presentation/widgets/action_switch.dart';
 
 void main() {
+  const testProfile = UserProfile(
+    name: 'Aishah Abdul Aziz',
+    email: 'aishah.abdulaziz@example.com',
+  );
+
   Widget buildTestApp() {
-    return const ProviderScope(
-      child: MaterialApp(
+    return ProviderScope(
+      overrides: [
+        currentUserProfileProvider.overrideWithValue(testProfile),
+      ],
+      child: const MaterialApp(
         home: Scaffold(
           body: DashboardScreen(),
         ),

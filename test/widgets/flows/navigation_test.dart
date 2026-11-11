@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:leaflens/core/router/auth_guard.dart';
-import 'package:leaflens/features/auth/presentation/login_page.dart';
-import 'package:leaflens/features/auth/presentation/signup_page.dart';
-import 'package:leaflens/features/dashboard/presentation/dashboard_screen.dart';
-import 'package:leaflens/features/splash/presentation/splash_screen.dart';
+import 'package:lextari/core/router/auth_guard.dart';
+import 'package:lextari/features/auth/presentation/login_page.dart';
+import 'package:lextari/features/auth/presentation/signup_page.dart';
+import 'package:lextari/features/dashboard/presentation/dashboard_screen.dart';
+import 'package:lextari/features/splash/presentation/splash_screen.dart';
 
 /// Creates a test-only GoRouter that uses [AuthGuard] without
-/// touching LeafLensAuth — safe for tests where Supabase isn't initialized.
+/// touching LextariAuth — safe for tests where Supabase isn't initialized.
 GoRouter createTestRouter({required Stream<bool> authStream}) {
   return GoRouter(
     initialLocation: '/splash',
     redirect: (context, state) {
-      // Simulate auth state — no LeafLensAuth.accessToken access.
+      // Simulate auth state — no LextariAuth.accessToken access.
       return null;
     },
     routes: [
@@ -58,7 +58,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Get Started'), findsOneWidget);
-      expect(find.text('LEAFLENS'), findsOneWidget);
+      expect(find.text('LEXTARI'), findsOneWidget);
 
       await tester.tap(find.text('Get Started'));
       await tester.pumpAndSettle();

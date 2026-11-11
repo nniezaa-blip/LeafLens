@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:leaflens/core/config/app_config.dart';
+import 'package:lextari/core/config/app_config.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 /// WebSocket client for FastAPI streaming endpoint.

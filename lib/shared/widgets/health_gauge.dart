@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import 'package:leaflens/features/dashboard/domain/growth_health_score.dart';
+import 'package:lextari/features/dashboard/domain/growth_health_score.dart';
 
 /// Circular gauges that shows the health score with color-coded arc.
 ///

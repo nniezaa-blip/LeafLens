@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-import 'package:leaflens/core/theme/app_colors.dart';
+import 'package:lextari/core/theme/app_colors.dart';
 
 /// Circular gauge that shows a value as an arc with a white inner circle.
 ///

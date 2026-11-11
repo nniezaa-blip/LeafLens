@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:leaflens/app.dart';
-import 'package:leaflens/core/init/app_init.dart';
+import 'package:lextari/app.dart';
+import 'package:lextari/core/init/app_init.dart';
 
-/// LeafLens application entry point.
+/// Lextari application entry point.
 ///
-/// Initialises services then hands off to [LeafLensApp].
+/// Initialises services then hands off to [LextariApp].
 Future<void> main() async {
   await initApp();
   _runApp();
@@ -14,7 +14,7 @@ Future<void> main() async {
 void _runApp() {
   runApp(
     const ProviderScope(
-      child: LeafLensApp(),
+      child: LextariApp(),
     ),
   );
 }

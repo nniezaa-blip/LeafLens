@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:leaflens/features/dashboard/domain/growth_health_score.dart';
-import 'package:leaflens/shared/widgets/status_badge.dart';
+import 'package:lextari/features/dashboard/domain/growth_health_score.dart';
+import 'package:lextari/shared/widgets/status_badge.dart';
 
 void main() {
   group('StatusBadge', () {

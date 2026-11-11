@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:leaflens/features/dashboard/data/dashboard_providers.dart';
-import 'package:leaflens/shared/widgets/offline_banner.dart';
+import 'package:lextari/features/dashboard/data/dashboard_providers.dart';
+import 'package:lextari/shared/widgets/offline_banner.dart';
 
 Widget buildTestAppWithAuth(String? token) {
   return ProviderScope(

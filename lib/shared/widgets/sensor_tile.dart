@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:leaflens/features/dashboard/domain/sensor_key.dart';
-import 'package:leaflens/features/dashboard/domain/sensor_reading.dart';
+import 'package:lextari/features/dashboard/domain/sensor_key.dart';
+import 'package:lextari/features/dashboard/domain/sensor_reading.dart';
 
 /// Displays a single sensor value with label, unit, and stale indicator.
 ///
