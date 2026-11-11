@@ -113,6 +113,29 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
     }
   }
 
+  Future<void> _handleGoogleSignUp() async {
+    setState(() {
+      _loading = true;
+      _formError = null;
+      _termsError = null;
+    });
+
+    try {
+      final signedIn = await ref
+          .read(authRepositoryProvider)
+          .signInWithGoogle();
+      if (mounted && signedIn) context.go('/dashboard');
+    } on AuthFailure catch (e) {
+      setState(() => _formError = e.message);
+    } on Failure catch (e) {
+      ErrorHandler.handle(e);
+    } on Exception catch (e) {
+      ErrorHandler.handle(UnknownFailure(e.toString()));
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -127,7 +150,10 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const Center(child: _SignUpHeader()),
-                  const _GoogleSignUpButton(),
+                  _GoogleSignUpButton(
+                    loading: _loading,
+                    onPressed: _handleGoogleSignUp,
+                  ),
                   const _OrDivider(),
                   _NameField(controller: _nameCtrl),
                   const SizedBox(height: 12),
@@ -184,14 +210,17 @@ class _SignUpHeader extends StatelessWidget {
 }
 
 class _GoogleSignUpButton extends StatelessWidget {
-  const _GoogleSignUpButton();
+  const _GoogleSignUpButton({required this.loading, required this.onPressed});
+
+  final bool loading;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 32),
       child: FilledButton.tonal(
-        onPressed: () => throw UnimplementedError('Google sign-up'),
+        onPressed: loading ? null : onPressed,
         style: FilledButton.styleFrom(
           backgroundColor: AppColors.offBlack,
           foregroundColor: AppColors.white,
@@ -201,11 +230,21 @@ class _GoogleSignUpButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset(
-              'assets/images/google_logo.svg',
-              width: 22,
-              height: 22,
-            ),
+            if (loading)
+              const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors.white,
+                ),
+              )
+            else
+              SvgPicture.asset(
+                'assets/images/google_logo.svg',
+                width: 22,
+                height: 22,
+              ),
             const SizedBox(width: 12),
             Text('Sign up with Google', style: context.googleButtonStyle),
           ],

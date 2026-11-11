@@ -128,7 +128,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const Center(child: _LoginHeader()),
-                  const _GoogleSignInButton(),
+                  _GoogleSignInButton(
+                    loading: _loading,
+                    onPressed: _handleGoogleLogin,
+                  ),
                   const _OrDivider(),
                   _EmailField(controller: _emailCtrl),
                   const SizedBox(height: 12),
@@ -144,11 +147,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   ],
                   const SizedBox(height: 20),
                   _LoginButton(loading: _loading, onPressed: _handleLogin),
-                  const SizedBox(height: 12),
-                  _GoogleButton(
-                    loading: _loading,
-                    onPressed: _handleGoogleLogin,
-                  ),
                   const SizedBox(height: 12),
                   const _SignUpRow(),
                 ],
@@ -175,14 +173,17 @@ class _LoginHeader extends StatelessWidget {
 }
 
 class _GoogleSignInButton extends StatelessWidget {
-  const _GoogleSignInButton();
+  const _GoogleSignInButton({required this.loading, required this.onPressed});
+
+  final bool loading;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 32),
       child: FilledButton.tonal(
-        onPressed: () => throw UnimplementedError('Google sign-in'),
+        onPressed: loading ? null : onPressed,
         style: FilledButton.styleFrom(
           backgroundColor: AppColors.offBlack,
           foregroundColor: AppColors.white,
@@ -192,11 +193,21 @@ class _GoogleSignInButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset(
-              'assets/images/google_logo.svg',
-              width: 22,
-              height: 22,
-            ),
+            if (loading)
+              const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors.white,
+                ),
+              )
+            else
+              SvgPicture.asset(
+                'assets/images/google_logo.svg',
+                width: 22,
+                height: 22,
+              ),
             const SizedBox(width: 12),
             Text('Log in with Google', style: context.googleButtonStyle),
           ],
@@ -297,25 +308,6 @@ class _LoginButton extends StatelessWidget {
               ),
             )
           : Text('Login', style: context.loginButtonStyle),
-    );
-  }
-}
-
-class _GoogleButton extends StatelessWidget {
-  const _GoogleButton({required this.loading, required this.onPressed});
-  final bool loading;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return OutlinedButton.icon(
-      onPressed: loading ? null : onPressed,
-      icon: const Icon(Icons.g_mobiledata, size: 26),
-      label: const Text('Continue with Google'),
-      style: OutlinedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: const StadiumBorder(),
-      ),
     );
   }
 }
