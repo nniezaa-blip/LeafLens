@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:lextari/core/theme/app_colors.dart';
 import 'package:lextari/core/theme/app_typography.dart';
-import 'package:lextari/features/auth/data/lextari_auth.dart';
+import 'package:lextari/features/auth/data/auth_session_manager.dart';
 import 'package:lextari/features/auth/data/user_profile_provider.dart';
 import 'package:lextari/features/auth/domain/user_profile.dart';
 import 'package:lextari/features/dashboard/presentation/widgets/action_switch.dart';
@@ -29,7 +29,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   bool _waterOn = false;
   bool _refillOn = false;
 
-  Future<void> _logout() => LextariAuth.signOut();
+  Future<void> _logout() => ref.read(authManagerProvider).logout();
 
   /// Deep-links to the 30-day trends tab with [metric] preselected.
   void _openTrend(TrendMetric metric) {

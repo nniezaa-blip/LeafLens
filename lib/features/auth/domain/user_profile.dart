@@ -1,11 +1,10 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:lextari/features/auth/domain/auth_user.dart';
 
 /// Display profile for the signed-in user.
 ///
-/// Name and avatar are read from the Supabase user's metadata when
-/// available (e.g. Google sign-in supplies `full_name` and `avatar_url`).
-/// Email/password accounts have no metadata, so a readable display name is
-/// derived from the email local part and the avatar falls back to an initial.
+/// The auth Worker returns an email only, so a readable display name is
+/// derived from the email local part and the avatar falls back to an
+/// initial.
 class UserProfile {
   /// Creates a [UserProfile].
   const UserProfile({
@@ -14,26 +13,10 @@ class UserProfile {
     this.avatarUrl,
   });
 
-  /// Builds a profile from a Supabase [user].
-  factory UserProfile.fromUser(User? user) {
+  /// Builds a profile from the signed-in [user].
+  factory UserProfile.fromUser(AuthUser? user) {
     if (user == null) return unknown;
-
-    final metadata = user.userMetadata;
-    final name =
-        _metadataString(metadata, 'full_name') ??
-        _metadataString(metadata, 'name') ??
-        _metadataString(metadata, 'display_name') ??
-        _metadataString(metadata, 'preferred_username') ??
-        _nameFromEmail(user.email);
-    final avatarUrl =
-        _metadataString(metadata, 'avatar_url') ??
-        _metadataString(metadata, 'picture');
-
-    return UserProfile(
-      name: name,
-      email: user.email ?? '',
-      avatarUrl: avatarUrl,
-    );
+    return UserProfile.fromEmail(user.email);
   }
 
   /// Builds a profile from an [email] alone, deriving a readable name.
@@ -62,14 +45,8 @@ class UserProfile {
     return trimmed.isEmpty ? '?' : trimmed[0].toUpperCase();
   }
 
-  static String? _metadataString(Map<String, dynamic>? metadata, String key) {
-    final value = metadata?[key];
-    if (value is String && value.trim().isNotEmpty) return value.trim();
-    return null;
-  }
-
-  static String _nameFromEmail(String? email) {
-    if (email == null || email.trim().isEmpty) return unknown.name;
+  static String _nameFromEmail(String email) {
+    if (email.trim().isEmpty) return unknown.name;
 
     final localPart = email.split('@').first.split('+').first;
     final words = localPart

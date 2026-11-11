@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:lextari/features/dashboard/data/dashboard_providers.dart';
+import 'package:lextari/features/auth/data/auth_session_manager.dart';
 
 /// Banner shown at the top of the dashboard when the user is offline.
 ///
@@ -12,11 +12,9 @@ class OfflineBanner extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final auth = ref.watch(authStateProvider);
-    if (auth.hasValue && auth.value != null) {
-      return const SizedBox.shrink();
-    }
-    if (auth.isLoading) return const SizedBox.shrink();
+    final session = ref.watch(authSessionProvider);
+    if (session.value != null) return const SizedBox.shrink();
+    if (session.isLoading) return const SizedBox.shrink();
 
     return MaterialBanner(
       backgroundColor: Theme.of(context).colorScheme.errorContainer,

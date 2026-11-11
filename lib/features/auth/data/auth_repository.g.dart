@@ -9,16 +9,22 @@ part of 'auth_repository.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// Provides a singleton [ApiClient] instance.
+///
+/// The bearer token follows the session, and a 401 drops the stored session.
 
 @ProviderFor(apiClient)
 final apiClientProvider = ApiClientProvider._();
 
 /// Provides a singleton [ApiClient] instance.
+///
+/// The bearer token follows the session, and a 401 drops the stored session.
 
 final class ApiClientProvider
     extends $FunctionalProvider<ApiClient, ApiClient, ApiClient>
     with $Provider<ApiClient> {
   /// Provides a singleton [ApiClient] instance.
+  ///
+  /// The bearer token follows the session, and a 401 drops the stored session.
   ApiClientProvider._()
     : super(
         from: null,
@@ -52,7 +58,7 @@ final class ApiClientProvider
   }
 }
 
-String _$apiClientHash() => r'61d47ad220d8fd27b1a1258e8d30e08859d61652';
+String _$apiClientHash() => r'879493ddc989120234c491e70b984a7fca75ead5';
 
 /// Provides the [AuthRepository] used for login/signup/logout operations.
 
@@ -98,4 +104,4 @@ final class AuthRepositoryProvider
   }
 }
 
-String _$authRepositoryHash() => r'cd705c2c440da2a17e1a83d3d357f2c599b6a97d';
+String _$authRepositoryHash() => r'ee63c9b13f172fed8f63b94deb339e4a5c73284f';

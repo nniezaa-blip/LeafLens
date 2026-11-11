@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:lextari/core/config/app_config.dart';
-import 'package:lextari/core/init/lextari_auth_init.dart';
 import 'package:lextari/core/init/sentry_init.dart';
 import 'package:lextari/core/router/app_router.dart';
 import 'package:lextari/shared/notifications/notification_service.dart';
@@ -18,8 +17,7 @@ Future<void> initApp() async {
   // 2. Load `.env` so configuration is available below.
   await AppConfig.load();
   await _initSentry();
-  // 3. Supabase must be initialised before the router/auth streams run.
-  await _initAuth();
+  // 3. The session is restored by LextariApp once the provider scope exists.
   _initNotifications();
   await _initStorage();
 }
@@ -38,9 +36,6 @@ void _initErrorHandlers() {
 
 /// Initialises Sentry error tracking from build-time SENTRY_DSN.
 Future<void> _initSentry() => initSentry();
-
-/// Initialises Supabase client with AppConfig credentials.
-Future<void> _initAuth() => initLextariAuth();
 
 /// Wires NotificationService to the root navigator key.
 void _initNotifications() {

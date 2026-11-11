@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lextari/core/router/auth_guard.dart';
-import 'package:lextari/features/auth/data/lextari_auth.dart';
+import 'package:lextari/features/auth/data/auth_session_manager.dart';
 import 'package:lextari/features/auth/presentation/login_page.dart';
 import 'package:lextari/features/auth/presentation/signup_page.dart';
-import 'package:lextari/features/dashboard/data/dashboard_providers.dart';
 import 'package:lextari/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:lextari/features/dashboard/presentation/dashboard_shell.dart';
 import 'package:lextari/features/settings/presentation/settings_screen.dart';
@@ -22,18 +21,6 @@ class AppRouter {
   /// Root navigator key shared with NotificationService.
   static final rootNavigatorKey = GlobalKey<NavigatorState>();
 
-  /// Rebuilds nothing — ticks whenever auth state changes so the single
-  /// [GoRouter] instance re-runs its redirect without being recreated.
-  /// Recreating the router would reset navigation to [appRouterInitialLocation]
-  /// and bounce users back to the splash after login.
-  static final _authRefreshProvider = Provider<ValueNotifier<int>>((ref) {
-    final ticks = ValueNotifier<int>(0);
-    ref
-      ..onDispose(ticks.dispose)
-      ..listen(authStateProvider, (_, _) => ticks.value++);
-    return ticks;
-  });
-
   /// First screen shown when the app cold starts.
   static const String appRouterInitialLocation = '/splash';
 
@@ -42,16 +29,15 @@ class AppRouter {
     return GoRouter(
       navigatorKey: rootNavigatorKey,
       initialLocation: appRouterInitialLocation,
-      refreshListenable: ref.watch(_authRefreshProvider),
+      refreshListenable: ref.watch(authManagerProvider),
       redirect: (context, state) {
-        // Read the latest session directly instead of capturing it at
-        // build time, so the router never needs to be recreated.
-        final streamToken = ref.read(authStateProvider).value;
-        final sessionToken = LextariAuth.accessToken;
+        // Read the live session synchronously so the redirect never depends on
+        // whether the session stream has emitted yet.
+        final session = ref.read(authManagerProvider).currentSession;
         return AuthGuard.call(
           state: state,
-          isLoggedIn: sessionToken != null || streamToken != null,
-          currentToken: sessionToken,
+          isLoggedIn: session != null,
+          currentToken: session?.accessToken,
         );
       },
       routes: [

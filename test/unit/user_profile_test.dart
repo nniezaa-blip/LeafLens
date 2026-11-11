@@ -1,54 +1,22 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lextari/features/auth/domain/auth_user.dart';
 import 'package:lextari/features/auth/domain/user_profile.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() {
-  User buildUser({
-    String? email,
-    Map<String, dynamic>? metadata,
-  }) {
-    return User(
-      id: 'user-1',
-      appMetadata: const {},
-      userMetadata: metadata,
-      aud: 'authenticated',
-      createdAt: '2026-01-01T00:00:00Z',
-      email: email,
-    );
-  }
-
   group('UserProfile', () {
-    test('reads name and avatar from metadata', () {
+    test('maps the auth user email onto the profile', () {
       final profile = UserProfile.fromUser(
-        buildUser(
-          email: 'aishah@example.com',
-          metadata: const {
-            'full_name': 'Aishah Abdul Aziz',
-            'avatar_url': 'https://example.com/avatar.png',
-          },
-        ),
+        const AuthUser(id: 'user-1', email: 'aishah@example.com'),
       );
 
-      expect(profile.name, 'Aishah Abdul Aziz');
+      expect(profile.name, 'Aishah');
       expect(profile.email, 'aishah@example.com');
-      expect(profile.avatarUrl, 'https://example.com/avatar.png');
       expect(profile.initial, 'A');
-    });
-
-    test('falls back to picture for the avatar', () {
-      final profile = UserProfile.fromUser(
-        buildUser(
-          email: 'aishah@example.com',
-          metadata: const {'picture': 'https://example.com/photo.png'},
-        ),
-      );
-
-      expect(profile.avatarUrl, 'https://example.com/photo.png');
     });
 
     test('derives a display name from the email local part', () {
       final profile = UserProfile.fromUser(
-        buildUser(email: 'aishah.abdul.aziz@example.com'),
+        const AuthUser(id: 'user-1', email: 'aishah.abdul.aziz@example.com'),
       );
 
       expect(profile.name, 'Aishah Abdul Aziz');

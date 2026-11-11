@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -20,6 +21,10 @@ class ApiClient {
 
   /// The JWT token to attach as a Bearer header, or null if not authenticated.
   String? token;
+
+  /// Invoked when the backend rejects [token] with 401, so the persisted
+  /// session can be dropped. Set by the auth layer on wiring.
+  Future<void> Function()? onSessionExpired;
 
   Map<String, String> get _headers {
     final h = <String, String>{'Content-Type': 'application/json'};
@@ -76,6 +81,7 @@ class ApiClient {
         throw const AuthFailure('Session expired. Please log in again.');
       }
       token = null;
+      unawaited(onSessionExpired?.call());
       ErrorHandler.handleSilent(const SessionExpiredFailure());
       throw const SessionExpiredFailure();
     }

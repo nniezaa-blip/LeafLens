@@ -55,15 +55,9 @@ class AppConfig {
   static String get wsUrl =>
       _value('WS_URL', const String.fromEnvironment('WS_URL'));
 
-  /// Supabase project URL.
-  static String get supabaseUrl =>
-      _value('SUPABASE_URL', const String.fromEnvironment('SUPABASE_URL'));
-
-  /// Supabase anon/public key.
-  static String get supabaseAnonKey => _value(
-        'SUPABASE_ANON_KEY',
-        const String.fromEnvironment('SUPABASE_ANON_KEY'),
-      );
+  /// Lextari auth Worker base URL (no trailing slash).
+  static String get authUrl =>
+      _value('AUTH_URL', const String.fromEnvironment('AUTH_URL'));
 
   /// Hive box for offline cache.
   static const String telemetryCacheBox = 'telemetry_cache';

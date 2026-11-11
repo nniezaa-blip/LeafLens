@@ -1,7 +1,7 @@
 import 'package:lextari/core/network/api_client.dart';
 import 'package:lextari/core/network/ws_client.dart';
 import 'package:lextari/features/auth/data/auth_repository.dart';
-import 'package:lextari/features/auth/data/lextari_auth.dart';
+import 'package:lextari/features/auth/data/auth_session_manager.dart';
 import 'package:lextari/features/dashboard/domain/dashboard_update.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -56,21 +56,9 @@ DashboardRepository dashboardRepository(Ref ref) {
 @riverpod
 Stream<DashboardUpdate> dashboardStream(Ref ref) {
   final repo = ref.read(dashboardRepositoryProvider);
-  final auth = ref.watch(authStateProvider);
+  final session = ref.watch(authSessionProvider).value;
 
-  final token = auth.value;
-  if (token == null) return const Stream.empty();
+  if (session == null) return const Stream.empty();
 
-  return repo.connect(token);
-}
-
-/// Watches Supabase auth state and syncs the API client token.
-/// Emits the current access token (null if not logged in).
-@Riverpod(keepAlive: true)
-Stream<String?> authState(Ref ref) {
-  return LextariAuth.onAuthChange.map((data) {
-    final token = data.session?.accessToken;
-    ref.read(apiClientProvider).token = token;
-    return token;
-  });
+  return repo.connect(session.accessToken);
 }

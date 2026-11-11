@@ -103,45 +103,4 @@ final class DashboardStreamProvider
   }
 }
 
-String _$dashboardStreamHash() => r'1693ce513f56cebb022b46f23a3a269cfb54cb18';
-
-/// Watches Supabase auth state and syncs the API client token.
-/// Emits the current access token (null if not logged in).
-
-@ProviderFor(authState)
-final authStateProvider = AuthStateProvider._();
-
-/// Watches Supabase auth state and syncs the API client token.
-/// Emits the current access token (null if not logged in).
-
-final class AuthStateProvider
-    extends $FunctionalProvider<AsyncValue<String?>, String?, Stream<String?>>
-    with $FutureModifier<String?>, $StreamProvider<String?> {
-  /// Watches Supabase auth state and syncs the API client token.
-  /// Emits the current access token (null if not logged in).
-  AuthStateProvider._()
-    : super(
-        from: null,
-        argument: null,
-        retry: null,
-        name: r'authStateProvider',
-        isAutoDispose: false,
-        dependencies: null,
-        $allTransitiveDependencies: null,
-      );
-
-  @override
-  String debugGetCreateSourceHash() => _$authStateHash();
-
-  @$internal
-  @override
-  $StreamProviderElement<String?> $createElement($ProviderPointer pointer) =>
-      $StreamProviderElement(pointer);
-
-  @override
-  Stream<String?> create(Ref ref) {
-    return authState(ref);
-  }
-}
-
-String _$authStateHash() => r'cffee782075ff0a886b3135c26a6e56047690e24';
+String _$dashboardStreamHash() => r'c0de32796934e629b9084d9787e6027fb57f666f';

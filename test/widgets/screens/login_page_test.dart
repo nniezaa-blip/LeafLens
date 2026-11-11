@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lextari/features/auth/data/auth_session_manager.dart';
+import 'package:lextari/features/auth/domain/auth_session.dart';
 import 'package:lextari/features/auth/presentation/login_page.dart';
-import 'package:lextari/features/dashboard/data/dashboard_providers.dart';
 
 import '../../helpers/test_asset_bundle.dart';
 
 Widget buildTestApp() {
   return ProviderScope(
     overrides: [
-      authStateProvider.overrideWith((ref) => Stream<String?>.value(null)),
+      authSessionProvider.overrideWith(
+        (ref) => Stream<AuthSession?>.value(null),
+      ),
     ],
     child: MaterialApp(
       home: Scaffold(
