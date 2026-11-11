@@ -48,13 +48,17 @@ class AuthApi {
   Future<AuthSession> login({
     required String email,
     required String password,
-  }) => _authenticate('/auth/login', email, password);
+  }) => _postSession('/auth/login', {'email': email, 'password': password});
 
   /// Registers a new account.
   Future<AuthSession> register({
     required String email,
     required String password,
-  }) => _authenticate('/auth/register', email, password);
+  }) => _postSession('/auth/register', {'email': email, 'password': password});
+
+  /// Exchanges a Google ID token for a Lextari session.
+  Future<AuthSession> googleLogin(String idToken) =>
+      _postSession('/auth/google', {'id_token': idToken});
 
   /// Best-effort server-side logout; the local session is cleared regardless.
   Future<void> logout(String token) async {
@@ -90,10 +94,9 @@ class AuthApi {
     }
   }
 
-  Future<AuthSession> _authenticate(
+  Future<AuthSession> _postSession(
     String path,
-    String email,
-    String password,
+    Map<String, Object?> body,
   ) async {
     if (!isConfigured) {
       throw const AuthException('auth_not_configured');
@@ -105,7 +108,7 @@ class AuthApi {
           .post(
             Uri.parse('$baseUrl$path'),
             headers: const {'Content-Type': 'application/json'},
-            body: jsonEncode({'email': email, 'password': password}),
+            body: jsonEncode(body),
           )
           .timeout(_timeout);
     } on TimeoutException {
@@ -114,16 +117,16 @@ class AuthApi {
       throw const AuthException('network');
     }
 
-    final body = _decode(response.body);
+    final payload = _decode(response.body);
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw AuthException(
-        body['error'] as String? ?? 'unknown',
+        payload['error'] as String? ?? 'unknown',
         statusCode: response.statusCode,
       );
     }
 
-    final accessToken = body['access_token'];
-    final user = body['user'];
+    final accessToken = payload['access_token'];
+    final user = payload['user'];
     if (accessToken is! String || user is! Map<String, dynamic>) {
       throw AuthException('invalid_response', statusCode: response.statusCode);
     }
@@ -131,7 +134,7 @@ class AuthApi {
     return AuthSession(
       accessToken: accessToken,
       user: AuthUser.fromJson(user),
-      expiresAt: DateTime.now().toUtc().add(_ttl(body['expires_in'])),
+      expiresAt: DateTime.now().toUtc().add(_ttl(payload['expires_in'])),
     );
   }
 

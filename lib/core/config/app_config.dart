@@ -55,6 +55,12 @@ class AppConfig {
   static String get wsUrl =>
       _value('WS_URL', const String.fromEnvironment('WS_URL'));
 
+  /// Google web OAuth client ID used as the ID-token audience.
+  static String get googleServerClientId => _value(
+    'GOOGLE_SERVER_CLIENT_ID',
+    const String.fromEnvironment('GOOGLE_SERVER_CLIENT_ID'),
+  );
+
   /// Lextari auth Worker base URL (no trailing slash).
   static String get authUrl =>
       _value('AUTH_URL', const String.fromEnvironment('AUTH_URL'));

@@ -92,6 +92,28 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     }
   }
 
+  Future<void> _handleGoogleLogin() async {
+    setState(() {
+      _loading = true;
+      _formError = null;
+    });
+
+    try {
+      final signedIn = await ref
+          .read(authRepositoryProvider)
+          .signInWithGoogle();
+      if (mounted && signedIn) context.go('/dashboard');
+    } on AuthFailure catch (e) {
+      setState(() => _formError = e.message);
+    } on Failure catch (e) {
+      ErrorHandler.handle(e);
+    } on Exception catch (e) {
+      ErrorHandler.handle(UnknownFailure(e.toString()));
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,6 +144,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   ],
                   const SizedBox(height: 20),
                   _LoginButton(loading: _loading, onPressed: _handleLogin),
+                  const SizedBox(height: 12),
+                  _GoogleButton(
+                    loading: _loading,
+                    onPressed: _handleGoogleLogin,
+                  ),
                   const SizedBox(height: 12),
                   const _SignUpRow(),
                 ],
@@ -270,6 +297,25 @@ class _LoginButton extends StatelessWidget {
               ),
             )
           : Text('Login', style: context.loginButtonStyle),
+    );
+  }
+}
+
+class _GoogleButton extends StatelessWidget {
+  const _GoogleButton({required this.loading, required this.onPressed});
+  final bool loading;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlinedButton.icon(
+      onPressed: loading ? null : onPressed,
+      icon: const Icon(Icons.g_mobiledata, size: 26),
+      label: const Text('Continue with Google'),
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        shape: const StadiumBorder(),
+      ),
     );
   }
 }

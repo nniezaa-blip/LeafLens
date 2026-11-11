@@ -1,7 +1,9 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lextari/core/errors/failures.dart';
 import 'package:lextari/core/network/api_client.dart';
 import 'package:lextari/features/auth/data/auth_api.dart';
 import 'package:lextari/features/auth/data/auth_session_manager.dart';
+import 'package:lextari/features/auth/data/google_sign_in_service.dart';
 import 'package:lextari/features/auth/domain/auth_session.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -13,9 +15,10 @@ part 'auth_repository.g.dart';
 /// never see [AuthException] or HTTP details.
 class AuthRepository {
   /// Creates an [AuthRepository] over the shared session manager.
-  AuthRepository(this._manager);
+  AuthRepository(this._manager, this._google);
 
   final AuthSessionManager _manager;
+  final GoogleSignInService _google;
 
   /// Login with email/password.
   /// Throws [AuthFailure] with a user-friendly message on failure.
@@ -28,6 +31,21 @@ class AuthRepository {
   Future<void> register(String email, String password) => _run(
     () => _manager.register(email: email, password: password),
   );
+
+  /// Signs in with Google; a cancelled chooser is not an error.
+  Future<bool> signInWithGoogle() async {
+    try {
+      final idToken = await _google.idToken();
+      await _manager.loginWithGoogle(idToken);
+      return true;
+    } on AuthException catch (error) {
+      if (error.code == 'canceled') return false;
+      if (error.code == 'network' || error.code == 'timeout') {
+        throw const NetworkFailure();
+      }
+      throw AuthFailure(_messages[error.code] ?? _fallback);
+    }
+  }
 
   /// Logout — clears the session locally and revokes it server-side.
   Future<void> logout() => _manager.logout();
@@ -53,6 +71,13 @@ class AuthRepository {
     'invalid_request':
         'Enter a valid email and a password of at least 8 characters.',
     'auth_not_configured': 'Login is not configured. Please try again later.',
+    'google_not_configured': 'Google sign-in is not configured yet.',
+    'google_sign_in_failed': 'Google sign-in failed. Please try again.',
+    'invalid_google_token': 'Google could not verify this account.',
+    'link_required':
+        'This email already has a password account. Log in with your '
+        'password instead.',
+    'conflict': 'This email is already linked to another sign-in method.',
   };
 }
 
@@ -75,8 +100,15 @@ ApiClient apiClient(Ref ref) {
   return client;
 }
 
+/// Google Sign-In wrapper for the app.
+final Provider<GoogleSignInService> googleSignInServiceProvider =
+    Provider<GoogleSignInService>((ref) => GoogleSignInService());
+
 /// Provides the [AuthRepository] used for login/signup/logout operations.
 @riverpod
 AuthRepository authRepository(Ref ref) {
-  return AuthRepository(ref.watch(authManagerProvider));
+  return AuthRepository(
+    ref.watch(authManagerProvider),
+    ref.watch(googleSignInServiceProvider),
+  );
 }

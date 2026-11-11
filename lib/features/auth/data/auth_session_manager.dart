@@ -51,6 +51,13 @@ class AuthSessionManager extends ChangeNotifier {
     return session;
   }
 
+  /// Logs in with a Google ID token and persists the issued session.
+  Future<AuthSession> loginWithGoogle(String idToken) async {
+    final session = await _api.googleLogin(idToken);
+    await _persist(session);
+    return session;
+  }
+
   /// Registers an account and persists the issued session.
   Future<AuthSession> register({
     required String email,
