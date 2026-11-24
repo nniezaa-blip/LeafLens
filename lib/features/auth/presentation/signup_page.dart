@@ -1,18 +1,17 @@
-import 'package:flutter/material.dart';
+import 'package:lextari/ui/ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lextari/core/errors/error_handler.dart';
 import 'package:lextari/core/errors/failures.dart';
-import 'package:lextari/ui/tokens/app_colors.dart';
+import 'package:lextari/ui/ui.dart';
 import 'package:lextari/core/utils/validators.dart';
-import 'package:lextari/features/auth/providers/auth_providers.dart';
+import 'package:lextari/features/auth/domain/auth_actions.dart';
 import 'package:lextari/widgets/app_text_field.dart';
 
 extension on BuildContext {
   ColorScheme get colors => Theme.of(this).colorScheme;
-  TextTheme get textTheme => Theme.of(this).textTheme;
-
+  
   TextStyle get signUpTitleStyle => const TextStyle(
     fontWeight: FontWeight.w600,
     fontSize: 30,
@@ -99,8 +98,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
     });
 
     try {
-      final repo = ref.read(authRepositoryProvider);
-      await repo.register(_emailCtrl.text.trim(), _passwordCtrl.text);
+      await ref.read(authActionsProvider).register(_emailCtrl.text.trim(), _passwordCtrl.text);
       if (mounted) context.go('/dashboard');
     } on AuthFailure catch (e) {
       setState(() => _formError = e.message);
@@ -121,9 +119,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
     });
 
     try {
-      final signedIn = await ref
-          .read(authRepositoryProvider)
-          .signInWithGoogle();
+      final signedIn = await ref.read(authActionsProvider).signInWithGoogle();
       if (mounted && signedIn) context.go('/dashboard');
     } on AuthFailure catch (e) {
       setState(() => _formError = e.message);
@@ -138,7 +134,8 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return PrismScaffold(
+      bar: const EmptyBar(),
       backgroundColor: AppColors.offWhite,
       body: SafeArea(
         child: Center(
@@ -219,14 +216,8 @@ class _GoogleSignUpButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 32),
-      child: FilledButton.tonal(
+      child: FilledButton(
         onPressed: loading ? null : onPressed,
-        style: FilledButton.styleFrom(
-          backgroundColor: AppColors.offBlack,
-          foregroundColor: AppColors.white,
-          padding: const EdgeInsets.symmetric(vertical: 18),
-          shape: const StadiumBorder(),
-        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -234,8 +225,8 @@ class _GoogleSignUpButton extends StatelessWidget {
               const SizedBox(
                 width: 20,
                 height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
+                child: ActivityIndicator(
+                  size: 20,
                   color: AppColors.white,
                 ),
               )
@@ -263,17 +254,17 @@ class _OrDivider extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 24),
       child: Row(
         children: [
-          Expanded(child: Divider(color: context.colors.outlineVariant)),
+          Expanded(child: Container(height:1,color:AppColors.greyLighter)),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
               'Or continue with Email',
-              style: context.textTheme.bodyMedium?.copyWith(
-                color: context.colors.outline,
+              style: DefaultTextStyle.of(context).style.copyWith(
+                color: AppColors.textGrey,
               ),
             ),
           ),
-          Expanded(child: Divider(color: context.colors.outlineVariant)),
+          Expanded(child: Container(height:1,color:AppColors.greyLighter)),
         ],
       ),
     );
@@ -342,9 +333,9 @@ class _PasswordField extends StatelessWidget {
       controller: controller,
       obscureText: obscure,
       validator: (v) => (v == null || v.isEmpty) ? 'Enter your password' : null,
-      suffixIcon: IconButton(
-        icon: Icon(
-          obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+      suffixIcon: IconTap(
+        icon: GlyphIcon(
+          obscure ? AppGlyphs.visibilityOff : AppGlyphs.visibility,
         ),
         onPressed: onToggle,
       ),
@@ -376,14 +367,6 @@ class _TermsCheckbox extends StatelessWidget {
               child: Checkbox(
                 value: agreed,
                 onChanged: (v) => onChanged(v ?? false),
-                side: BorderSide(
-                  color: error != null
-                      ? AppColors.redDark
-                      : context.colors.outline,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4),
-                ),
               ),
             ),
             const SizedBox(width: 10),
@@ -433,16 +416,12 @@ class _SignUpButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return FilledButton(
       onPressed: loading ? null : onPressed,
-      style: FilledButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 18),
-        shape: const StadiumBorder(),
-      ),
       child: loading
           ? const SizedBox(
               width: 20,
               height: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
+              child: ActivityIndicator(
+                size: 20,
                 color: AppColors.offWhite,
               ),
             )

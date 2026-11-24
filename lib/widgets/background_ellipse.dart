@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:lextari/ui/ui.dart';
 
 /// Decorative SVG positioned with fractional sizing.
 ///

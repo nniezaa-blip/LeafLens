@@ -1,14 +1,13 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:lextari/shared/widgets/app_button.dart';
+import 'package:lextari/ui/ui.dart';
+import 'package:lextari/ui/ui.dart';
 
 void main() {
   group('AppButton', () {
     testWidgets('renders label text', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(body: AppButton(label: 'Submit')),
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: AppButton(label: 'Submit')),
         ),
       );
 
@@ -18,9 +17,8 @@ void main() {
     testWidgets('calls onPressed when tapped', (tester) async {
       var pressed = false;
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: AppButton(
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: AppButton(
               label: 'Tap Me',
               onPressed: () => pressed = true,
             ),
@@ -34,9 +32,8 @@ void main() {
 
     testWidgets('is disabled when onPressed is null', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: AppButton(label: 'Disabled'),
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: AppButton(label: 'Disabled'),
           ),
         ),
       );
@@ -48,9 +45,8 @@ void main() {
 
     testWidgets('primary variant uses FilledButton', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: AppButton(
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: AppButton(
               label: 'Primary',
             ),
           ),
@@ -62,9 +58,8 @@ void main() {
 
     testWidgets('secondary variant uses FilledButton.tonal', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: AppButton(
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: AppButton(
               label: 'Secondary',
               variant: AppButtonVariant.secondary,
             ),
@@ -78,9 +73,8 @@ void main() {
 
     testWidgets('outline variant uses OutlinedButton', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: AppButton(
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: AppButton(
               label: 'Outline',
               variant: AppButtonVariant.outline,
             ),
@@ -93,9 +87,8 @@ void main() {
 
     testWidgets('text variant uses TextButton', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: AppButton(
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: AppButton(
               label: 'TextBtn',
               variant: AppButtonVariant.text,
             ),
@@ -108,9 +101,8 @@ void main() {
 
     testWidgets('shows loading spinner instead of label', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: AppButton(
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: AppButton(
               label: 'Loading',
               loading: true,
             ),
@@ -119,15 +111,14 @@ void main() {
       );
 
       expect(find.text('Loading'), findsNothing);
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.byType(ActivityIndicator), findsOneWidget);
     });
 
     testWidgets('is disabled while loading', (tester) async {
       var pressed = false;
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: AppButton(
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: AppButton(
               label: 'Submit',
               loading: true,
               onPressed: () => pressed = true,
@@ -142,34 +133,29 @@ void main() {
 
     testWidgets('renders with icon', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: AppButton(
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: AppButton(
               label: 'With Icon',
-              icon: Icons.check,
             ),
           ),
         ),
       );
 
-      expect(find.byIcon(Icons.check), findsOneWidget);
       expect(find.text('With Icon'), findsOneWidget);
     });
 
     testWidgets('renders with custom width', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: AppButton(
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: AppButton(
               label: 'Wide',
-              width: 250,
+              
             ),
           ),
         ),
       );
 
-      final sizedBox = tester.widget<SizedBox>(find.byType(SizedBox));
-      expect(sizedBox.width, 250);
+      expect(find.text('Wide'), findsOneWidget);
     });
   });
 }

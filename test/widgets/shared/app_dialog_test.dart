@@ -1,15 +1,14 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lextari/shared/notifications/app_dialog.dart';
+import 'package:lextari/widgets/notifications/app_dialog.dart';
+import 'package:lextari/ui/ui.dart';
 
 void main() {
   group('showAppDialog', () {
     testWidgets('shows title and message', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) => ElevatedButton(
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: Builder(
+              builder: (context) => FilledButton(
                 onPressed: () => showAppDialog<void>(
                   context: context,
                   title: 'Test Title',
@@ -31,10 +30,9 @@ void main() {
 
     testWidgets('shows OK button by default', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) => ElevatedButton(
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: Builder(
+              builder: (context) => FilledButton(
                 onPressed: () => showAppDialog<void>(
                   context: context,
                   title: 'Info',
@@ -55,10 +53,9 @@ void main() {
 
     testWidgets('shows custom confirm label', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) => ElevatedButton(
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: Builder(
+              builder: (context) => FilledButton(
                 onPressed: () => showAppDialog<void>(
                   context: context,
                   title: 'Delete?',
@@ -81,10 +78,9 @@ void main() {
 
     testWidgets('shows cancel when cancelLabel provided', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) => ElevatedButton(
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: Builder(
+              builder: (context) => FilledButton(
                 onPressed: () => showAppDialog<void>(
                   context: context,
                   title: 'Confirm',
@@ -109,10 +105,9 @@ void main() {
     testWidgets('confirm returns true', (tester) async {
       bool? result;
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) => ElevatedButton(
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: Builder(
+              builder: (context) => FilledButton(
                 onPressed: () async {
                   result = await showAppDialog<bool>(
                     context: context,
@@ -138,10 +133,9 @@ void main() {
     testWidgets('cancel returns null', (tester) async {
       bool? result;
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) => ElevatedButton(
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: Builder(
+              builder: (context) => FilledButton(
                 onPressed: () async {
                   result = await showAppDialog<bool>(
                     context: context,
@@ -167,15 +161,14 @@ void main() {
 
     testWidgets('shows icon when provided', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) => ElevatedButton(
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: Builder(
+              builder: (context) => FilledButton(
                 onPressed: () => showAppDialog<void>(
                   context: context,
                   title: 'Warning',
                   message: 'Be careful',
-                  icon: const Icon(Icons.warning),
+                  icon: const GlyphIcon(AppGlyphs.warning),
                 ),
                 child: const Text('open'),
               ),
@@ -187,15 +180,14 @@ void main() {
       await tester.tap(find.text('open'));
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.warning), findsOneWidget);
+      expect(find.byWidgetPredicate((w) => w is GlyphIcon && w.glyph == AppGlyphs.warning), findsOneWidget);
     });
 
     testWidgets('barrier not dismissible by default', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) => ElevatedButton(
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: Builder(
+              builder: (context) => FilledButton(
                 onPressed: () => showAppDialog<void>(
                   context: context,
                   title: 'Modal',

@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lextari/shared/notifications/lextari_toast.dart';
+import 'package:lextari/widgets/notifications/lextari_toast.dart';
+import 'package:lextari/ui/ui.dart';
 import 'package:toastification/toastification.dart';
 
 void main() {
@@ -26,8 +26,8 @@ void main() {
 
     testWidgets('renders title text', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: buildToast(title: 'Success!')),
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: buildToast(title: 'Success!')),
         ),
       );
       expect(find.text('Success!'), findsOneWidget);
@@ -35,9 +35,8 @@ void main() {
 
     testWidgets('renders description when provided', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: buildToast(
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: buildToast(
               title: 'Error',
               description: 'Something went wrong',
             ),
@@ -50,8 +49,8 @@ void main() {
 
     testWidgets('hides description when null', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: buildToast(title: 'Info')),
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: buildToast(title: 'Info')),
         ),
       );
       expect(find.text('Info'), findsOneWidget);
@@ -61,55 +60,51 @@ void main() {
 
     testWidgets('shows close button', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(body: buildToast()),
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: buildToast()),
         ),
       );
-      expect(find.byIcon(Icons.close_rounded), findsOneWidget);
+      expect(find.byWidgetPredicate((w) => w is GlyphIcon && w.glyph == AppGlyphs.close), findsOneWidget);
     });
 
     testWidgets('error type shows error icon', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: buildToast(type: ToastificationType.error),
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: buildToast(type: ToastificationType.error),
           ),
         ),
       );
-      expect(find.byIcon(Icons.error_rounded), findsOneWidget);
+      expect(find.byWidgetPredicate((w) => w is GlyphIcon && w.glyph == AppGlyphs.error), findsOneWidget);
     });
 
     testWidgets('success type shows check icon', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: buildToast(type: ToastificationType.success),
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: buildToast(type: ToastificationType.success),
           ),
         ),
       );
-      expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
+      expect(find.byWidgetPredicate((w) => w is GlyphIcon && w.glyph == AppGlyphs.checkCircle), findsOneWidget);
     });
 
     testWidgets('warning type shows warning icon', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: buildToast(type: ToastificationType.warning),
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: buildToast(type: ToastificationType.warning),
           ),
         ),
       );
-      expect(find.byIcon(Icons.warning_rounded), findsOneWidget);
+      expect(find.byWidgetPredicate((w) => w is GlyphIcon && w.glyph == AppGlyphs.warning), findsOneWidget);
     });
 
     testWidgets('info type shows info icon', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: buildToast(),
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: buildToast(),
           ),
         ),
       );
-      expect(find.byIcon(Icons.info_rounded), findsOneWidget);
+      expect(find.byWidgetPredicate((w) => w is GlyphIcon && w.glyph == AppGlyphs.info), findsOneWidget);
     });
   });
 }

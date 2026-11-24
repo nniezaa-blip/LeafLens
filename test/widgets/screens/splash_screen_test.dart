@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:lextari/features/splash/presentation/splash_screen.dart';
+import 'package:lextari/ui/ui.dart';
 
 import '../../helpers/test_asset_bundle.dart';
 
@@ -12,7 +11,7 @@ import '../../helpers/test_asset_bundle.dart';
 /// so the auto-advance timer does not linger after the test.
 Future<void> _pumpSplash(WidgetTester tester) async {
   await tester.pumpWidget(
-    MaterialApp(
+    PrismApp(
       home: DefaultAssetBundle(
         bundle: TestAssetBundle(),
         child: const SplashScreen(),
@@ -60,7 +59,7 @@ void main() {
           GoRoute(path: '/splash', builder: (_, _) => const SplashScreen()),
           GoRoute(
             path: '/login',
-            builder: (_, _) => const Scaffold(body: Text('Login')),
+            builder: (_, _) => const PrismScaffold(bar: const EmptyBar(), body: Text('Login')),
           ),
         ],
       );
@@ -69,7 +68,7 @@ void main() {
         ProviderScope(
           child: DefaultAssetBundle(
             bundle: TestAssetBundle(),
-            child: MaterialApp.router(routerConfig: router),
+            child: PrismApp.router(routerConfig: router),
           ),
         ),
       );

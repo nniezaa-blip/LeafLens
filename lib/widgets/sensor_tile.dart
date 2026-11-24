@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
-
 import 'package:lextari/features/dashboard/domain/sensor_key.dart';
 import 'package:lextari/features/dashboard/domain/sensor_reading.dart';
+import 'package:lextari/ui/ui.dart';
 
 /// Displays a single sensor value with label, unit, and stale indicator.
 ///
@@ -19,11 +18,11 @@ class SensorTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-    final textStyle = Theme.of(context).textTheme;
+    final cs = context.colorScheme;
+    final textStyle = DefaultTextStyle.of(context).style;
 
     if (reading == null) {
-      return Card(
+      return AppCard(
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -52,7 +51,7 @@ class SensorTile extends StatelessWidget {
       );
     }
 
-    return Card(
+    return AppCard(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -60,16 +59,14 @@ class SensorTile extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text(sensor.name, style: textStyle.labelMedium),
+                Text(sensor.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
                 if (reading!.isStale) ...[
                   const SizedBox(width: 4),
-                  Tooltip(
-                    message: 'Last updated ${reading!.ageLabel}',
-                    child: Icon(
-                      Icons.warning_amber_rounded,
-                      size: 14,
-                      color: cs.error,
-                    ),
+                  GlyphIcon(
+                    AppGlyphs.warning,
+                    size: 14,
+                    color: cs.error,
+                    
                   ),
                 ],
               ],
@@ -77,13 +74,13 @@ class SensorTile extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               '${reading!.value.toStringAsFixed(1)}${sensor.unit}',
-              style: textStyle.headlineLarge?.copyWith(
+              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w700).copyWith(
                 color: reading!.isStale ? cs.error : cs.onSurface,
               ),
             ),
             Text(
               reading!.ageLabel,
-              style: textStyle.bodySmall?.copyWith(
+              style: const TextStyle(fontSize: 12)?.copyWith(
                 color: reading!.isStale ? cs.error : cs.outline,
               ),
             ),

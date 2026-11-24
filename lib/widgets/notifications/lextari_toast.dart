@@ -31,8 +31,8 @@ class LextariToast extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accent = _colour(type);
-    return Material(
-      color: Colors.transparent,
+    return Container(
+      color: const Color(0x00000000),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
@@ -175,7 +175,7 @@ class _ToastCloseButton extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(right: 4),
       child: Center(
-        child: IconButton(
+        child: IconTap(
           icon: const GlyphIcon(AppGlyphs.close, size: 18),
           onPressed: () => Toastification().dismiss(holder),
         ),

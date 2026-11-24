@@ -1,9 +1,10 @@
 import 'dart:math' as math;
-
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
-import 'package:lextari/ui/tokens/app_colors.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lextari/features/dashboard/domain/telemetry_history_point.dart';
+import 'package:lextari/features/dashboard/providers/telemetry_providers.dart';
 import 'package:lextari/features/stats/presentation/trend_metric.dart';
+import 'package:lextari/ui/ui.dart';
 import 'package:lextari/widgets/frosted_card.dart';
 
 /// Rounded frosted card containing the 30-day line chart for a [TrendMetric].
@@ -14,7 +15,7 @@ import 'package:lextari/widgets/frosted_card.dart';
 /// The plot is initially zoomed so roughly ten days fill the width and can be
 /// dragged horizontally to slide between day 1 and day 30, while the value axis
 /// stays pinned in place.
-class TrendChartCard extends StatefulWidget {
+class TrendChartCard extends ConsumerStatefulWidget {
   /// Creates a [TrendChartCard].
   const TrendChartCard({required this.metric, super.key});
 
@@ -22,10 +23,10 @@ class TrendChartCard extends StatefulWidget {
   final TrendMetric metric;
 
   @override
-  State<TrendChartCard> createState() => _TrendChartCardState();
+  ConsumerState<TrendChartCard> createState() => _TrendChartCardState();
 }
 
-class _TrendChartCardState extends State<TrendChartCard> {
+class _TrendChartCardState extends ConsumerState<TrendChartCard> {
   /// How many times wider than the viewport the plot is laid out, i.e. how far
   /// the chart is zoomed in. A value of 3 shows about 10 days per screen.
   static const _initialScale = 3.0;
@@ -57,6 +58,11 @@ class _TrendChartCardState extends State<TrendChartCard> {
 
   @override
   Widget build(BuildContext context) {
+    final historyAsync = ref.watch(telemetryHistoryProvider(widget.metric.apiKey));
+    final spots = historyAsync.maybeWhen(
+      data: (points) => _spotsFromHistory(widget.metric, points),
+      orElse: () => _trendSpots(widget.metric),
+    );
     return FrostedCard(
       padding: const EdgeInsets.fromLTRB(18, 18, 12, 14),
       child: Column(
@@ -68,7 +74,7 @@ class _TrendChartCardState extends State<TrendChartCard> {
             child: Padding(
               padding: const EdgeInsets.only(right: 6, top: 4),
               child: LineChart(
-                _buildChartData(widget.metric),
+                _buildChartData(widget.metric, spots),
                 duration: const Duration(milliseconds: 450),
                 curve: Curves.easeInOutCubic,
                 transformationConfig: FlTransformationConfig(
@@ -90,8 +96,18 @@ class _TrendChartCardState extends State<TrendChartCard> {
 // Chart data
 //
 
+List<FlSpot> _spotsFromHistory(TrendMetric metric, List<TelemetryHistoryPoint> points) {
+  if (points.isEmpty) return _trendSpots(metric);
+  final sorted = [...points]..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+  final sliced = sorted.length > 30 ? sorted.sublist(sorted.length - 30) : sorted;
+  return [
+    for (var i = 0; i < sliced.length; i++)
+      FlSpot((i + 1).toDouble(), sliced[i].value.clamp(metric.minY, metric.maxY)),
+  ];
+}
+
 /// Builds the full [LineChartData] configuration for [metric].
-LineChartData _buildChartData(TrendMetric metric) {
+LineChartData _buildChartData(TrendMetric metric, List<FlSpot> spots) {
   final lineColor = metric.lineColor;
 
   return LineChartData(
@@ -116,7 +132,7 @@ LineChartData _buildChartData(TrendMetric metric) {
       ),
     ),
     titlesData: _titlesData(metric),
-    lineBarsData: [_lineBar(metric, lineColor)],
+    lineBarsData: [_lineBar(metric, lineColor, spots)],
     lineTouchData: _touchData(metric, lineColor),
   );
 }
@@ -182,9 +198,9 @@ FlTitlesData _titlesData(TrendMetric metric) {
   );
 }
 
-LineChartBarData _lineBar(TrendMetric metric, Color lineColor) {
+LineChartBarData _lineBar(TrendMetric metric, Color lineColor, List<FlSpot> spots) {
   return LineChartBarData(
-    spots: _trendSpots(metric),
+    spots: spots,
     isCurved: true,
     curveSmoothness: 0.25,
     preventCurveOverShooting: true,
@@ -246,7 +262,6 @@ LineTouchData _touchData(TrendMetric metric, Color lineColor) {
           getDotPainter: (spot, percent, bar, i) => FlDotCirclePainter(
             radius: 4.5,
             color: lineColor,
-            strokeWidth: 2,
             strokeColor: AppColors.white,
           ),
         ),
@@ -308,7 +323,7 @@ class _ChartHeader extends StatelessWidget {
             color: lineColor.withValues(alpha: 0.16),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Icon(metric.icon, size: 20, color: lineColor),
+          child: GlyphIcon(metric.icon, color: lineColor),
         ),
         const SizedBox(width: 12),
         Expanded(

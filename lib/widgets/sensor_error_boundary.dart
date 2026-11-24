@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:lextari/ui/ui.dart';
 
 /// Wraps a child widget and catches build errors, showing a fallback
 /// instead of crashing the whole screen.
@@ -30,7 +30,7 @@ class _SensorErrorBoundaryState extends State<SensorErrorBoundary> {
   @override
   Widget build(BuildContext context) {
     if (_error != null) {
-      final cs = Theme.of(context).colorScheme;
+      final cs = context.colorScheme;
       return Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
@@ -41,13 +41,11 @@ class _SensorErrorBoundaryState extends State<SensorErrorBoundary> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.sensors_off, color: cs.error, size: 24),
+            GlyphIcon(AppGlyphs.sensorsOff, color: cs.error, size: 24),
             const SizedBox(height: 4),
             Text(
               '${widget.label} unavailable',
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: cs.onErrorContainer),
+              style: TextStyle(fontSize: 12, color: cs.onErrorContainer),
             ),
             TextButton(
               onPressed: () => setState(() => _error = null),

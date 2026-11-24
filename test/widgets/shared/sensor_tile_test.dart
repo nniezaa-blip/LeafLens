@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:lextari/features/dashboard/domain/sensor_key.dart';
 import 'package:lextari/features/dashboard/domain/sensor_reading.dart';
-import 'package:lextari/shared/widgets/sensor_tile.dart';
+import 'package:lextari/widgets/sensor_tile.dart';
+import 'package:lextari/ui/ui.dart';
 
 void main() {
   group('SensorTile', () {
@@ -23,9 +22,8 @@ void main() {
 
     testWidgets('renders sensor name and value', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SensorTile(
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: SensorTile(
               sensor: SensorKey.temperature,
               reading: reading(),
             ),
@@ -40,9 +38,8 @@ void main() {
 
     testWidgets('renders humidity value with % symbol', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SensorTile(
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: SensorTile(
               sensor: SensorKey.humidity,
               reading: reading(value: 65, unit: '%'),
             ),
@@ -56,23 +53,21 @@ void main() {
 
     testWidgets('shows skeleton when reading is null', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SensorTile(sensor: SensorKey.temperature),
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: SensorTile(sensor: SensorKey.temperature),
           ),
         ),
       );
 
       // Skeleton shows placeholder containers, not real text
       expect(find.text('temperature'), findsNothing);
-      expect(find.byType(Card), findsOneWidget);
+      expect(find.byType(SensorTile), findsOneWidget);
     });
 
     testWidgets('shows stale warning for old readings', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SensorTile(
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: SensorTile(
               sensor: SensorKey.soilMoisture,
               reading: reading(
                 value: 55,
@@ -84,14 +79,13 @@ void main() {
         ),
       );
 
-      expect(find.byIcon(Icons.warning_amber_rounded), findsOneWidget);
+      expect(find.byWidgetPredicate((w) => w is GlyphIcon && w.glyph == AppGlyphs.warning), findsOneWidget);
     });
 
     testWidgets('shows age label for recent readings', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SensorTile(
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: SensorTile(
               sensor: SensorKey.soilMoisture,
               reading: reading(
                 value: 55,
@@ -109,9 +103,8 @@ void main() {
 
     testWidgets('renders water level sensor', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SensorTile(
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: SensorTile(
               sensor: SensorKey.waterLevel,
               reading: reading(value: 80, unit: '%'),
             ),

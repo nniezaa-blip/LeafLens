@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lextari/core/router/auth_guard.dart';
@@ -6,6 +5,7 @@ import 'package:lextari/features/auth/presentation/login_page.dart';
 import 'package:lextari/features/auth/presentation/signup_page.dart';
 import 'package:lextari/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:lextari/features/splash/presentation/splash_screen.dart';
+import 'package:lextari/ui/ui.dart';
 
 /// Creates a test-only GoRouter that uses [AuthGuard] without
 /// touching LextariAuth — safe for tests where Supabase isn't initialized.
@@ -44,7 +44,7 @@ Widget buildTestApp({bool isAuthenticated = false}) {
     authStream: Stream.value(isAuthenticated),
   );
 
-  return MaterialApp.router(
+  return PrismApp.router(
     routerConfig: router,
   );
 }

@@ -1,14 +1,12 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:lextari/shared/widgets/background_ellipse.dart';
+import 'package:lextari/widgets/background_ellipse.dart';
+import 'package:lextari/ui/ui.dart';
 
 import '../../helpers/test_asset_bundle.dart';
 
 Widget wrapWithAssetBundle(Widget child) {
-  return MaterialApp(
-    home: Scaffold(
-      body: DefaultAssetBundle(
+  return PrismApp(
+    home: PrismScaffold(bar: const EmptyBar(), body: DefaultAssetBundle(
         bundle: TestAssetBundle(),
         child: child,
       ),
@@ -21,14 +19,14 @@ void main() {
     testWidgets('renders without error', (tester) async {
       await tester.pumpWidget(wrapWithAssetBundle(const BackgroundEllipse()));
 
-      expect(find.byType(Align), findsOneWidget);
+      expect(find.byType(BackgroundEllipse), findsOneWidget);
       expect(find.byType(FractionallySizedBox), findsOneWidget);
     });
 
     testWidgets('uses default alignment bottomRight', (tester) async {
       await tester.pumpWidget(wrapWithAssetBundle(const BackgroundEllipse()));
 
-      final align = tester.widget<Align>(find.byType(Align));
+      final align = tester.widget<Align>(find.descendant(of: find.byType(BackgroundEllipse), matching: find.byType(Align)).first);
       expect(align.alignment, Alignment.bottomRight);
     });
 
@@ -39,7 +37,7 @@ void main() {
         ),
       );
 
-      final align = tester.widget<Align>(find.byType(Align));
+      final align = tester.widget<Align>(find.descendant(of: find.byType(BackgroundEllipse), matching: find.byType(Align)).first);
       expect(align.alignment, Alignment.topLeft);
     });
 
