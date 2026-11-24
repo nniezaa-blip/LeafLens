@@ -58,7 +58,7 @@ final class ApiClientProvider
   }
 }
 
-String _$apiClientHash() => r'879493ddc989120234c491e70b984a7fca75ead5';
+String _$apiClientHash() => r'8401bd225f31f9b6008d009f55bbe64bf4c34faa';
 
 /// Provides the [AuthRepository] used for login/signup/logout operations.
 
@@ -104,4 +104,4 @@ final class AuthRepositoryProvider
   }
 }
 
-String _$authRepositoryHash() => r'ee63c9b13f172fed8f63b94deb339e4a5c73284f';
+String _$authRepositoryHash() => r'8cb6c7e96c7611510eb30f192b83fa342189325a';

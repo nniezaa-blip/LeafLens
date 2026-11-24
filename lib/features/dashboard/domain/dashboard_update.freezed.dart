@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'dashboard_update.dart';
@@ -9,6 +9,7 @@ part of 'dashboard_update.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 DashboardUpdate _$DashboardUpdateFromJson(
@@ -47,7 +48,7 @@ mixin _$DashboardUpdate {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is DashboardUpdate);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is DashboardUpdate);
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -56,7 +57,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'DashboardUpdate()';
+    return 'DashboardUpdate()';
 }
 
 
@@ -214,7 +215,7 @@ return ack(_that.type,_that.success);case _:
 @JsonSerializable()
 
 class TelemetryUpdate implements DashboardUpdate {
-  const TelemetryUpdate({this.soilMoisture, this.temperature, this.humidity, this.waterLevel, final  String? $type}): $type = $type ?? 'telemetry';
+  const TelemetryUpdate({this.soilMoisture, this.temperature, this.humidity, this.waterLevel,  String? $type}): $type = $type ?? 'telemetry';
   factory TelemetryUpdate.fromJson(Map<String, dynamic> json) => _$TelemetryUpdateFromJson(json);
 
  final  double? soilMoisture;
@@ -239,16 +240,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TelemetryUpdate&&(identical(other.soilMoisture, soilMoisture) || other.soilMoisture == soilMoisture)&&(identical(other.temperature, temperature) || other.temperature == temperature)&&(identical(other.humidity, humidity) || other.humidity == humidity)&&(identical(other.waterLevel, waterLevel) || other.waterLevel == waterLevel));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is TelemetryUpdate&&(identical(other.soilMoisture, soilMoisture) || other.soilMoisture == soilMoisture)&&(identical(other.temperature, temperature) || other.temperature == temperature)&&(identical(other.humidity, humidity) || other.humidity == humidity)&&(identical(other.waterLevel, waterLevel) || other.waterLevel == waterLevel));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,soilMoisture,temperature,humidity,waterLevel);
+int get hashCode {
+    return Object.hash(runtimeType,soilMoisture,temperature,humidity,waterLevel);
+}
 
 @override
 String toString() {
-  return 'DashboardUpdate.telemetry(soilMoisture: $soilMoisture, temperature: $temperature, humidity: $humidity, waterLevel: $waterLevel)';
+    return 'DashboardUpdate.telemetry(soilMoisture: $soilMoisture, temperature: $temperature, humidity: $humidity, waterLevel: $waterLevel)';
 }
 
 
@@ -293,7 +296,7 @@ as double?,
 @JsonSerializable()
 
 class GHSUpdate implements DashboardUpdate {
-  const GHSUpdate({required this.score, required this.status, final  String? $type}): $type = $type ?? 'ghs';
+  const GHSUpdate({required this.score, required this.status,  String? $type}): $type = $type ?? 'ghs';
   factory GHSUpdate.fromJson(Map<String, dynamic> json) => _$GHSUpdateFromJson(json);
 
  final  double score;
@@ -316,16 +319,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is GHSUpdate&&(identical(other.score, score) || other.score == score)&&(identical(other.status, status) || other.status == status));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is GHSUpdate&&(identical(other.score, score) || other.score == score)&&(identical(other.status, status) || other.status == status));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,score,status);
+int get hashCode {
+    return Object.hash(runtimeType,score,status);
+}
 
 @override
 String toString() {
-  return 'DashboardUpdate.ghs(score: $score, status: $status)';
+    return 'DashboardUpdate.ghs(score: $score, status: $status)';
 }
 
 
@@ -368,7 +373,7 @@ as String,
 @JsonSerializable()
 
 class WaterSystemUpdate implements DashboardUpdate {
-  const WaterSystemUpdate({@JsonKey(name: 'water_level') required this.tankLevelPercent, @JsonKey(name: 'refill_active') required this.refillActive, @JsonKey(name: 'safety_lockout') required this.safetyLockout, final  String? $type}): $type = $type ?? 'waterSystem';
+  const WaterSystemUpdate({@JsonKey(name: 'water_level') required this.tankLevelPercent, @JsonKey(name: 'refill_active') required this.refillActive, @JsonKey(name: 'safety_lockout') required this.safetyLockout,  String? $type}): $type = $type ?? 'waterSystem';
   factory WaterSystemUpdate.fromJson(Map<String, dynamic> json) => _$WaterSystemUpdateFromJson(json);
 
 @JsonKey(name: 'water_level') final  double tankLevelPercent;
@@ -392,16 +397,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is WaterSystemUpdate&&(identical(other.tankLevelPercent, tankLevelPercent) || other.tankLevelPercent == tankLevelPercent)&&(identical(other.refillActive, refillActive) || other.refillActive == refillActive)&&(identical(other.safetyLockout, safetyLockout) || other.safetyLockout == safetyLockout));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is WaterSystemUpdate&&(identical(other.tankLevelPercent, tankLevelPercent) || other.tankLevelPercent == tankLevelPercent)&&(identical(other.refillActive, refillActive) || other.refillActive == refillActive)&&(identical(other.safetyLockout, safetyLockout) || other.safetyLockout == safetyLockout));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,tankLevelPercent,refillActive,safetyLockout);
+int get hashCode {
+    return Object.hash(runtimeType,tankLevelPercent,refillActive,safetyLockout);
+}
 
 @override
 String toString() {
-  return 'DashboardUpdate.waterSystem(tankLevelPercent: $tankLevelPercent, refillActive: $refillActive, safetyLockout: $safetyLockout)';
+    return 'DashboardUpdate.waterSystem(tankLevelPercent: $tankLevelPercent, refillActive: $refillActive, safetyLockout: $safetyLockout)';
 }
 
 
@@ -464,16 +471,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AckUpdate&&(identical(other.type, type) || other.type == type)&&(identical(other.success, success) || other.success == success));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is AckUpdate&&(identical(other.type, type) || other.type == type)&&(identical(other.success, success) || other.success == success));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,type,success);
+int get hashCode {
+    return Object.hash(runtimeType,type,success);
+}
 
 @override
 String toString() {
-  return 'DashboardUpdate.ack(type: $type, success: $success)';
+    return 'DashboardUpdate.ack(type: $type, success: $success)';
 }
 
 

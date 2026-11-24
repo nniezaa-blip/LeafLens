@@ -1,15 +1,17 @@
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lextari/features/auth/providers/auth_providers.dart';
 
-class AppManager extends StatefulWidget {
+class AppManager extends ConsumerStatefulWidget {
   const AppManager({required this.child, super.key});
 
   final Widget child;
 
   @override
-  State<AppManager> createState() => _AppManagerState();
+  ConsumerState<AppManager> createState() => _AppManagerState();
 }
 
-class _AppManagerState extends State<AppManager> with WidgetsBindingObserver {
+class _AppManagerState extends ConsumerState<AppManager> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
@@ -20,6 +22,13 @@ class _AppManagerState extends State<AppManager> with WidgetsBindingObserver {
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      ref.invalidate(authSessionProvider);
+    }
   }
 
   @override

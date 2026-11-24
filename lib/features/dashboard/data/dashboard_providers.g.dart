@@ -61,22 +61,17 @@ final class DashboardRepositoryProvider
 String _$dashboardRepositoryHash() =>
     r'b57ac1694d73e47baefb3e5b145c06a055a41dcd';
 
-/// Provides a live stream of [DashboardUpdate] events from the WebSocket.
+/// Provides a live stream of typed [WsEvent]s from the WebSocket.
 
 @ProviderFor(dashboardStream)
 final dashboardStreamProvider = DashboardStreamProvider._();
 
-/// Provides a live stream of [DashboardUpdate] events from the WebSocket.
+/// Provides a live stream of typed [WsEvent]s from the WebSocket.
 
 final class DashboardStreamProvider
-    extends
-        $FunctionalProvider<
-          AsyncValue<DashboardUpdate>,
-          DashboardUpdate,
-          Stream<DashboardUpdate>
-        >
-    with $FutureModifier<DashboardUpdate>, $StreamProvider<DashboardUpdate> {
-  /// Provides a live stream of [DashboardUpdate] events from the WebSocket.
+    extends $FunctionalProvider<AsyncValue<WsEvent>, WsEvent, Stream<WsEvent>>
+    with $FutureModifier<WsEvent>, $StreamProvider<WsEvent> {
+  /// Provides a live stream of typed [WsEvent]s from the WebSocket.
   DashboardStreamProvider._()
     : super(
         from: null,
@@ -93,14 +88,13 @@ final class DashboardStreamProvider
 
   @$internal
   @override
-  $StreamProviderElement<DashboardUpdate> $createElement(
-    $ProviderPointer pointer,
-  ) => $StreamProviderElement(pointer);
+  $StreamProviderElement<WsEvent> $createElement($ProviderPointer pointer) =>
+      $StreamProviderElement(pointer);
 
   @override
-  Stream<DashboardUpdate> create(Ref ref) {
+  Stream<WsEvent> create(Ref ref) {
     return dashboardStream(ref);
   }
 }
 
-String _$dashboardStreamHash() => r'c0de32796934e629b9084d9787e6027fb57f666f';
+String _$dashboardStreamHash() => r'727443ed058e58e6656cce0683899f9c1ff19aaf';

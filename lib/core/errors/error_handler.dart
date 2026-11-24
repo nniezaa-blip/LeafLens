@@ -1,5 +1,5 @@
 import 'package:lextari/core/errors/failures.dart';
-import 'package:lextari/shared/notifications/notification_service.dart';
+import 'package:lextari/widgets/notifications/notification_service.dart';
 
 /// Centralised error handler implementing the two-tier logging system.
 ///

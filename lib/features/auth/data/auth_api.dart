@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:lextari/core/config/app_config.dart';
+import 'package:lextari/core/network/api_endpoints.dart';
 import 'package:lextari/features/auth/domain/auth_session.dart';
 import 'package:lextari/features/auth/domain/auth_user.dart';
 
@@ -48,17 +49,17 @@ class AuthApi {
   Future<AuthSession> login({
     required String email,
     required String password,
-  }) => _postSession('/auth/login', {'email': email, 'password': password});
+  }) => _postSession(ApiEndpoints.login, {'email': email, 'password': password});
 
   /// Registers a new account.
   Future<AuthSession> register({
     required String email,
     required String password,
-  }) => _postSession('/auth/register', {'email': email, 'password': password});
+  }) => _postSession(ApiEndpoints.register, {'email': email, 'password': password});
 
   /// Exchanges a Google ID token for a Lextari session.
   Future<AuthSession> googleLogin(String idToken) =>
-      _postSession('/auth/google', {'id_token': idToken});
+      _postSession(ApiEndpoints.google, {'id_token': idToken});
 
   /// Best-effort server-side logout; the local session is cleared regardless.
   Future<void> logout(String token) async {

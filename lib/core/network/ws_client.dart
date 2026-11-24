@@ -55,10 +55,13 @@ class WsClient {
           try {
             final data = jsonDecode(raw as String) as Map<String, dynamic>;
 
-            // First message should be auth acknowledgement
             if (!_authenticated) {
               if (data['type'] == 'auth_ok') {
                 _authenticated = true;
+                _controller?.add(data);
+              } else if (data['type'] == 'auth_error') {
+                _controller?.addError(StateError(data['message']?.toString() ?? 'WebSocket auth failed'));
+                unawaited(_controller?.close());
               }
               return;
             }
@@ -87,8 +90,7 @@ class WsClient {
     _reconnectTimer?.cancel();
     _reconnectTimer = Timer(delay, () {
       // sink.close() is fire-and-forget inside a timer callback.
-      // ignore: discarded_futures
-      _channel?.sink.close();
+        unawaited(_channel?.sink.close());
       // _doConnect() returns void; no await needed here.
       _doConnect();
     });
@@ -106,10 +108,8 @@ class WsClient {
     _disposed = true;
     _reconnectTimer?.cancel();
     // Fire-and-forget: sink.close() called inside dispose(), not awaited.
-    // ignore: discarded_futures
-    _channel?.sink.close();
+    unawaited(_channel?.sink.close());
     // StreamController.close() returns a Future; fire-and-forget in dispose().
-    // ignore: discarded_futures
-    _controller?.close();
+    unawaited(_controller?.close());
   }
 }
