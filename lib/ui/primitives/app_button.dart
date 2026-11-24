@@ -1,13 +1,11 @@
-import 'package:flutter/widgets.dart';
-import 'package:prism_ui/prism_ui.dart' as prism;
+import 'package:lextari/ui/ui.dart';
 
-enum AppButtonVariant { primary, secondary, ghost }
+enum AppButtonVariant { primary, secondary, outline, text }
 
 class AppButton extends StatelessWidget {
   const AppButton({
     required this.label,
     this.onPressed,
-    this.icon,
     this.loading = false,
     this.variant = AppButtonVariant.primary,
     this.expand = false,
@@ -16,7 +14,6 @@ class AppButton extends StatelessWidget {
 
   final String label;
   final VoidCallback? onPressed;
-  final IconData? icon;
   final bool loading;
   final AppButtonVariant variant;
   final bool expand;
@@ -24,22 +21,13 @@ class AppButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final effectiveOnPressed = loading ? null : onPressed;
-    final displayLabel = loading ? 'Loading...' : label;
-    final Widget button = switch (variant) {
-      AppButtonVariant.primary => prism.FilledButton(
-        onPressed: effectiveOnPressed,
-        child: Text(displayLabel),
-      ),
-      AppButtonVariant.secondary => prism.TonalButton(
-        onPressed: effectiveOnPressed,
-        label: displayLabel,
-      ),
-      AppButtonVariant.ghost => prism.TextButton(
-        onPressed: effectiveOnPressed,
-        child: Text(displayLabel),
-      ),
+    final child = loading ? const ActivityIndicator() : Text(label);
+    final button = switch (variant) {
+      AppButtonVariant.secondary => FilledButton(onPressed: effectiveOnPressed, child: child),
+      AppButtonVariant.outline => OutlinedButton(onPressed: effectiveOnPressed, child: child),
+      AppButtonVariant.text => TextButton(onPressed: effectiveOnPressed, child: child),
+      AppButtonVariant.primary => FilledButton(onPressed: effectiveOnPressed, child: child),
     };
-
     if (!expand) return button;
     return SizedBox(width: double.infinity, child: button);
   }

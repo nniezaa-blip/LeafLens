@@ -25,7 +25,7 @@ class AppSection extends StatelessWidget {
             child: Text(
               subtitle!,
               style: prism.AppTextStyle.footnote.of(context).copyWith(
-                color: prism.Theme.of(context).colorScheme.onSurfaceVariant,
+                color: context.colorScheme.onSurfaceVariant,
               ),
             ),
           ),
