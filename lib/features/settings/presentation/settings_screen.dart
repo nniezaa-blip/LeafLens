@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lextari/core/theme/app_colors.dart';
+import 'package:lextari/ui/tokens/app_colors.dart';
 import 'package:lextari/features/auth/providers/auth_providers.dart';
 import 'package:lextari/features/settings/presentation/widgets/settings_card.dart';
 import 'package:lextari/features/settings/presentation/widgets/settings_nav_tile.dart';
 import 'package:lextari/features/settings/presentation/widgets/settings_switch_tile.dart';
-import 'package:lextari/shared/widgets/user_avatar.dart';
+import 'package:lextari/widgets/user_avatar.dart';
 
 /// Settings tab — account profile, preferences, and general app options.
 ///

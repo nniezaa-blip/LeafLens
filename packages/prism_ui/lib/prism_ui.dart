@@ -99,3 +99,5 @@ export 'package:prism_ui/slider.dart';
 export 'package:prism_ui/text_field.dart';
 export 'package:prism_ui/theme_data.dart';
 export 'package:prism_ui/text_selection_controls.dart';
+
+export 'icons/icons.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:lextari/core/theme/app_colors.dart';
+import 'package:lextari/ui/tokens/app_colors.dart';
 import 'package:lextari/features/stats/presentation/trend_metric.dart';
-import 'package:lextari/shared/widgets/frosted_card.dart';
+import 'package:lextari/widgets/frosted_card.dart';
 
 /// Pill-shaped segmented control for choosing the active [TrendMetric].
 ///

@@ -2,9 +2,9 @@ import 'dart:math' as math;
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:lextari/core/theme/app_colors.dart';
+import 'package:lextari/ui/tokens/app_colors.dart';
 import 'package:lextari/features/stats/presentation/trend_metric.dart';
-import 'package:lextari/shared/widgets/frosted_card.dart';
+import 'package:lextari/widgets/frosted_card.dart';
 
 /// Rounded frosted card containing the 30-day line chart for a [TrendMetric].
 ///

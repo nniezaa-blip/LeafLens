@@ -4,10 +4,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lextari/core/errors/error_handler.dart';
 import 'package:lextari/core/errors/failures.dart';
-import 'package:lextari/core/theme/app_colors.dart';
+import 'package:lextari/ui/tokens/app_colors.dart';
 import 'package:lextari/core/utils/validators.dart';
 import 'package:lextari/features/auth/providers/auth_providers.dart';
-import 'package:lextari/shared/widgets/app_text_field.dart';
+import 'package:lextari/widgets/app_text_field.dart';
 
 /// Per-screen extensions keep build() readable without
 /// global namespace pollution.

@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:lextari/core/theme/app_colors.dart';
+import 'package:lextari/ui/tokens/app_colors.dart';
 
 /// Translucent, frosted-glass surface used for cards and panels.
 ///

@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:lextari/core/theme/app_colors.dart';
 import 'package:lextari/features/settings/presentation/widgets/settings_icon_badge.dart';
 import 'package:lextari/features/settings/presentation/widgets/settings_switch.dart';
+import 'package:lextari/ui/ui.dart';
 
 /// Settings row with a leading icon, a label, and a custom [SettingsSwitch].
 ///
@@ -17,7 +16,7 @@ class SettingsSwitchTile extends StatelessWidget {
   });
 
   /// Leading icon for the row.
-  final IconData icon;
+  final Glyph icon;
 
   /// Text label for the row.
   final String label;

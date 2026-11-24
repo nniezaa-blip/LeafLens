@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
-
-import 'package:lextari/core/theme/app_colors.dart';
+import 'package:lextari/ui/ui.dart';
 
 /// Toggle switch pill used in the dashboard action row.
 ///
@@ -18,7 +16,7 @@ class ActionSwitch extends StatelessWidget {
   });
 
   /// Icon displayed on the left side of the pill.
-  final IconData icon;
+  final Glyph icon;
 
   /// Text label for this switch.
   final String label;
@@ -43,7 +41,7 @@ class ActionSwitch extends StatelessWidget {
         child: Row(
           children: [
             const SizedBox(width: 19),
-            Icon(icon, size: 26, color: AppColors.offBlack),
+            GlyphIcon(icon, size: 26, color: AppColors.offBlack),
             const SizedBox(width: 8),
             Expanded(
               child: Text(

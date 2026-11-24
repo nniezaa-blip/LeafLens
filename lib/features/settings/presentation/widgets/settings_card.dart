@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lextari/core/theme/app_colors.dart';
+import 'package:lextari/ui/tokens/app_colors.dart';
 
 /// Rounded white surface used to group settings rows into sections.
 class SettingsCard extends StatelessWidget {

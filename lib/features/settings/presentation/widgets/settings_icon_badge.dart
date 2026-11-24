@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:lextari/core/theme/app_colors.dart';
+import 'package:lextari/ui/ui.dart';
 
 /// Rounded tinted square holding the leading icon for a settings row.
 class SettingsIconBadge extends StatelessWidget {
@@ -7,7 +6,7 @@ class SettingsIconBadge extends StatelessWidget {
   const SettingsIconBadge({required this.icon, super.key, this.color});
 
   /// Icon rendered inside the badge.
-  final IconData icon;
+  final Glyph icon;
 
   /// Accent colour for the icon and its tint. Defaults to brand green.
   final Color? color;
@@ -23,7 +22,7 @@ class SettingsIconBadge extends StatelessWidget {
         color: accent.withValues(alpha: 0.14),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Icon(icon, size: 20, color: accent),
+      child: GlyphIcon(icon, size: 20, color: accent),
     );
   }
 }

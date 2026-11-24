@@ -1,12 +1,10 @@
-import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lextari/core/theme/app_colors.dart';
 import 'package:lextari/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:lextari/features/settings/presentation/settings_screen.dart';
 import 'package:lextari/features/stats/presentation/stats_screen.dart';
-import 'package:lextari/shared/widgets/background_ellipse.dart';
+import 'package:lextari/ui/ui.dart';
+import 'package:lextari/widgets/background_ellipse.dart';
 
 /// App-level shell wrapping dashboard tabs with persistent green background,
 /// ellipse, floating bottom nav bar, and draggable carousel.
@@ -104,7 +102,7 @@ class _DashboardShellState extends State<DashboardShell>
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     final swipeEnabled = widget.navigationShell.currentIndex != _statsIndex;
 
-    return Scaffold(
+    return PrismScaffold(
       body: Stack(
         children: [
           const BackgroundEllipse(),
@@ -261,16 +259,16 @@ class _DashboardShellState extends State<DashboardShell>
     _settleTween = Tween<double>(begin: _dragOffset, end: target);
     _controller
       ..stop()
-      ..reset();
-    unawaited(_controller.forward());
+      ..reset()
+      ..forward();
   }
 
   void _settleToOrigin() {
     _settleTween = Tween<double>(begin: _dragOffset, end: 0);
     _controller
       ..stop()
-      ..reset();
-    unawaited(_controller.forward());
+      ..reset()
+      ..forward();
   }
 
   void _commitTabSwitch() {
@@ -339,10 +337,10 @@ class _FloatingNavBar extends StatelessWidget {
 
   static const _itemWidth = 62.0;
   static const _itemCount = 3;
-  static const List<IconData> _icons = [
-    Icons.home_rounded,
-    Icons.bar_chart_rounded,
-    Icons.settings_rounded,
+  static const List<Glyph> _icons = [
+    AppGlyphs.home,
+    AppGlyphs.barChart,
+    AppGlyphs.settings,
   ];
 
   int get _activeIndex => navigationShell.currentIndex;
@@ -467,7 +465,7 @@ class _NavIcon extends StatelessWidget {
 
   final int index;
   final double gap;
-  final IconData icon;
+  final Glyph icon;
   final double itemWidth;
   final VoidCallback onTap;
 
@@ -481,7 +479,7 @@ class _NavIcon extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Center(
-          child: Icon(
+          child: GlyphIcon(
             icon,
             size: 28,
             color: AppColors.offBlack,

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:lextari/ui/ui.dart';
 
 /// The three environmental metrics tracked on the 30-day trends screen.
 enum TrendMetric {
@@ -67,9 +67,15 @@ extension TrendMetricX on TrendMetric {
   };
 
   /// Icon representing the metric.
-  IconData get icon => switch (this) {
-    TrendMetric.temperature => Icons.thermostat,
-    TrendMetric.humidity => Icons.water_drop_outlined,
-    TrendMetric.moisture => Icons.grass,
+  Glyph get icon => switch (this) {
+    TrendMetric.temperature => AppGlyphs.thermostat,
+    TrendMetric.humidity => AppGlyphs.waterDrop,
+    TrendMetric.moisture => AppGlyphs.grass,
+  };
+
+  String get apiKey => switch (this) {
+    TrendMetric.temperature => 'temperature',
+    TrendMetric.humidity => 'humidity',
+    TrendMetric.moisture => 'soil_moisture',
   };
 }

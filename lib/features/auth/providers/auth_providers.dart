@@ -1,8 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:lextari/core/network/api_client.dart';
-import 'package:lextari/features/auth/data/auth_repository.dart';
 import 'package:lextari/features/auth/data/auth_session_manager.dart';
+import 'package:lextari/features/auth/data/user_profile_provider.dart';
 import 'package:lextari/features/auth/domain/auth_session.dart';
 import 'package:lextari/features/auth/domain/user_profile.dart';
 

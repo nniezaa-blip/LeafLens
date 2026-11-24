@@ -1,7 +1,5 @@
-import 'package:flutter/material.dart';
-
-import 'package:lextari/core/theme/app_colors.dart';
 import 'package:lextari/features/dashboard/presentation/widgets/mini_gauge.dart';
+import 'package:lextari/ui/ui.dart';
 
 /// Sensor reading card displayed on the dashboard.
 ///
@@ -32,7 +30,7 @@ class SensorCard extends StatelessWidget {
   final String unit;
 
   /// Icon representing the unit (e.g. thermometer, water droplet).
-  final IconData unitIcon;
+  final Glyph unitIcon;
 
   /// Status description (e.g. "Temperature is normal", "Saturated").
   final String statusText;
@@ -148,7 +146,7 @@ class _SensorTitle extends StatelessWidget {
 class _UnitBadge extends StatelessWidget {
   const _UnitBadge({required this.icon, required this.unit});
 
-  final IconData icon;
+  final Glyph icon;
   final String unit;
 
   @override
@@ -159,7 +157,7 @@ class _UnitBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 24, color: AppColors.offBlack),
+          GlyphIcon(icon, size: 24, color: AppColors.offBlack),
           const SizedBox(width: 4),
           Text(
             unit,
@@ -230,8 +228,8 @@ class _MoreLink extends StatelessWidget {
               ),
             ),
             SizedBox(width: 4),
-            Icon(
-              Icons.double_arrow,
+            GlyphIcon(
+              AppGlyphs.doubleArrow,
               size: 20,
               color: AppColors.offBlack,
             ),

@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lextari/core/theme/app_colors.dart';
-import 'package:lextari/shared/widgets/background_ellipse.dart';
-import 'package:lextari/shared/widgets/lextari_logo.dart';
+import 'package:lextari/ui/tokens/app_colors.dart';
+import 'package:lextari/widgets/background_ellipse.dart';
+import 'package:lextari/widgets/lextari_logo.dart';
 
 /// Per-screen extensions keep build() readable without
 /// global namespace pollution.

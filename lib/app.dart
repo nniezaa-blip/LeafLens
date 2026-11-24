@@ -15,15 +15,14 @@ class LextariApp extends ConsumerWidget {
     final router = ref.watch(AppRouter.provider);
     return PrismApp.router(
       title: 'Lextari',
-      theme: LextariTheme.light(),
+      theme: AppTheme.prismLight(),
+      darkTheme: AppTheme.prismDark(),
+      themeMode: ThemeMode.system,
       routerConfig: router,
       builder: (context, child) {
-        final appChild = child ?? const SizedBox.shrink();
         return buildManagerStack(
-          child: appChild,
-          managers: [
-            (stackChild) => AppManager(child: stackChild),
-          ],
+          child: child ?? const SizedBox.shrink(),
+          managers: [(child) => AppManager(child: child)],
         );
       },
     );

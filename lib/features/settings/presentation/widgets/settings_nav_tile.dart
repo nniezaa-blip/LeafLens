@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:lextari/core/theme/app_colors.dart';
 import 'package:lextari/features/settings/presentation/widgets/settings_icon_badge.dart';
+import 'package:lextari/ui/ui.dart';
 
 /// Tappable settings row with a leading icon, label, optional trailing value,
 /// and a chevron arrow indicating navigation.
@@ -16,7 +15,7 @@ class SettingsNavTile extends StatelessWidget {
   });
 
   /// Leading icon for the row.
-  final IconData icon;
+  final Glyph icon;
 
   /// Text label for the row.
   final String label;
@@ -62,8 +61,8 @@ class SettingsNavTile extends StatelessWidget {
               ),
               const SizedBox(width: 6),
             ],
-            const Icon(
-              Icons.chevron_right_rounded,
+            const GlyphIcon(
+              AppGlyphs.chevronRight,
               size: 24,
               color: AppColors.mediumGrey,
             ),
