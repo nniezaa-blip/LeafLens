@@ -18,7 +18,18 @@
     "lint-staged": "^17.0.4"
   },
   "lint-staged": {
-    "*.dart": ["dart format", "dart analyze --fatal-infos"]
+    "lib/**/*.dart": [
+      "dart format",
+      "dart analyze --fatal-infos"
+    ],
+    "test/**/*.dart": [
+      "dart format",
+      "dart analyze --fatal-infos"
+    ],
+    "tool/**/*.dart": [
+      "dart format",
+      "dart analyze --fatal-infos"
+    ]
   },
   "packageManager": "pnpm@11.1.2"
 }
