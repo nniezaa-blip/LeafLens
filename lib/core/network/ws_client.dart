@@ -6,8 +6,8 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 
 /// WebSocket client for FastAPI streaming endpoint.
 ///
-/// Auth via first message (not query param) — same pattern as
-/// ThingsBoard's own WS auth. No token leakage in server logs.
+/// Auth travels as the first message, not the URL, so the token does not
+/// appear in proxy or server logs.
 class WsClient {
   /// Creates a [WsClient] with an optional custom [url].
   /// Defaults to [AppConfig.wsUrl].
