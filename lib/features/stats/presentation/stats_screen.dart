@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lextari/ui/tokens/app_colors.dart';
 import 'package:lextari/features/stats/presentation/trend_metric_provider.dart';
 import 'package:lextari/features/stats/presentation/widgets/trend_chart_card.dart';
 import 'package:lextari/features/stats/presentation/widgets/trend_metric_switcher.dart';
+import 'package:lextari/ui/ui.dart';
 
 /// Stats / Graphs tab — shows 30-day trends for each sensor metric.
 ///

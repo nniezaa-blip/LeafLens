@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:lextari/ui/ui.dart';
 
 /// Lextari brand logo — used on splash, login, and app bar.
 class LextariLogo extends StatelessWidget {

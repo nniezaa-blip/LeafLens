@@ -1,8 +1,7 @@
 import 'dart:math' as math;
 
-import 'package:flutter/material.dart';
-
 import 'package:lextari/features/dashboard/domain/growth_health_score.dart';
+import 'package:lextari/ui/ui.dart';
 
 /// Circular gauges that shows the health score with color-coded arc.
 ///
@@ -46,14 +45,14 @@ class HealthGauge extends StatelessWidget {
             children: [
               Text(
                 '${result.score.round()}%',
-                style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+                style: DefaultTextStyle.of(context).style.copyWith(fontSize: 40, fontWeight: FontWeight.w600,
+                  
                   color: color,
                 ),
               ),
               Text(
                 _label(result.status),
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                style: DefaultTextStyle.of(context).style.copyWith(fontSize: 14, fontWeight: FontWeight.w500,
                   color: color,
                 ),
               ),
@@ -78,7 +77,7 @@ class HealthGauge extends StatelessWidget {
         HealthStatus.moderate => const Color(0xFF8BC34A),
         HealthStatus.caution => const Color(0xFFFFC107),
         HealthStatus.danger => const Color(0xFFFF9800),
-        HealthStatus.critical => Theme.of(context).colorScheme.error,
+        HealthStatus.critical => context.colorScheme.error,
       };
 }
 

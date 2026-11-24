@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:lextari/ui/tokens/app_colors.dart';
 import 'package:lextari/features/stats/presentation/trend_metric.dart';
+import 'package:lextari/ui/ui.dart';
 import 'package:lextari/widgets/frosted_card.dart';
 
 /// Pill-shaped segmented control for choosing the active [TrendMetric].
@@ -64,7 +63,7 @@ class _Segment extends StatelessWidget {
         curve: Curves.easeOutCubic,
         height: 46,
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.mediumGreen : Colors.transparent,
+          color: isSelected ? AppColors.mediumGreen : const Color(0x00000000),
           borderRadius: BorderRadius.circular(50),
           boxShadow: isSelected
               ? [

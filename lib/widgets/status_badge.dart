@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-
 import 'package:lextari/features/dashboard/domain/growth_health_score.dart';
+import 'package:lextari/ui/ui.dart';
 
 /// Small colored chip showing the health status label.
 class StatusBadge extends StatelessWidget {
@@ -23,7 +22,7 @@ class StatusBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.circle, size: 8, color: color),
+          GlyphIcon(AppGlyphs.info, size: 8, color: color),
           const SizedBox(width: 6),
           Text(
             _label,
@@ -51,6 +50,6 @@ class StatusBadge extends StatelessWidget {
     HealthStatus.moderate => const Color(0xFF8BC34A),
     HealthStatus.caution => const Color(0xFFFFC107),
     HealthStatus.danger => const Color(0xFFFF9800),
-    HealthStatus.critical => Theme.of(context).colorScheme.error,
+    HealthStatus.critical => context.colorScheme.error,
   };
 }

@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:lextari/ui/tokens/app_colors.dart';
 import 'package:lextari/features/auth/domain/user_profile.dart';
+import 'package:lextari/ui/ui.dart';
 
 /// Circular avatar for the signed-in user.
 ///

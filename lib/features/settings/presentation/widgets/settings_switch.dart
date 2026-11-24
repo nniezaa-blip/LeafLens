@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:lextari/ui/tokens/app_colors.dart';
+import 'package:lextari/ui/ui.dart';
 
 /// Custom pill toggle used across the settings screen.
 ///

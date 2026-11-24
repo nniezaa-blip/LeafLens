@@ -1,15 +1,12 @@
 import 'dart:async';
-
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lextari/ui/tokens/app_colors.dart';
+import 'package:lextari/ui/ui.dart';
 import 'package:lextari/widgets/background_ellipse.dart';
 import 'package:lextari/widgets/lextari_logo.dart';
 
 /// Per-screen extensions keep build() readable without
 /// global namespace pollution.
 extension on BuildContext {
-  ColorScheme get colors => Theme.of(this).colorScheme;
   void navigateTo(String route) => go(route);
 
   TextStyle get brandStyle => const TextStyle(
@@ -73,7 +70,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return const PrismScaffold(
+      bar: const EmptyBar(),
       backgroundColor: AppColors.lightGreenBg,
       body: Stack(
         children: [
@@ -121,12 +119,6 @@ class _GetStartedButton extends StatelessWidget {
         width: double.infinity,
         child: FilledButton(
           onPressed: () => context.navigateTo('/login'),
-          style: FilledButton.styleFrom(
-            backgroundColor: context.colors.primary,
-            foregroundColor: context.colors.onPrimary,
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            shape: const StadiumBorder(),
-          ),
           child: Text('Get Started', style: context.buttonStyle),
         ),
       ),
