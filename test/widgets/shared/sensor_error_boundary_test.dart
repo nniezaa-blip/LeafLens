@@ -1,15 +1,13 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:lextari/shared/widgets/sensor_error_boundary.dart';
+import 'package:lextari/widgets/sensor_error_boundary.dart';
+import 'package:lextari/ui/ui.dart';
 
 void main() {
   group('SensorErrorBoundary', () {
     testWidgets('renders child widget normally', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SensorErrorBoundary(
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: SensorErrorBoundary(
               label: 'Temperature',
               child: Text('28.5 °C'),
             ),
@@ -23,9 +21,8 @@ void main() {
 
     testWidgets('renders with any label', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SensorErrorBoundary(
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: SensorErrorBoundary(
               label: 'Humidity',
               child: Text('65%'),
             ),
@@ -40,9 +37,8 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SensorErrorBoundary(
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: SensorErrorBoundary(
               label: 'Soil Moisture',
               child: Text('54%'),
             ),

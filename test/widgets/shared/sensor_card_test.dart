@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:lextari/features/dashboard/presentation/widgets/sensor_card.dart';
+import 'package:lextari/ui/ui.dart';
 
 void _noop() {}
 
@@ -9,15 +8,14 @@ void main() {
   group('SensorCard', () {
     testWidgets('renders sensor name', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SensorCard(
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: SensorCard(
               sensorName: 'Temperature',
               value: 26,
               unit: '°C',
-              unitIcon: Icons.thermostat,
+              unitIcon: AppGlyphs.thermostat,
               statusText: 'Temperature is normal',
-              gaugeColor: Colors.green,
+              gaugeColor: AppColors.deepGreen,
               onMoreTap: _noop,
             ),
           ),
@@ -29,15 +27,14 @@ void main() {
 
     testWidgets('renders unit text', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SensorCard(
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: SensorCard(
               sensorName: 'Temperature',
               value: 26,
               unit: '°C',
-              unitIcon: Icons.thermostat,
+              unitIcon: AppGlyphs.thermostat,
               statusText: 'Temperature is normal',
-              gaugeColor: Colors.green,
+              gaugeColor: AppColors.deepGreen,
               onMoreTap: _noop,
             ),
           ),
@@ -49,15 +46,14 @@ void main() {
 
     testWidgets('renders status text', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SensorCard(
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: SensorCard(
               sensorName: 'Temperature',
               value: 26,
               unit: '°C',
-              unitIcon: Icons.thermostat,
+              unitIcon: AppGlyphs.thermostat,
               statusText: 'Temperature is normal',
-              gaugeColor: Colors.green,
+              gaugeColor: AppColors.deepGreen,
               onMoreTap: _noop,
             ),
           ),
@@ -69,15 +65,14 @@ void main() {
 
     testWidgets('renders More link', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SensorCard(
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: SensorCard(
               sensorName: 'Temperature',
               value: 26,
               unit: '°C',
-              unitIcon: Icons.thermostat,
+              unitIcon: AppGlyphs.thermostat,
               statusText: 'Temperature is normal',
-              gaugeColor: Colors.green,
+              gaugeColor: AppColors.deepGreen,
               onMoreTap: _noop,
             ),
           ),
@@ -89,17 +84,16 @@ void main() {
 
     testWidgets('does not overflow on standard phone width', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SizedBox(
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: SizedBox(
               width: 400,
               child: SensorCard(
                 sensorName: 'Soil Moisture',
                 value: 90,
                 unit: '%',
-                unitIcon: Icons.water_drop,
+                unitIcon: AppGlyphs.waterDrop,
                 statusText: 'Saturated',
-                gaugeColor: Colors.red,
+                gaugeColor: AppColors.redDark,
                 onMoreTap: _noop,
               ),
             ),
@@ -112,15 +106,14 @@ void main() {
 
     testWidgets('renders gauge', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SensorCard(
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: SensorCard(
               sensorName: 'Humidity',
               value: 64,
               unit: '%',
-              unitIcon: Icons.water_drop_outlined,
+              unitIcon: AppGlyphs.waterDrop,
               statusText: 'Perfect Environment',
-              gaugeColor: Colors.green,
+              gaugeColor: AppColors.deepGreen,
               onMoreTap: _noop,
             ),
           ),
@@ -132,15 +125,14 @@ void main() {
 
     testWidgets('hides More link when onMoreTap is null', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: SensorCard(
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: SensorCard(
               sensorName: 'Water Level',
               value: 45,
               unit: 'cm',
-              unitIcon: Icons.waves,
+              unitIcon: AppGlyphs.waves,
               statusText: 'Water level is low',
-              gaugeColor: Colors.orange,
+              gaugeColor: AppColors.yellowAlert,
             ),
           ),
         ),
@@ -153,15 +145,14 @@ void main() {
       var tapped = false;
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: SensorCard(
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: SensorCard(
               sensorName: 'Temperature',
               value: 26,
               unit: '°C',
-              unitIcon: Icons.thermostat,
+              unitIcon: AppGlyphs.thermostat,
               statusText: 'Temperature is normal',
-              gaugeColor: Colors.green,
+              gaugeColor: AppColors.deepGreen,
               onMoreTap: () => tapped = true,
             ),
           ),

@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lextari/core/router/auth_guard.dart';
+import 'package:lextari/ui/ui.dart';
 
 /// Builds a minimal GoRouterState for testing.
 ///

@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:lextari/shared/widgets/lextari_logo.dart';
+import 'package:lextari/widgets/lextari_logo.dart';
+import 'package:lextari/ui/ui.dart';
 
 import '../../helpers/test_asset_bundle.dart';
 
@@ -9,10 +8,10 @@ void main() {
   group('LextariLogo', () {
     testWidgets('renders without error', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        PrismApp(
           home: DefaultAssetBundle(
             bundle: TestAssetBundle(),
-            child: const Scaffold(body: LextariLogo()),
+            child: const PrismScaffold(bar: const EmptyBar(), body: LextariLogo()),
           ),
         ),
       );

@@ -1,29 +1,26 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:lextari/features/dashboard/domain/growth_health_score.dart';
-import 'package:lextari/shared/widgets/status_badge.dart';
+import 'package:lextari/widgets/status_badge.dart';
+import 'package:lextari/ui/ui.dart';
 
 void main() {
   group('StatusBadge', () {
     testWidgets('renders Optimal label with green color', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: StatusBadge(status: HealthStatus.optimal),
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: StatusBadge(status: HealthStatus.optimal),
           ),
         ),
       );
 
       expect(find.text('Optimal'), findsOneWidget);
-      expect(find.byIcon(Icons.circle), findsOneWidget);
+      expect(find.byWidgetPredicate((w) => w is GlyphIcon && w.glyph == AppGlyphs.info), findsOneWidget);
     });
 
     testWidgets('renders Moderate label', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: StatusBadge(status: HealthStatus.moderate),
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: StatusBadge(status: HealthStatus.moderate),
           ),
         ),
       );
@@ -33,9 +30,8 @@ void main() {
 
     testWidgets('renders Caution label', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: StatusBadge(status: HealthStatus.caution),
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: StatusBadge(status: HealthStatus.caution),
           ),
         ),
       );
@@ -45,9 +41,8 @@ void main() {
 
     testWidgets('renders Danger label', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: StatusBadge(status: HealthStatus.danger),
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: StatusBadge(status: HealthStatus.danger),
           ),
         ),
       );
@@ -57,9 +52,8 @@ void main() {
 
     testWidgets('renders Critical label', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: StatusBadge(status: HealthStatus.critical),
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: StatusBadge(status: HealthStatus.critical),
           ),
         ),
       );
@@ -70,8 +64,8 @@ void main() {
     testWidgets('renders all statuses without error', (tester) async {
       for (final status in HealthStatus.values) {
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(body: StatusBadge(status: status)),
+          PrismApp(
+            home: PrismScaffold(bar: const EmptyBar(), body: StatusBadge(status: status)),
           ),
         );
 

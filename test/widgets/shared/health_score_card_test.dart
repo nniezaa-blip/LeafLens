@@ -1,18 +1,16 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:lextari/features/dashboard/presentation/widgets/health_score_card.dart';
+import 'package:lextari/ui/ui.dart';
 
 void main() {
   group('HealthScoreCard', () {
     testWidgets('renders Health Score title', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: HealthScoreCard(
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: HealthScoreCard(
               score: 62,
               statusText: 'Soil is too wet',
-              gaugeColor: Colors.orange,
+              gaugeColor: AppColors.yellowAlert,
             ),
           ),
         ),
@@ -23,12 +21,11 @@ void main() {
 
     testWidgets('renders status text', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: HealthScoreCard(
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: HealthScoreCard(
               score: 62,
               statusText: 'Soil is too wet',
-              gaugeColor: Colors.orange,
+              gaugeColor: AppColors.yellowAlert,
             ),
           ),
         ),
@@ -39,12 +36,11 @@ void main() {
 
     testWidgets('renders warning text when provided', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: HealthScoreCard(
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: HealthScoreCard(
               score: 62,
               statusText: 'Soil is too wet',
-              gaugeColor: Colors.orange,
+              gaugeColor: AppColors.yellowAlert,
               warningText: 'STOP WATERING!',
             ),
           ),
@@ -56,12 +52,11 @@ void main() {
 
     testWidgets('hides warning text when null', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: HealthScoreCard(
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: HealthScoreCard(
               score: 85,
               statusText: 'Perfect',
-              gaugeColor: Colors.green,
+              gaugeColor: AppColors.deepGreen,
             ),
           ),
         ),
@@ -72,12 +67,11 @@ void main() {
 
     testWidgets('renders gauge with score', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: HealthScoreCard(
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: HealthScoreCard(
               score: 62,
               statusText: 'Soil is too wet',
-              gaugeColor: Colors.orange,
+              gaugeColor: AppColors.yellowAlert,
             ),
           ),
         ),

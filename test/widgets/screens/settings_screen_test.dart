@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lextari/features/auth/data/user_profile_provider.dart';
 import 'package:lextari/features/auth/domain/user_profile.dart';
 import 'package:lextari/features/settings/presentation/settings_screen.dart';
 import 'package:lextari/features/settings/presentation/widgets/settings_switch.dart';
+import 'package:lextari/ui/ui.dart';
 
 void main() {
   Widget buildTestApp() {
@@ -17,9 +17,8 @@ void main() {
           ),
         ),
       ],
-      child: const MaterialApp(
-        home: Scaffold(
-          body: SettingsScreen(),
+      child: const PrismApp(
+        home: PrismScaffold(bar: const EmptyBar(), body: SettingsScreen(),
         ),
       ),
     );
@@ -69,10 +68,10 @@ void main() {
       expect(find.text('Privacy Policy'), findsOneWidget);
       expect(find.text('About Lextari'), findsOneWidget);
 
-      // One chevron on the profile card plus one per nav tile.
+      // Profile chevron + nav tiles (including Log out).
       expect(
-        find.byIcon(Icons.chevron_right_rounded),
-        findsNWidgets(6),
+        find.byWidgetPredicate((w) => w is GlyphIcon && w.glyph == AppGlyphs.chevronRight),
+        findsNWidgets(7),
       );
     });
   });

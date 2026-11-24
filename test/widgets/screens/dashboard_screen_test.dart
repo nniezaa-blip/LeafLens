@@ -1,10 +1,29 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lextari/features/auth/data/user_profile_provider.dart';
 import 'package:lextari/features/auth/domain/user_profile.dart';
+import 'package:lextari/features/dashboard/domain/dashboard_action.dart';
+import 'package:lextari/features/dashboard/domain/growth_health_score.dart';
+import 'package:lextari/features/dashboard/domain/sensor_key.dart';
+import 'package:lextari/features/dashboard/domain/sensor_reading.dart';
 import 'package:lextari/features/dashboard/presentation/dashboard_screen.dart';
+import 'package:lextari/features/dashboard/presentation/dashboard_view_model.dart';
 import 'package:lextari/features/dashboard/presentation/widgets/action_switch.dart';
+import 'package:lextari/ui/ui.dart';
+
+class FakeDashboardViewModel extends DashboardViewModel {
+  FakeDashboardViewModel(this.initial);
+  final DashboardViewState initial;
+  final List<String> rpcCalls = [];
+
+  @override
+  DashboardViewState build() => initial;
+
+  @override
+  Future<void> sendAction(DashboardAction action) async {
+    rpcCalls.add(action.rpcMethod);
+  }
+}
 
 void main() {
   const testProfile = UserProfile(
@@ -12,14 +31,34 @@ void main() {
     email: 'aishah.abdulaziz@example.com',
   );
 
+  DashboardViewState testState() {
+    final now = DateTime.now();
+    return DashboardViewState(
+      telemetry: {
+        SensorKey.temperature: SensorReading(value: 26, recordedAt: now, unit: '°C'),
+        SensorKey.humidity: SensorReading(value: 64, recordedAt: now, unit: '%'),
+        SensorKey.soilMoisture: SensorReading(value: 90, recordedAt: now, unit: '%'),
+        SensorKey.waterLevel: SensorReading(value: 45, recordedAt: now, unit: '%'),
+      },
+      healthScore: HealthScoreResult(
+        score: 62,
+        status: HealthStatus.caution,
+        componentScores: const {},
+        computedAt: now,
+      ),
+      statusText: 'Environment is great but the soil is too wet!',
+      waterLevelPercent: 45,
+    );
+  }
+
   Widget buildTestApp() {
     return ProviderScope(
       overrides: [
         currentUserProfileProvider.overrideWithValue(testProfile),
+        dashboardViewModelProvider.overrideWith(() => FakeDashboardViewModel(testState())),
       ],
-      child: const MaterialApp(
-        home: Scaffold(
-          body: DashboardScreen(),
+      child: const PrismApp(
+        home: PrismScaffold(bar: const EmptyBar(), body: DashboardScreen(),
         ),
       ),
     );
@@ -55,10 +94,10 @@ void main() {
       expect(find.text('Mist'), findsOneWidget);
       expect(find.text('Water'), findsOneWidget);
       expect(find.text('Refill'), findsOneWidget);
-      expect(find.byIcon(Icons.cloud_outlined), findsOneWidget);
+      expect(find.byWidgetPredicate((w) => w is GlyphIcon && w.glyph == AppGlyphs.cloud), findsOneWidget);
       // water_drop_outlined appears in Water switch + Humidity sensor card
-      expect(find.byIcon(Icons.water_drop_outlined), findsNWidgets(2));
-      expect(find.byIcon(Icons.autorenew), findsOneWidget);
+      expect(find.byWidgetPredicate((w) => w is GlyphIcon && w.glyph == AppGlyphs.waterDrop), findsNWidgets(2));
+      expect(find.byWidgetPredicate((w) => w is GlyphIcon && w.glyph == AppGlyphs.autorenew), findsOneWidget);
     });
 
     testWidgets('renders visible sensor cards', (tester) async {
@@ -67,6 +106,7 @@ void main() {
       // Temperature and Humidity fit in viewport; Soil Moisture needs scroll
       expect(find.text('Temperature'), findsOneWidget);
       expect(find.text('Humidity'), findsOneWidget);
+      expect(find.text('Water Level'), findsNothing);
     });
 
     testWidgets('scrolls to reveal soil moisture card', (tester) async {
@@ -103,7 +143,7 @@ void main() {
       await tester.pumpWidget(buildTestApp());
 
       expect(find.text('Health Score'), findsOneWidget);
-      expect(find.text('STOP WATERING!'), findsOneWidget);
+      expect(find.text('Environment is great but the soil is too wet!'), findsOneWidget);
     });
 
     testWidgets('toggles mist switch', (tester) async {
@@ -160,20 +200,24 @@ void main() {
       expect(widget.value, isTrue);
     });
 
-    testWidgets('all three sensor cards exist', (tester) async {
+    testWidgets('all sensor cards exist', (tester) async {
       await tester.pumpWidget(buildTestApp());
 
-      // First two are visible without scroll
       expect(find.text('Temperature'), findsOneWidget);
       expect(find.text('Humidity'), findsOneWidget);
 
-      // Scroll to reveal Soil Moisture
       await tester.scrollUntilVisible(
         find.text('Soil Moisture'),
         300,
         scrollable: find.byType(Scrollable).last,
       );
       expect(find.text('Soil Moisture'), findsOneWidget);
+      await tester.scrollUntilVisible(
+        find.text('Water Level'),
+        300,
+        scrollable: find.byType(Scrollable).last,
+      );
+      expect(find.text('Water Level'), findsOneWidget);
     });
   });
 }

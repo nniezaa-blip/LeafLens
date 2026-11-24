@@ -1,15 +1,14 @@
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lextari/features/stats/presentation/stats_screen.dart';
+import 'package:lextari/ui/ui.dart';
 
 void main() {
   Widget buildTestApp() {
     return const ProviderScope(
-      child: MaterialApp(
-        home: Scaffold(
-          body: StatsScreen(),
+      child: PrismApp(
+        home: PrismScaffold(bar: const EmptyBar(), body: StatsScreen(),
         ),
       ),
     );

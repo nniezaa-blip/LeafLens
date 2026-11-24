@@ -1,16 +1,15 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lextari/shared/notifications/lextari_notification_overlay.dart';
+import 'package:lextari/widgets/notifications/lextari_notification_overlay.dart';
+import 'package:lextari/ui/ui.dart';
 import 'package:toastification/toastification.dart';
 
 void main() {
   group('LextariNotificationOverlay', () {
     testWidgets('renders child widget', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        const PrismApp(
           home: LextariNotificationOverlay(
-            child: Scaffold(
-              body: Text('Hello Lextari'),
+            child: PrismScaffold(bar: const EmptyBar(), body: Text('Hello Lextari'),
             ),
           ),
         ),
@@ -21,10 +20,9 @@ void main() {
 
     testWidgets('wraps child with ToastificationWrapper', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        const PrismApp(
           home: LextariNotificationOverlay(
-            child: Scaffold(
-              body: Text('Content'),
+            child: PrismScaffold(bar: const EmptyBar(), body: Text('Content'),
             ),
           ),
         ),
@@ -35,10 +33,9 @@ void main() {
 
     testWidgets('child is inside ToastificationWrapper', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        const PrismApp(
           home: LextariNotificationOverlay(
-            child: Scaffold(
-              body: Text('Nested'),
+            child: PrismScaffold(bar: const EmptyBar(), body: Text('Nested'),
             ),
           ),
         ),
@@ -47,7 +44,7 @@ void main() {
       final wrapper = tester.widget<ToastificationWrapper>(
         find.byType(ToastificationWrapper),
       );
-      expect(wrapper.child, isA<Scaffold>());
+      expect(wrapper.child, isA<PrismScaffold>());
     });
   });
 }

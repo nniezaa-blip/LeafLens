@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lextari/features/auth/data/auth_session_manager.dart';
 import 'package:lextari/features/auth/domain/auth_session.dart';
 import 'package:lextari/features/auth/presentation/signup_page.dart';
+import 'package:lextari/ui/ui.dart';
 
 import '../../helpers/test_asset_bundle.dart';
 
@@ -14,9 +14,8 @@ Widget buildTestApp() {
         (ref) => Stream<AuthSession?>.value(null),
       ),
     ],
-    child: MaterialApp(
-      home: Scaffold(
-        body: DefaultAssetBundle(
+    child: PrismApp(
+      home: PrismScaffold(bar: const EmptyBar(), body: DefaultAssetBundle(
           bundle: TestAssetBundle(),
           child: const SignUpPage(),
         ),

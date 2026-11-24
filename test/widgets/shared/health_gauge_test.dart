@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:lextari/features/dashboard/domain/growth_health_score.dart';
-import 'package:lextari/shared/widgets/health_gauge.dart';
+import 'package:lextari/widgets/health_gauge.dart';
+import 'package:lextari/ui/ui.dart';
 
 void main() {
   group('HealthGauge', () {
@@ -17,9 +16,8 @@ void main() {
 
     testWidgets('renders score percentage text', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: HealthGauge(result: result(85, HealthStatus.optimal)),
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: HealthGauge(result: result(85, HealthStatus.optimal)),
           ),
         ),
       );
@@ -29,9 +27,8 @@ void main() {
 
     testWidgets('renders status label for optimal', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: HealthGauge(result: result(85, HealthStatus.optimal)),
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: HealthGauge(result: result(85, HealthStatus.optimal)),
           ),
         ),
       );
@@ -41,9 +38,8 @@ void main() {
 
     testWidgets('renders status label for critical', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: HealthGauge(result: result(15, HealthStatus.critical)),
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: HealthGauge(result: result(15, HealthStatus.critical)),
           ),
         ),
       );
@@ -53,9 +49,8 @@ void main() {
 
     testWidgets('renders CustomPaint for the ring', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: HealthGauge(result: result(50, HealthStatus.caution)),
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: HealthGauge(result: result(50, HealthStatus.caution)),
           ),
         ),
       );
@@ -75,9 +70,8 @@ void main() {
         };
 
         await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: HealthGauge(result: result(score, status)),
+          PrismApp(
+            home: PrismScaffold(bar: const EmptyBar(), body: HealthGauge(result: result(score, status)),
             ),
           ),
         );
@@ -88,9 +82,8 @@ void main() {
 
     testWidgets('renders with custom size', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: HealthGauge(
+        PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: HealthGauge(
               result: result(75, HealthStatus.moderate),
               size: 150,
             ),

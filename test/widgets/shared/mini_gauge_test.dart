@@ -1,15 +1,13 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:lextari/features/dashboard/presentation/widgets/mini_gauge.dart';
+import 'package:lextari/ui/ui.dart';
 
 void main() {
   group('MiniGauge', () {
     testWidgets('renders percentage text', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: MiniGauge(value: 0.62, color: Colors.green),
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: MiniGauge(value: 0.62, color: AppColors.deepGreen),
           ),
         ),
       );
@@ -19,9 +17,8 @@ void main() {
 
     testWidgets('renders 0% for zero value', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: MiniGauge(value: 0, color: Colors.green),
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: MiniGauge(value: 0, color: AppColors.deepGreen),
           ),
         ),
       );
@@ -31,9 +28,8 @@ void main() {
 
     testWidgets('renders 100% for full value', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: MiniGauge(value: 1, color: Colors.red),
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: MiniGauge(value: 1, color: AppColors.redDark),
           ),
         ),
       );
@@ -43,9 +39,8 @@ void main() {
 
     testWidgets('uses custom size', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: MiniGauge(value: 0.5, color: Colors.blue, size: 100),
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: MiniGauge(value: 0.5, color: AppColors.chartBlue, size: 100),
           ),
         ),
       );
@@ -59,9 +54,8 @@ void main() {
 
     testWidgets('contains CustomPaint for arc', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: MiniGauge(value: 0.75, color: Colors.orange),
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: MiniGauge(value: 0.75, color: AppColors.yellowAlert),
           ),
         ),
       );
@@ -71,9 +65,8 @@ void main() {
 
     testWidgets('clamps value above 1.0', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: MiniGauge(value: 1.5, color: Colors.green),
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: MiniGauge(value: 1.5, color: AppColors.deepGreen),
           ),
         ),
       );
@@ -84,9 +77,8 @@ void main() {
 
     testWidgets('clamps negative value to 0', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: MiniGauge(value: -0.3, color: Colors.green),
+        const PrismApp(
+          home: PrismScaffold(bar: const EmptyBar(), body: MiniGauge(value: -0.3, color: AppColors.deepGreen),
           ),
         ),
       );
