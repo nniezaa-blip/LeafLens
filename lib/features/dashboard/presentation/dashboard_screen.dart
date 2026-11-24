@@ -4,8 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:lextari/core/theme/app_colors.dart';
 import 'package:lextari/core/theme/app_typography.dart';
-import 'package:lextari/features/auth/data/auth_session_manager.dart';
-import 'package:lextari/features/auth/data/user_profile_provider.dart';
+import 'package:lextari/features/auth/providers/auth_providers.dart';
 import 'package:lextari/features/auth/domain/user_profile.dart';
 import 'package:lextari/features/dashboard/presentation/widgets/action_switch.dart';
 import 'package:lextari/features/dashboard/presentation/widgets/health_score_card.dart';

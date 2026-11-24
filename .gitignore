@@ -60,3 +60,8 @@ node_modules/
 
 # Environment
 .env
+
+# Local parity checklist (do not commit)
+.agents/parity-checklist.local.md
+.agents/*parity*.md
+.agents/*comparison*.md

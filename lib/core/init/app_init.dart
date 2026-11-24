@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:lextari/app/router/app_router.dart';
 import 'package:lextari/core/config/app_config.dart';
-import 'package:lextari/core/router/app_router.dart';
 import 'package:lextari/shared/notifications/notification_service.dart';
 
 /// Orchestrates all app initialisation in the correct order.
