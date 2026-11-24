@@ -12,7 +12,7 @@ import 'package:lextari/widgets/app_text_field.dart';
 /// Per-screen extensions keep build() readable without
 /// global namespace pollution.
 extension on BuildContext {
-  prism.ColorScheme get colors => context.colorScheme;
+  ColorScheme get colors => colorScheme;
   
   TextStyle get loginTitleStyle => const TextStyle(
     fontWeight: FontWeight.w600,

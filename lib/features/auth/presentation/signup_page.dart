@@ -10,7 +10,7 @@ import 'package:lextari/features/auth/domain/auth_actions.dart';
 import 'package:lextari/widgets/app_text_field.dart';
 
 extension on BuildContext {
-  prism.ColorScheme get colors => context.colorScheme;
+  ColorScheme get colors => colorScheme;
   
   TextStyle get signUpTitleStyle => const TextStyle(
     fontWeight: FontWeight.w600,
