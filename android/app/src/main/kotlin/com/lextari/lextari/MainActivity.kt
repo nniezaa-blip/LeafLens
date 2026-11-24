@@ -1,4 +1,4 @@
-package com.example.lextari
+package com.lextari.lextari
 
 import io.flutter.embedding.android.FlutterActivity
 
