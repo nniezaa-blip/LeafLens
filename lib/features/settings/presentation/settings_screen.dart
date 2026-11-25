@@ -36,14 +36,18 @@ class SettingsScreen extends ConsumerWidget {
                         icon: AppGlyphs.notificationsPaused,
                         label: 'Pause notifications',
                         value: prefs.pauseNotifications,
-                        onChanged: ref.read(settingsPreferencesProvider.notifier).setPauseNotifications,
+                        onChanged: (value) => ref
+                            .read(settingsPreferencesProvider.notifier)
+                            .setPauseNotifications(value: value),
                       ),
                       const _CardDivider(),
                       SettingsSwitchTile(
                         icon: AppGlyphs.darkMode,
                         label: 'Dark mode',
                         value: prefs.darkMode,
-                        onChanged: ref.read(settingsPreferencesProvider.notifier).setDarkMode,
+                        onChanged: (value) => ref
+                            .read(settingsPreferencesProvider.notifier)
+                            .setDarkMode(value: value),
                       ),
                     ],
                   ),

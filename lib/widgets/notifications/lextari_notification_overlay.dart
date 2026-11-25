@@ -6,7 +6,7 @@ import 'package:toastification/toastification.dart';
 /// Wraps [ToastificationWrapper] so the rest of the app never imports
 /// [toastification] directly at the widget tree level.
 ///
-/// Place this as the outermost widget in [MaterialApp.router]:
+/// Place this as the outermost widget in the app router:
 /// ```dart
 /// return LextariNotificationOverlay(
 ///   child: MaterialApp.router(...),

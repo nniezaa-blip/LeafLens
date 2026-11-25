@@ -35,10 +35,26 @@ void main() {
     final now = DateTime.now();
     return DashboardViewState(
       telemetry: {
-        SensorKey.temperature: SensorReading(value: 26, recordedAt: now, unit: '°C'),
-        SensorKey.humidity: SensorReading(value: 64, recordedAt: now, unit: '%'),
-        SensorKey.soilMoisture: SensorReading(value: 90, recordedAt: now, unit: '%'),
-        SensorKey.waterLevel: SensorReading(value: 45, recordedAt: now, unit: '%'),
+        SensorKey.temperature: SensorReading(
+          value: 26,
+          recordedAt: now,
+          unit: '°C',
+        ),
+        SensorKey.humidity: SensorReading(
+          value: 64,
+          recordedAt: now,
+          unit: '%',
+        ),
+        SensorKey.soilMoisture: SensorReading(
+          value: 90,
+          recordedAt: now,
+          unit: '%',
+        ),
+        SensorKey.waterLevel: SensorReading(
+          value: 45,
+          recordedAt: now,
+          unit: '%',
+        ),
       },
       healthScore: HealthScoreResult(
         score: 62,
@@ -55,10 +71,14 @@ void main() {
     return ProviderScope(
       overrides: [
         currentUserProfileProvider.overrideWithValue(testProfile),
-        dashboardViewModelProvider.overrideWith(() => FakeDashboardViewModel(testState())),
+        dashboardViewModelProvider.overrideWith(
+          () => FakeDashboardViewModel(testState()),
+        ),
       ],
       child: const PrismApp(
-        home: PrismScaffold(bar: const EmptyBar(), body: DashboardScreen(),
+        home: PrismScaffold(
+          bar: EmptyBar(),
+          body: DashboardScreen(),
         ),
       ),
     );
@@ -94,10 +114,25 @@ void main() {
       expect(find.text('Mist'), findsOneWidget);
       expect(find.text('Water'), findsOneWidget);
       expect(find.text('Refill'), findsOneWidget);
-      expect(find.byWidgetPredicate((w) => w is GlyphIcon && w.glyph == AppGlyphs.cloud), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is GlyphIcon && w.glyph == AppGlyphs.cloud,
+        ),
+        findsOneWidget,
+      );
       // water_drop_outlined appears in Water switch + Humidity sensor card
-      expect(find.byWidgetPredicate((w) => w is GlyphIcon && w.glyph == AppGlyphs.waterDrop), findsNWidgets(2));
-      expect(find.byWidgetPredicate((w) => w is GlyphIcon && w.glyph == AppGlyphs.autorenew), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is GlyphIcon && w.glyph == AppGlyphs.waterDrop,
+        ),
+        findsNWidgets(2),
+      );
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is GlyphIcon && w.glyph == AppGlyphs.autorenew,
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('renders visible sensor cards', (tester) async {
@@ -143,7 +178,10 @@ void main() {
       await tester.pumpWidget(buildTestApp());
 
       expect(find.text('Health Score'), findsOneWidget);
-      expect(find.text('Environment is great but the soil is too wet!'), findsOneWidget);
+      expect(
+        find.text('Environment is great but the soil is too wet!'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('toggles mist switch', (tester) async {

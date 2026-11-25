@@ -59,7 +59,8 @@ void main() {
           GoRoute(path: '/splash', builder: (_, _) => const SplashScreen()),
           GoRoute(
             path: '/login',
-            builder: (_, _) => const PrismScaffold(bar: const EmptyBar(), body: Text('Login')),
+            builder: (_, _) =>
+                const PrismScaffold(bar: EmptyBar(), body: Text('Login')),
           ),
         ],
       );

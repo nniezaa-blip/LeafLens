@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lextari/widgets/notifications/lextari_toast.dart';
 import 'package:lextari/ui/ui.dart';
+import 'package:lextari/widgets/notifications/lextari_toast.dart';
 import 'package:toastification/toastification.dart';
 
 void main() {
@@ -27,7 +27,10 @@ void main() {
     testWidgets('renders title text', (tester) async {
       await tester.pumpWidget(
         PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: buildToast(title: 'Success!')),
+          home: PrismScaffold(
+            bar: const EmptyBar(),
+            body: buildToast(title: 'Success!'),
+          ),
         ),
       );
       expect(find.text('Success!'), findsOneWidget);
@@ -36,7 +39,9 @@ void main() {
     testWidgets('renders description when provided', (tester) async {
       await tester.pumpWidget(
         PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: buildToast(
+          home: PrismScaffold(
+            bar: const EmptyBar(),
+            body: buildToast(
               title: 'Error',
               description: 'Something went wrong',
             ),
@@ -50,7 +55,10 @@ void main() {
     testWidgets('hides description when null', (tester) async {
       await tester.pumpWidget(
         PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: buildToast(title: 'Info')),
+          home: PrismScaffold(
+            bar: const EmptyBar(),
+            body: buildToast(title: 'Info'),
+          ),
         ),
       );
       expect(find.text('Info'), findsOneWidget);
@@ -64,47 +72,80 @@ void main() {
           home: PrismScaffold(bar: const EmptyBar(), body: buildToast()),
         ),
       );
-      expect(find.byWidgetPredicate((w) => w is GlyphIcon && w.glyph == AppGlyphs.close), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is GlyphIcon && w.glyph == AppGlyphs.close,
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('error type shows error icon', (tester) async {
       await tester.pumpWidget(
         PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: buildToast(type: ToastificationType.error),
+          home: PrismScaffold(
+            bar: const EmptyBar(),
+            body: buildToast(type: ToastificationType.error),
           ),
         ),
       );
-      expect(find.byWidgetPredicate((w) => w is GlyphIcon && w.glyph == AppGlyphs.error), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is GlyphIcon && w.glyph == AppGlyphs.error,
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('success type shows check icon', (tester) async {
       await tester.pumpWidget(
         PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: buildToast(type: ToastificationType.success),
+          home: PrismScaffold(
+            bar: const EmptyBar(),
+            body: buildToast(type: ToastificationType.success),
           ),
         ),
       );
-      expect(find.byWidgetPredicate((w) => w is GlyphIcon && w.glyph == AppGlyphs.checkCircle), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is GlyphIcon && w.glyph == AppGlyphs.checkCircle,
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('warning type shows warning icon', (tester) async {
       await tester.pumpWidget(
         PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: buildToast(type: ToastificationType.warning),
+          home: PrismScaffold(
+            bar: const EmptyBar(),
+            body: buildToast(type: ToastificationType.warning),
           ),
         ),
       );
-      expect(find.byWidgetPredicate((w) => w is GlyphIcon && w.glyph == AppGlyphs.warning), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is GlyphIcon && w.glyph == AppGlyphs.warning,
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('info type shows info icon', (tester) async {
       await tester.pumpWidget(
         PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: buildToast(),
+          home: PrismScaffold(
+            bar: const EmptyBar(),
+            body: buildToast(),
           ),
         ),
       );
-      expect(find.byWidgetPredicate((w) => w is GlyphIcon && w.glyph == AppGlyphs.info), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is GlyphIcon && w.glyph == AppGlyphs.info,
+        ),
+        findsOneWidget,
+      );
     });
   });
 }

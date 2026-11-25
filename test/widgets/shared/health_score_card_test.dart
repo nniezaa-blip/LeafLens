@@ -7,7 +7,9 @@ void main() {
     testWidgets('renders Health Score title', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: HealthScoreCard(
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: HealthScoreCard(
               score: 62,
               statusText: 'Soil is too wet',
               gaugeColor: AppColors.yellowAlert,
@@ -22,7 +24,9 @@ void main() {
     testWidgets('renders status text', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: HealthScoreCard(
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: HealthScoreCard(
               score: 62,
               statusText: 'Soil is too wet',
               gaugeColor: AppColors.yellowAlert,
@@ -37,7 +41,9 @@ void main() {
     testWidgets('renders warning text when provided', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: HealthScoreCard(
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: HealthScoreCard(
               score: 62,
               statusText: 'Soil is too wet',
               gaugeColor: AppColors.yellowAlert,
@@ -53,7 +59,9 @@ void main() {
     testWidgets('hides warning text when null', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: HealthScoreCard(
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: HealthScoreCard(
               score: 85,
               statusText: 'Perfect',
               gaugeColor: AppColors.deepGreen,
@@ -68,7 +76,9 @@ void main() {
     testWidgets('renders gauge with score', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: HealthScoreCard(
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: HealthScoreCard(
               score: 62,
               statusText: 'Soil is too wet',
               gaugeColor: AppColors.yellowAlert,

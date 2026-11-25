@@ -3,8 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lextari/features/auth/data/auth_session_manager.dart';
 import 'package:lextari/features/auth/domain/auth_session.dart';
 import 'package:lextari/features/auth/domain/auth_user.dart';
-import 'package:lextari/widgets/offline_banner.dart';
 import 'package:lextari/ui/ui.dart';
+import 'package:lextari/widgets/offline_banner.dart';
 
 Widget buildTestAppWithAuth(String? token) {
   return ProviderScope(
@@ -23,7 +23,9 @@ Widget buildTestAppWithAuth(String? token) {
         ),
       ),
     ],
-    child: const PrismApp(home: PrismScaffold(bar: const EmptyBar(), body: OfflineBanner())),
+    child: const PrismApp(
+      home: PrismScaffold(bar: EmptyBar(), body: OfflineBanner()),
+    ),
   );
 }
 
@@ -50,7 +52,12 @@ void main() {
         find.text('No connection — showing last known data'),
         findsOneWidget,
       );
-      expect(find.byWidgetPredicate((w) => w is GlyphIcon && w.glyph == AppGlyphs.cloudOff), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is GlyphIcon && w.glyph == AppGlyphs.cloudOff,
+        ),
+        findsOneWidget,
+      );
       expect(find.byType(Container), findsOneWidget);
     });
   });

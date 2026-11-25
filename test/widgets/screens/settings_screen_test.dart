@@ -18,7 +18,9 @@ void main() {
         ),
       ],
       child: const PrismApp(
-        home: PrismScaffold(bar: const EmptyBar(), body: SettingsScreen(),
+        home: PrismScaffold(
+          bar: EmptyBar(),
+          body: SettingsScreen(),
         ),
       ),
     );
@@ -70,7 +72,9 @@ void main() {
 
       // Profile chevron + nav tiles (including Log out).
       expect(
-        find.byWidgetPredicate((w) => w is GlyphIcon && w.glyph == AppGlyphs.chevronRight),
+        find.byWidgetPredicate(
+          (w) => w is GlyphIcon && w.glyph == AppGlyphs.chevronRight,
+        ),
         findsNWidgets(7),
       );
     });

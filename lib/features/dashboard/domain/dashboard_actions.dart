@@ -15,7 +15,10 @@ class DashboardActions {
     return _ref.read(dashboardRepositoryProvider).sendRpc(action.rpcMethod);
   }
 
-  Future<RpcResult> setMist(bool enabled) => send(enabled ? DashboardAction.mistOn : DashboardAction.mistOff);
-  Future<RpcResult> setWater(bool enabled) => send(enabled ? DashboardAction.waterOn : DashboardAction.waterOff);
-  Future<RpcResult> setRefill(bool enabled) => send(enabled ? DashboardAction.refillOn : DashboardAction.refillOff);
+  Future<RpcResult> setMist({required bool enabled}) =>
+      send(enabled ? DashboardAction.mistOn : DashboardAction.mistOff);
+  Future<RpcResult> setWater({required bool enabled}) =>
+      send(enabled ? DashboardAction.waterOn : DashboardAction.waterOff);
+  Future<RpcResult> setRefill({required bool enabled}) =>
+      send(enabled ? DashboardAction.refillOn : DashboardAction.refillOff);
 }

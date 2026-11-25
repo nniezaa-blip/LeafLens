@@ -45,7 +45,9 @@ class DashboardViewState {
 }
 
 final dashboardViewModelProvider =
-    NotifierProvider<DashboardViewModel, DashboardViewState>(DashboardViewModel.new);
+    NotifierProvider<DashboardViewModel, DashboardViewState>(
+      DashboardViewModel.new,
+    );
 
 class DashboardViewModel extends Notifier<DashboardViewState> {
   @override
@@ -72,18 +74,32 @@ class DashboardViewModel extends Notifier<DashboardViewState> {
 
   void _applyUpdate(DashboardUpdate update) {
     switch (update) {
-      case TelemetryUpdate(:final soilMoisture, :final temperature, :final humidity, :final waterLevel):
-        final nextTelemetry = Map<SensorKey, SensorReading>.from(state.telemetry);
+      case TelemetryUpdate(
+        :final soilMoisture,
+        :final temperature,
+        :final humidity,
+        :final waterLevel,
+      ):
+        final nextTelemetry = Map<SensorKey, SensorReading>.from(
+          state.telemetry,
+        );
         final now = DateTime.now();
         void put(SensorKey key, double? value) {
           if (value == null) return;
-          nextTelemetry[key] = SensorReading(value: value, recordedAt: now, unit: key.unit);
+          nextTelemetry[key] = SensorReading(
+            value: value,
+            recordedAt: now,
+            unit: key.unit,
+          );
         }
         put(SensorKey.soilMoisture, soilMoisture);
         put(SensorKey.temperature, temperature);
         put(SensorKey.humidity, humidity);
         put(SensorKey.waterLevel, waterLevel);
-        final score = GrowthHealthScore.compute(nextTelemetry, const HealthConfig());
+        final score = GrowthHealthScore.compute(
+          nextTelemetry,
+          const HealthConfig(),
+        );
         state = state.copyWith(
           telemetry: nextTelemetry,
           healthScore: score,
@@ -101,7 +117,11 @@ class DashboardViewModel extends Notifier<DashboardViewState> {
             computedAt: DateTime.now(),
           ),
         );
-      case WaterSystemUpdate(:final tankLevelPercent, :final refillActive, :final safetyLockout):
+      case WaterSystemUpdate(
+        :final tankLevelPercent,
+        :final refillActive,
+        :final safetyLockout,
+      ):
         state = state.copyWith(
           waterLevelPercent: tankLevelPercent,
           refillActive: refillActive,
@@ -127,7 +147,11 @@ class DashboardViewModel extends Notifier<DashboardViewState> {
     }
   }
 
-  Future<void> setMist(bool enabled) => sendAction(enabled ? DashboardAction.mistOn : DashboardAction.mistOff);
-  Future<void> setWater(bool enabled) => sendAction(enabled ? DashboardAction.waterOn : DashboardAction.waterOff);
-  Future<void> setRefill(bool enabled) => sendAction(enabled ? DashboardAction.refillOn : DashboardAction.refillOff);
+  Future<void> setMist({required bool enabled}) =>
+      sendAction(enabled ? DashboardAction.mistOn : DashboardAction.mistOff);
+  Future<void> setWater({required bool enabled}) =>
+      sendAction(enabled ? DashboardAction.waterOn : DashboardAction.waterOff);
+  Future<void> setRefill({required bool enabled}) => sendAction(
+    enabled ? DashboardAction.refillOn : DashboardAction.refillOff,
+  );
 }

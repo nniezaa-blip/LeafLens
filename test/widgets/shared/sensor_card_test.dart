@@ -9,7 +9,9 @@ void main() {
     testWidgets('renders sensor name', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: SensorCard(
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: SensorCard(
               sensorName: 'Temperature',
               value: 26,
               unit: '°C',
@@ -28,7 +30,9 @@ void main() {
     testWidgets('renders unit text', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: SensorCard(
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: SensorCard(
               sensorName: 'Temperature',
               value: 26,
               unit: '°C',
@@ -47,7 +51,9 @@ void main() {
     testWidgets('renders status text', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: SensorCard(
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: SensorCard(
               sensorName: 'Temperature',
               value: 26,
               unit: '°C',
@@ -66,7 +72,9 @@ void main() {
     testWidgets('renders More link', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: SensorCard(
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: SensorCard(
               sensorName: 'Temperature',
               value: 26,
               unit: '°C',
@@ -85,7 +93,9 @@ void main() {
     testWidgets('does not overflow on standard phone width', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: SizedBox(
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: SizedBox(
               width: 400,
               child: SensorCard(
                 sensorName: 'Soil Moisture',
@@ -107,7 +117,9 @@ void main() {
     testWidgets('renders gauge', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: SensorCard(
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: SensorCard(
               sensorName: 'Humidity',
               value: 64,
               unit: '%',
@@ -126,7 +138,9 @@ void main() {
     testWidgets('hides More link when onMoreTap is null', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: SensorCard(
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: SensorCard(
               sensorName: 'Water Level',
               value: 45,
               unit: 'cm',
@@ -146,7 +160,9 @@ void main() {
 
       await tester.pumpWidget(
         PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: SensorCard(
+          home: PrismScaffold(
+            bar: const EmptyBar(),
+            body: SensorCard(
               sensorName: 'Temperature',
               value: 26,
               unit: '°C',

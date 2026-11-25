@@ -16,7 +16,7 @@ Future<T?> showAppDialog<T>({
     barrierDismissible: barrierDismissible,
     barrierLabel: title,
     barrierColor: AppColors.black.withValues(alpha: 0.35),
-    pageBuilder: (dialogContext, _, __) {
+    pageBuilder: (dialogContext, _, _) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -32,15 +32,31 @@ Future<T?> showAppDialog<T>({
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (icon != null) ...[icon, const SizedBox(height: 12)],
-                Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: AppColors.offBlack)),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.offBlack,
+                  ),
+                ),
                 const SizedBox(height: 12),
-                Text(message, style: const TextStyle(fontSize: 14, color: AppColors.textGrey)),
+                Text(
+                  message,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textGrey,
+                  ),
+                ),
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     if (cancelLabel != null)
-                      TextButton(onPressed: () => Navigator.of(dialogContext).pop(), child: Text(cancelLabel)),
+                      TextButton(
+                        onPressed: () => Navigator.of(dialogContext).pop(),
+                        child: Text(cancelLabel),
+                      ),
                     if (confirmLabel != null) ...[
                       const SizedBox(width: 8),
                       FilledButton(

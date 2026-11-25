@@ -31,7 +31,7 @@ class LextariToast extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accent = _colour(type);
-    return Container(
+    return ColoredBox(
       color: const Color(0x00000000),
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

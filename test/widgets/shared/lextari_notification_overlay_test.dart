@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lextari/widgets/notifications/lextari_notification_overlay.dart';
 import 'package:lextari/ui/ui.dart';
+import 'package:lextari/widgets/notifications/lextari_notification_overlay.dart';
 import 'package:toastification/toastification.dart';
 
 void main() {
@@ -9,7 +9,9 @@ void main() {
       await tester.pumpWidget(
         const PrismApp(
           home: LextariNotificationOverlay(
-            child: PrismScaffold(bar: const EmptyBar(), body: Text('Hello Lextari'),
+            child: PrismScaffold(
+              bar: EmptyBar(),
+              body: Text('Hello Lextari'),
             ),
           ),
         ),
@@ -22,7 +24,9 @@ void main() {
       await tester.pumpWidget(
         const PrismApp(
           home: LextariNotificationOverlay(
-            child: PrismScaffold(bar: const EmptyBar(), body: Text('Content'),
+            child: PrismScaffold(
+              bar: EmptyBar(),
+              body: Text('Content'),
             ),
           ),
         ),
@@ -35,7 +39,9 @@ void main() {
       await tester.pumpWidget(
         const PrismApp(
           home: LextariNotificationOverlay(
-            child: PrismScaffold(bar: const EmptyBar(), body: Text('Nested'),
+            child: PrismScaffold(
+              bar: EmptyBar(),
+              body: Text('Nested'),
             ),
           ),
         ),

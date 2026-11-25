@@ -1,13 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lextari/ui/ui.dart';
-import 'package:lextari/ui/ui.dart';
 
 void main() {
   group('AppButton', () {
     testWidgets('renders label text', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: AppButton(label: 'Submit')),
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: AppButton(label: 'Submit'),
+          ),
         ),
       );
 
@@ -18,7 +20,9 @@ void main() {
       var pressed = false;
       await tester.pumpWidget(
         PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: AppButton(
+          home: PrismScaffold(
+            bar: const EmptyBar(),
+            body: AppButton(
               label: 'Tap Me',
               onPressed: () => pressed = true,
             ),
@@ -33,7 +37,9 @@ void main() {
     testWidgets('is disabled when onPressed is null', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: AppButton(label: 'Disabled'),
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: AppButton(label: 'Disabled'),
           ),
         ),
       );
@@ -46,7 +52,9 @@ void main() {
     testWidgets('primary variant uses FilledButton', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: AppButton(
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: AppButton(
               label: 'Primary',
             ),
           ),
@@ -59,7 +67,9 @@ void main() {
     testWidgets('secondary variant uses FilledButton.tonal', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: AppButton(
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: AppButton(
               label: 'Secondary',
               variant: AppButtonVariant.secondary,
             ),
@@ -74,7 +84,9 @@ void main() {
     testWidgets('outline variant uses OutlinedButton', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: AppButton(
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: AppButton(
               label: 'Outline',
               variant: AppButtonVariant.outline,
             ),
@@ -88,7 +100,9 @@ void main() {
     testWidgets('text variant uses TextButton', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: AppButton(
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: AppButton(
               label: 'TextBtn',
               variant: AppButtonVariant.text,
             ),
@@ -102,7 +116,9 @@ void main() {
     testWidgets('shows loading spinner instead of label', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: AppButton(
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: AppButton(
               label: 'Loading',
               loading: true,
             ),
@@ -118,7 +134,9 @@ void main() {
       var pressed = false;
       await tester.pumpWidget(
         PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: AppButton(
+          home: PrismScaffold(
+            bar: const EmptyBar(),
+            body: AppButton(
               label: 'Submit',
               loading: true,
               onPressed: () => pressed = true,
@@ -134,7 +152,9 @@ void main() {
     testWidgets('renders with icon', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: AppButton(
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: AppButton(
               label: 'With Icon',
             ),
           ),
@@ -147,9 +167,10 @@ void main() {
     testWidgets('renders with custom width', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: AppButton(
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: AppButton(
               label: 'Wide',
-              
             ),
           ),
         ),

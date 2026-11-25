@@ -1,17 +1,14 @@
-import 'package:lextari/ui/ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lextari/core/errors/error_handler.dart';
 import 'package:lextari/core/errors/failures.dart';
-import 'package:lextari/ui/ui.dart';
 import 'package:lextari/core/utils/validators.dart';
 import 'package:lextari/features/auth/domain/auth_actions.dart';
+import 'package:lextari/ui/ui.dart';
 import 'package:lextari/widgets/app_text_field.dart';
 
 extension on BuildContext {
-  ColorScheme get colors => colorScheme;
-  
   TextStyle get signUpTitleStyle => const TextStyle(
     fontWeight: FontWeight.w600,
     fontSize: 30,
@@ -98,7 +95,9 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
     });
 
     try {
-      await ref.read(authActionsProvider).register(_emailCtrl.text.trim(), _passwordCtrl.text);
+      await ref
+          .read(authActionsProvider)
+          .register(_emailCtrl.text.trim(), _passwordCtrl.text);
       if (mounted) context.go('/dashboard');
     } on AuthFailure catch (e) {
       setState(() => _formError = e.message);
@@ -254,7 +253,7 @@ class _OrDivider extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 24),
       child: Row(
         children: [
-          Expanded(child: Container(height:1,color:AppColors.greyLighter)),
+          Expanded(child: Container(height: 1, color: AppColors.greyLighter)),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
@@ -264,7 +263,7 @@ class _OrDivider extends StatelessWidget {
               ),
             ),
           ),
-          Expanded(child: Container(height:1,color:AppColors.greyLighter)),
+          Expanded(child: Container(height: 1, color: AppColors.greyLighter)),
         ],
       ),
     );

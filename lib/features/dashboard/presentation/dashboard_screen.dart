@@ -43,7 +43,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final temperature = telemetry[SensorKey.temperature]?.value;
     final humidity = telemetry[SensorKey.humidity]?.value;
     final moisture = telemetry[SensorKey.soilMoisture]?.value;
-    final waterLevel = dashboard.waterLevelPercent ?? telemetry[SensorKey.waterLevel]?.value;
+    final waterLevel =
+        dashboard.waterLevelPercent ?? telemetry[SensorKey.waterLevel]?.value;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(22, 24, 22, 0),
@@ -58,15 +59,27 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             refillOn: _refillOn || dashboard.refillActive,
             onMistChanged: (value) {
               setState(() => _mistOn = value);
-              unawaited(ref.read(dashboardViewModelProvider.notifier).setMist(value));
+              unawaited(
+                ref
+                    .read(dashboardViewModelProvider.notifier)
+                    .setMist(enabled: value),
+              );
             },
             onWaterChanged: (value) {
               setState(() => _waterOn = value);
-              unawaited(ref.read(dashboardViewModelProvider.notifier).setWater(value));
+              unawaited(
+                ref
+                    .read(dashboardViewModelProvider.notifier)
+                    .setWater(enabled: value),
+              );
             },
             onRefillChanged: (value) {
               setState(() => _refillOn = value);
-              unawaited(ref.read(dashboardViewModelProvider.notifier).setRefill(value));
+              unawaited(
+                ref
+                    .read(dashboardViewModelProvider.notifier)
+                    .setRefill(enabled: value),
+              );
             },
           ),
           const SizedBox(height: 16),
@@ -86,7 +99,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   value: temperature ?? 0,
                   unit: '°C',
                   unitIcon: AppGlyphs.thermostat,
-                  statusText: temperature == null ? 'Waiting for data' : 'Live telemetry',
+                  statusText: temperature == null
+                      ? 'Waiting for data'
+                      : 'Live telemetry',
                   gaugeColor: AppColors.gaugeGreen,
                   onMoreTap: () => _openTrend(TrendMetric.temperature),
                 ),
@@ -96,7 +111,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   value: humidity ?? 0,
                   unit: 'RH',
                   unitIcon: AppGlyphs.waterDrop,
-                  statusText: humidity == null ? 'Waiting for data' : 'Live telemetry',
+                  statusText: humidity == null
+                      ? 'Waiting for data'
+                      : 'Live telemetry',
                   gaugeColor: AppColors.gaugeGreen,
                   onMoreTap: () => _openTrend(TrendMetric.humidity),
                 ),
@@ -106,7 +123,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   value: moisture ?? 0,
                   unit: '%',
                   unitIcon: AppGlyphs.grass,
-                  statusText: moisture == null ? 'Waiting for data' : 'Live telemetry',
+                  statusText: moisture == null
+                      ? 'Waiting for data'
+                      : 'Live telemetry',
                   gaugeColor: AppColors.redAlert,
                   onMoreTap: () => _openTrend(TrendMetric.moisture),
                 ),
@@ -116,7 +135,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   value: waterLevel ?? 0,
                   unit: '%',
                   unitIcon: AppGlyphs.waves,
-                  statusText: waterLevel == null ? 'Waiting for data' : 'Live telemetry',
+                  statusText: waterLevel == null
+                      ? 'Waiting for data'
+                      : 'Live telemetry',
                   gaugeColor: AppColors.gaugeOrange,
                 ),
               ],
@@ -131,7 +152,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return switch (status) {
       HealthStatus.optimal || HealthStatus.moderate => AppColors.gaugeGreen,
       HealthStatus.caution => AppColors.gaugeOrange,
-      HealthStatus.danger || HealthStatus.critical || null => AppColors.redAlert,
+      HealthStatus.danger ||
+      HealthStatus.critical ||
+      null => AppColors.redAlert,
     };
   }
 }

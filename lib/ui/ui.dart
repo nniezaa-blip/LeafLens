@@ -1,15 +1,15 @@
 export 'package:flutter/widgets.dart';
-export 'package:prism_ui/prism_ui.dart' hide Card, LineChart, Text;
+export 'package:prism_ui/prism_ui.dart' hide Card, LineChart;
 
 export 'icons/app_glyphs.dart';
 export 'motion/app_motion.dart';
 export 'primitives/app_button.dart';
-export 'primitives/empty_bar.dart';
-export 'primitives/icon_tap.dart';
 export 'primitives/app_card.dart';
 export 'primitives/app_list_item.dart';
 export 'primitives/app_scaffold.dart';
 export 'primitives/app_section.dart';
+export 'primitives/empty_bar.dart';
+export 'primitives/icon_tap.dart';
 export 'theme/app_text.dart';
 export 'theme/app_theme.dart';
 export 'tokens/app_colors.dart';

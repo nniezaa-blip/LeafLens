@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lextari/widgets/lextari_logo.dart';
 import 'package:lextari/ui/ui.dart';
+import 'package:lextari/widgets/lextari_logo.dart';
 
 import '../../helpers/test_asset_bundle.dart';
 
@@ -11,7 +11,7 @@ void main() {
         PrismApp(
           home: DefaultAssetBundle(
             bundle: TestAssetBundle(),
-            child: const PrismScaffold(bar: const EmptyBar(), body: LextariLogo()),
+            child: const PrismScaffold(bar: EmptyBar(), body: LextariLogo()),
           ),
         ),
       );

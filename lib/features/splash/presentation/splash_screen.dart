@@ -71,7 +71,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return const PrismScaffold(
-      bar: const EmptyBar(),
+      bar: EmptyBar(),
       backgroundColor: AppColors.lightGreenBg,
       body: Stack(
         children: [

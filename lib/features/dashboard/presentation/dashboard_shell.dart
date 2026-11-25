@@ -35,7 +35,10 @@ class _DashboardShellState extends State<DashboardShell>
       vsync: this,
       duration: const Duration(milliseconds: 320),
     );
-    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic);
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOutCubic,
+    );
     _controller.value = 1;
   }
 
@@ -58,7 +61,7 @@ class _DashboardShellState extends State<DashboardShell>
 
   void _handleTap(int index) {
     if (index == widget.navigationShell.currentIndex) return;
-    widget.navigationShell.goBranch(index, initialLocation: index == widget.navigationShell.currentIndex);
+    widget.navigationShell.goBranch(index);
   }
 
   Widget _pageForIndex(int index) {
@@ -87,8 +90,14 @@ class _DashboardShellState extends State<DashboardShell>
                 animation: _animation,
                 builder: (context, _) {
                   final t = _animation.value;
-                  final enteringOffset = Offset((_isForward ? 1 : -1) * (1 - t) * 0.08, 0);
-                  final leavingOffset = Offset((_isForward ? -1 : 1) * t * 0.03, 0);
+                  final enteringOffset = Offset(
+                    (_isForward ? 1 : -1) * (1 - t) * 0.08,
+                    0,
+                  );
+                  final leavingOffset = Offset(
+                    (_isForward ? -1 : 1) * t * 0.03,
+                    0,
+                  );
                   return Stack(
                     fit: StackFit.expand,
                     children: [
@@ -97,12 +106,23 @@ class _DashboardShellState extends State<DashboardShell>
                           translation: leavingOffset,
                           child: Opacity(
                             opacity: 1 - t,
-                            child: IgnorePointer(child: _pageForIndex(_previousIndex == currentIndex ? currentIndex : (_isForward ? currentIndex - 1 : currentIndex + 1))),
+                            child: IgnorePointer(
+                              child: _pageForIndex(
+                                _previousIndex == currentIndex
+                                    ? currentIndex
+                                    : (_isForward
+                                          ? currentIndex - 1
+                                          : currentIndex + 1),
+                              ),
+                            ),
                           ),
                         ),
                       FractionalTranslation(
                         translation: t < 1 ? enteringOffset : Offset.zero,
-                        child: Opacity(opacity: t.clamp(0.0, 1.0), child: widget.navigationShell),
+                        child: Opacity(
+                          opacity: t.clamp(0.0, 1.0),
+                          child: widget.navigationShell,
+                        ),
                       ),
                     ],
                   );

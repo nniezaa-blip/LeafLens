@@ -1,9 +1,7 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lextari/app/router/app_router.dart';
 import 'package:lextari/managers/managers.dart';
-import 'package:lextari/ui/theme/app_theme.dart';
 import 'package:lextari/ui/ui.dart';
 
 class LextariApp extends ConsumerWidget {

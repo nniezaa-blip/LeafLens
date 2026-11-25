@@ -8,7 +8,9 @@ void main() {
   Widget buildTestApp() {
     return const ProviderScope(
       child: PrismApp(
-        home: PrismScaffold(bar: const EmptyBar(), body: StatsScreen(),
+        home: PrismScaffold(
+          bar: EmptyBar(),
+          body: StatsScreen(),
         ),
       ),
     );

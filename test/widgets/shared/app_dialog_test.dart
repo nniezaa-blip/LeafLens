@@ -1,13 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lextari/widgets/notifications/app_dialog.dart';
 import 'package:lextari/ui/ui.dart';
+import 'package:lextari/widgets/notifications/app_dialog.dart';
 
 void main() {
   group('showAppDialog', () {
     testWidgets('shows title and message', (tester) async {
       await tester.pumpWidget(
         PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: Builder(
+          home: PrismScaffold(
+            bar: const EmptyBar(),
+            body: Builder(
               builder: (context) => FilledButton(
                 onPressed: () => showAppDialog<void>(
                   context: context,
@@ -31,7 +33,9 @@ void main() {
     testWidgets('shows OK button by default', (tester) async {
       await tester.pumpWidget(
         PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: Builder(
+          home: PrismScaffold(
+            bar: const EmptyBar(),
+            body: Builder(
               builder: (context) => FilledButton(
                 onPressed: () => showAppDialog<void>(
                   context: context,
@@ -54,7 +58,9 @@ void main() {
     testWidgets('shows custom confirm label', (tester) async {
       await tester.pumpWidget(
         PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: Builder(
+          home: PrismScaffold(
+            bar: const EmptyBar(),
+            body: Builder(
               builder: (context) => FilledButton(
                 onPressed: () => showAppDialog<void>(
                   context: context,
@@ -79,7 +85,9 @@ void main() {
     testWidgets('shows cancel when cancelLabel provided', (tester) async {
       await tester.pumpWidget(
         PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: Builder(
+          home: PrismScaffold(
+            bar: const EmptyBar(),
+            body: Builder(
               builder: (context) => FilledButton(
                 onPressed: () => showAppDialog<void>(
                   context: context,
@@ -106,7 +114,9 @@ void main() {
       bool? result;
       await tester.pumpWidget(
         PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: Builder(
+          home: PrismScaffold(
+            bar: const EmptyBar(),
+            body: Builder(
               builder: (context) => FilledButton(
                 onPressed: () async {
                   result = await showAppDialog<bool>(
@@ -134,7 +144,9 @@ void main() {
       bool? result;
       await tester.pumpWidget(
         PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: Builder(
+          home: PrismScaffold(
+            bar: const EmptyBar(),
+            body: Builder(
               builder: (context) => FilledButton(
                 onPressed: () async {
                   result = await showAppDialog<bool>(
@@ -162,7 +174,9 @@ void main() {
     testWidgets('shows icon when provided', (tester) async {
       await tester.pumpWidget(
         PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: Builder(
+          home: PrismScaffold(
+            bar: const EmptyBar(),
+            body: Builder(
               builder: (context) => FilledButton(
                 onPressed: () => showAppDialog<void>(
                   context: context,
@@ -180,13 +194,20 @@ void main() {
       await tester.tap(find.text('open'));
       await tester.pumpAndSettle();
 
-      expect(find.byWidgetPredicate((w) => w is GlyphIcon && w.glyph == AppGlyphs.warning), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is GlyphIcon && w.glyph == AppGlyphs.warning,
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('barrier not dismissible by default', (tester) async {
       await tester.pumpWidget(
         PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: Builder(
+          home: PrismScaffold(
+            bar: const EmptyBar(),
+            body: Builder(
               builder: (context) => FilledButton(
                 onPressed: () => showAppDialog<void>(
                   context: context,

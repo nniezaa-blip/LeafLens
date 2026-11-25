@@ -1,13 +1,16 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lextari/widgets/app_text_field.dart';
 import 'package:lextari/ui/ui.dart';
+import 'package:lextari/widgets/app_text_field.dart';
 
 void main() {
   group('AppTextField', () {
     testWidgets('renders with hint text', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: AppTextField(hint: 'Email')),
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: AppTextField(hint: 'Email'),
+          ),
         ),
       );
 
@@ -16,7 +19,9 @@ void main() {
 
     testWidgets('renders without hint when omitted', (tester) async {
       await tester.pumpWidget(
-        const PrismApp(home: PrismScaffold(bar: const EmptyBar(), body: AppTextField())),
+        const PrismApp(
+          home: PrismScaffold(bar: EmptyBar(), body: AppTextField()),
+        ),
       );
 
       expect(find.byType(TextFormField), findsOneWidget);
@@ -25,7 +30,9 @@ void main() {
     testWidgets('renders with prefix icon', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: AppTextField(
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: AppTextField(
               hint: 'Name',
               prefixIcon: GlyphIcon(AppGlyphs.info),
             ),
@@ -33,13 +40,20 @@ void main() {
         ),
       );
 
-      expect(find.byWidgetPredicate((w) => w is GlyphIcon && w.glyph == AppGlyphs.info), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is GlyphIcon && w.glyph == AppGlyphs.info,
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('renders with suffix icon', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: AppTextField(
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: AppTextField(
               hint: 'Password',
               suffixIcon: GlyphIcon(AppGlyphs.info),
             ),
@@ -47,13 +61,20 @@ void main() {
         ),
       );
 
-      expect(find.byWidgetPredicate((w) => w is GlyphIcon && w.glyph == AppGlyphs.info), findsOneWidget);
+      expect(
+        find.byWidgetPredicate(
+          (w) => w is GlyphIcon && w.glyph == AppGlyphs.info,
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('obscures text input visually', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: AppTextField(obscureText: true),
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: AppTextField(obscureText: true),
           ),
         ),
       );
@@ -69,7 +90,9 @@ void main() {
     testWidgets('accepts typed input', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: AppTextField(hint: 'Name'),
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: AppTextField(hint: 'Name'),
           ),
         ),
       );
@@ -86,7 +109,10 @@ void main() {
       final controller = TextEditingController(text: 'prefilled');
       await tester.pumpWidget(
         PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: AppTextField(controller: controller)),
+          home: PrismScaffold(
+            bar: const EmptyBar(),
+            body: AppTextField(controller: controller),
+          ),
         ),
       );
 
@@ -97,7 +123,9 @@ void main() {
     testWidgets('uses email keyboard type', (tester) async {
       await tester.pumpWidget(
         const PrismApp(
-          home: PrismScaffold(bar: const EmptyBar(), body: AppTextField(
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: AppTextField(
               hint: 'Email',
               keyboardType: TextInputType.emailAddress,
             ),

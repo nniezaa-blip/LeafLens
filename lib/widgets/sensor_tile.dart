@@ -19,8 +19,6 @@ class SensorTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = context.colorScheme;
-    final textStyle = DefaultTextStyle.of(context).style;
-
     if (reading == null) {
       return AppCard(
         child: Padding(
@@ -59,14 +57,19 @@ class SensorTile extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text(sensor.name, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+                Text(
+                  sensor.name,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
                 if (reading!.isStale) ...[
                   const SizedBox(width: 4),
                   GlyphIcon(
                     AppGlyphs.warning,
                     size: 14,
                     color: cs.error,
-                    
                   ),
                 ],
               ],
@@ -74,13 +77,14 @@ class SensorTile extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               '${reading!.value.toStringAsFixed(1)}${sensor.unit}',
-              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w700).copyWith(
-                color: reading!.isStale ? cs.error : cs.onSurface,
-              ),
+              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w700)
+                  .copyWith(
+                    color: reading!.isStale ? cs.error : cs.onSurface,
+                  ),
             ),
             Text(
               reading!.ageLabel,
-              style: const TextStyle(fontSize: 12)?.copyWith(
+              style: const TextStyle(fontSize: 12).copyWith(
                 color: reading!.isStale ? cs.error : cs.outline,
               ),
             ),
