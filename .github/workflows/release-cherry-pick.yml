@@ -1,0 +1,42 @@
+name: release-cherry-pick
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: Commit SHA to cherry-pick onto the release branch
+        required: true
+        type: string
+      branch:
+        description: Target release branch
+        required: true
+        default: release
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  cherry-pick:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out release branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Cherry-pick and push
+        env:
+          COMMIT: ${{ inputs.commit }}
+          TARGET_BRANCH: ${{ inputs.branch }}
+        run: |
+          git rev-parse --verify "$COMMIT^{commit}" >/dev/null
+          git fetch origin main
+          git cherry-pick -x "$COMMIT"
+          git push origin "HEAD:$TARGET_BRANCH"
