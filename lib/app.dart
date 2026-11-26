@@ -21,14 +21,19 @@ class LextariApp extends ConsumerWidget {
       ],
       supportedLocales: const [Locale('en')],
       builder: (context, child) {
-        return buildManagerStack(
-          child: child ?? const SizedBox.shrink(),
-          managers: [
-            (child) => ConnectivityManager(child: child),
-            (child) => SessionManager(child: child),
-            (child) => AppStateManager(child: child),
-            (child) => DashboardManager(child: child),
-          ],
+        final size = MediaQuery.sizeOf(context);
+        return ViewScope(
+          size: size,
+          isMobile: size.width < 600,
+          child: buildManagerStack(
+            child: child ?? const SizedBox.shrink(),
+            managers: [
+              (child) => ConnectivityManager(child: child),
+              (child) => SessionManager(child: child),
+              (child) => AppStateManager(child: child),
+              (child) => DashboardManager(child: child),
+            ],
+          ),
         );
       },
     );
