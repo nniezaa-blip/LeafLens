@@ -31,10 +31,10 @@ enum DashboardDensity {
 /// Carries the dashboard density and text scale to the cards.
 class DashboardDensityScope extends InheritedWidget {
   const DashboardDensityScope({
-    super.key,
     required this.density,
     required this.scale,
     required super.child,
+    super.key,
   });
 
   final DashboardDensity density;
