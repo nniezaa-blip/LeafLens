@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lextari/ui/tokens/app_tokens.dart';
 import 'package:prism_ui/prism_ui.dart';
 
 /// A removable filter chip shown under a page bar.
@@ -48,8 +49,8 @@ class AppBarSearchState {
 
 /// A page layout with a floating bar, loading line, actions and search.
 ///
-/// The API mirrors FlClash's scaffold: a page supplies its content and the
-/// state of its bar instead of building a bar by hand.
+/// The API keeps the page in charge of its content and bar state instead of
+/// building a bar by hand.
 class Scaffold extends StatefulWidget {
   /// Creates a [Scaffold].
   const Scaffold({
@@ -198,7 +199,7 @@ class _ScaffoldState extends State<Scaffold> {
       body: widget.body,
       headerListenable: _barRefresh,
       headerBuilder: _buildHeader,
-      backgroundColor: widget.backgroundColor,
+      backgroundColor: widget.backgroundColor ?? const Color(0x00000000),
       resizeToAvoidBottomInset: widget.resizeToAvoidBottomInset,
     );
   }
@@ -207,6 +208,9 @@ class _ScaffoldState extends State<Scaffold> {
     return AppBar(
       leading: _buildLeading(context),
       title: _buildTitle(context),
+      titleTextStyle: AppTextStyle.pageTitle
+          .of(context)
+          .copyWith(color: context.colorScheme.onSurface),
       actions: _buildActions(context),
     );
   }
@@ -295,6 +299,7 @@ class _ScaffoldState extends State<Scaffold> {
     }
     final extraActions = widget.actions;
     if (extraActions != null) actions.addAll(extraActions);
+    actions.add(const SizedBox(width: AppSpacing.s8));
     return actions;
   }
 

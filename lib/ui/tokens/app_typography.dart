@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 /// Lextari's display and text roles.
 ///
 /// Figures use tabular digits where callers need them; the sizes stay close to
-/// Prism's Dynamic Type scale so FlClash components keep their proportions.
+/// Prism's Dynamic Type scale so the design-system components keep their proportions.
 class AppTypography {
   AppTypography._();
 

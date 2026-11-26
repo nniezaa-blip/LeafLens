@@ -31,12 +31,10 @@ class CareControlsCard extends StatelessWidget {
           const DashboardCardHeader(
             glyph: AppGlyphs.tune,
             title: 'Care controls',
-            trailing: [
-              DashboardChip(label: 'Tap to toggle'),
-            ],
           ),
           const SizedBox(height: AppSpacing.s14),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: ActionSwitch(

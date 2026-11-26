@@ -7,7 +7,7 @@ import 'package:prism_ui/prism_ui.dart';
 
 /// The soft botanical page background used by the app shell.
 ///
-/// A cream or forest wash sits under three blurred glows. The glows are
+/// A cream or black wash sits under three blurred glows. The glows are
 /// decorative, so they never receive pointer events.
 class BotanicalBackground extends StatelessWidget {
   /// Creates a [BotanicalBackground].
@@ -30,16 +30,20 @@ class BotanicalBackground extends StatelessWidget {
               end: Alignment.bottomRight,
               colors: dark
                   ? [
-                      AppColors.forest,
+                      AppColors.black,
                       Color.alphaBlend(
-                        scheme.primary.withValues(alpha: AppBotanical.washAlphaDark),
-                        AppColors.forest,
+                        scheme.primary.withValues(
+                          alpha: AppBotanical.washAlphaDark,
+                        ),
+                        AppColors.black,
                       ),
                     ]
                   : [
                       AppColors.cream,
                       Color.alphaBlend(
-                        scheme.primary.withValues(alpha: AppBotanical.washAlpha),
+                        scheme.primary.withValues(
+                          alpha: AppBotanical.washAlpha,
+                        ),
                         AppColors.cream,
                       ),
                     ],
@@ -51,7 +55,9 @@ class BotanicalBackground extends StatelessWidget {
           left: AppBotanical.glowLeft,
           child: _BotanicalGlow(
             size: AppBotanical.glowLarge,
-            color: scheme.primary.withValues(alpha: dark ? 0.38 : 0.22),
+            color: scheme.primary.withValues(
+              alpha: dark ? AppBotanical.glowAlphaDark : AppBotanical.glowAlpha,
+            ),
           ),
         ),
         Positioned(
@@ -59,7 +65,11 @@ class BotanicalBackground extends StatelessWidget {
           right: AppBotanical.glowRight,
           child: _BotanicalGlow(
             size: AppBotanical.glowXLarge,
-            color: scheme.secondary.withValues(alpha: dark ? 0.28 : 0.18),
+            color: scheme.secondary.withValues(
+              alpha: dark
+                  ? AppBotanical.glowAlphaSecondaryDark
+                  : AppBotanical.glowAlphaSecondary,
+            ),
           ),
         ),
         Positioned(
@@ -67,10 +77,10 @@ class BotanicalBackground extends StatelessWidget {
           right: AppBotanical.accentRight,
           child: _BotanicalGlow(
             size: AppBotanical.glowSmall,
-            color: (dark ? AppColors.sky : AppColors.lime).withValues(
+            color: AppColors.lime.withValues(
               alpha: dark
-                ? AppBotanical.glowAlphaAccentDark
-                : AppBotanical.glowAlphaAccent,
+                  ? AppBotanical.glowAlphaAccentDark
+                  : AppBotanical.glowAlphaAccent,
             ),
           ),
         ),
@@ -91,9 +101,9 @@ class _BotanicalGlow extends StatelessWidget {
     return IgnorePointer(
       child: ImageFiltered(
         imageFilter: ImageFilter.blur(
-            sigmaX: AppBotanical.glowBlur,
-            sigmaY: AppBotanical.glowBlur,
-          ),
+          sigmaX: AppBotanical.glowBlur,
+          sigmaY: AppBotanical.glowBlur,
+        ),
         child: Container(
           width: size,
           height: size,

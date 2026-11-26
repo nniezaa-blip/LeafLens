@@ -11,6 +11,7 @@ class AuthGuard {
     String? currentToken,
     bool hasLinkedDevice = false,
     bool deviceCheckResolved = false,
+    bool deviceProvisioningSkipped = false,
   }) {
     final path = state.matchedLocation;
     final authenticated = isLoggedIn || currentToken != null;
@@ -22,12 +23,16 @@ class AuthGuard {
 
     if (!authenticated && !isPublic) return AppRoutes.login;
     if (authenticated && isPublic) {
-      if (!deviceCheckResolved) return null;
-      return hasLinkedDevice ? AppRoutes.dashboard : AppRoutes.onboarding;
+      if (!deviceCheckResolved) return AppRoutes.dashboard;
+      if (!hasLinkedDevice && !deviceProvisioningSkipped) {
+        return AppRoutes.onboarding;
+      }
+      return AppRoutes.dashboard;
     }
     if (authenticated &&
         deviceCheckResolved &&
         !hasLinkedDevice &&
+        !deviceProvisioningSkipped &&
         !isOnboarding) {
       return AppRoutes.onboarding;
     }

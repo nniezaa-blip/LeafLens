@@ -10,6 +10,7 @@ import 'package:lextari/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:lextari/features/dashboard/presentation/dashboard_view_model.dart';
 import 'package:lextari/features/dashboard/presentation/widgets/action_switch.dart';
 import 'package:lextari/features/dashboard/presentation/widgets/dashboard_skeleton.dart';
+import 'package:lextari/features/dashboard/providers/device_providers.dart';
 import 'package:lextari/ui/ui.dart';
 import 'package:lextari/widgets/user_avatar.dart';
 
@@ -69,13 +70,14 @@ void main() {
     );
   }
 
-  Widget buildTestApp({DashboardViewState? state}) {
+  Widget buildTestApp({DashboardViewState? state, bool hasDevice = true}) {
     return ProviderScope(
       overrides: [
         currentUserProfileProvider.overrideWithValue(testProfile),
         dashboardViewModelProvider.overrideWith(
           () => FakeDashboardViewModel(state ?? testState()),
         ),
+        hasLinkedDeviceProvider.overrideWithValue(AsyncValue.data(hasDevice)),
       ],
       child: const PrismApp(
         home: PrismScaffold(
@@ -238,6 +240,18 @@ void main() {
       await tester.pump(const Duration(seconds: 9));
       expect(find.text('No telemetry yet'), findsOneWidget);
       expect(find.byType(DashboardSkeleton), findsNothing);
+    });
+
+    testWidgets('shows the no-device state without waiting for a timeout', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        buildTestApp(state: const DashboardViewState(), hasDevice: false),
+      );
+
+      expect(find.text('No device linked'), findsOneWidget);
+      expect(find.byType(DashboardSkeleton), findsNothing);
+      expect(find.text('Add device'), findsWidgets);
     });
   });
 }

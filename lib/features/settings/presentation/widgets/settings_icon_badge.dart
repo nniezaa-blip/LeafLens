@@ -16,13 +16,13 @@ class SettingsIconBadge extends StatelessWidget {
     final accent = color ?? AppColors.mediumGreen;
 
     return Container(
-      width: 38,
-      height: 38,
+      width: AppSizes.badge,
+      height: AppSizes.badge,
       decoration: BoxDecoration(
-        color: accent.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(12),
+        color: accent.withValues(alpha: AppOpacity.tint),
+        borderRadius: BorderRadius.circular(AppRadii.sm),
       ),
-      child: GlyphIcon(icon, size: 20, color: accent),
+      child: GlyphIcon(icon, size: AppSizes.iconLg, color: accent),
     );
   }
 }

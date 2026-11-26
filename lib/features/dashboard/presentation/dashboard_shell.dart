@@ -1,7 +1,4 @@
 import 'package:go_router/go_router.dart';
-import 'package:lextari/features/dashboard/presentation/dashboard_screen.dart';
-import 'package:lextari/features/settings/presentation/settings_screen.dart';
-import 'package:lextari/features/stats/presentation/stats_screen.dart';
 import 'package:lextari/ui/ui.dart';
 
 class DashboardShell extends StatefulWidget {
@@ -16,7 +13,7 @@ class DashboardShell extends StatefulWidget {
 class _DashboardShellState extends State<DashboardShell>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  late Animation<double> _animation;
+  late final Animation<double> _animation;
   int _previousIndex = 0;
   bool _isForward = true;
 
@@ -32,7 +29,7 @@ class _DashboardShellState extends State<DashboardShell>
     _previousIndex = widget.navigationShell.currentIndex;
     _controller = AnimationController(
       vsync: this,
-      duration: AppMotionTokens.page,
+      duration: AppMotionTokens.fast,
     );
     _animation = CurvedAnimation(
       parent: _controller,
@@ -63,14 +60,6 @@ class _DashboardShellState extends State<DashboardShell>
     widget.navigationShell.goBranch(index);
   }
 
-  Widget _pageForIndex(int index) {
-    return switch (index) {
-      1 => const StatsScreen(),
-      2 => const SettingsScreen(),
-      _ => const DashboardScreen(),
-    };
-  }
-
   @override
   Widget build(BuildContext context) {
     final currentIndex = widget.navigationShell.currentIndex;
@@ -81,47 +70,20 @@ class _DashboardShellState extends State<DashboardShell>
         const BotanicalBackground(),
         BottomInsetScope(
           inset: bottomInset,
-          child: AnimatedBuilder(
-            animation: _animation,
-            builder: (context, _) {
-              final t = _animation.value;
-              final enteringOffset = Offset(
-                (_isForward ? 1 : -1) * (1 - t) * AppMotionTokens.pageEnterOffset,
-                0,
-              );
-              final leavingOffset = Offset(
-                (_isForward ? -1 : 1) * t * AppMotionTokens.pageLeaveOffset,
-                0,
-              );
-              return Stack(
-                fit: StackFit.expand,
-                children: [
-                  if (t < 1)
-                    FractionalTranslation(
-                      translation: leavingOffset,
-                      child: Opacity(
-                        opacity: 1 - t,
-                        child: IgnorePointer(
-                          child: _pageForIndex(
-                            _previousIndex == currentIndex
-                                ? currentIndex
-                                : (_isForward
-                                      ? currentIndex - 1
-                                      : currentIndex + 1),
-                          ),
-                        ),
-                      ),
-                    ),
-                  FractionalTranslation(
-                    translation: t < 1 ? enteringOffset : Offset.zero,
-                    child: Opacity(
-                      opacity: t.clamp(0.0, 1.0),
-                      child: widget.navigationShell,
-                    ),
-                  ),
-                ],
-              );
-            },
+          child: RepaintBoundary(
+            child: AnimatedBuilder(
+              animation: _animation,
+              child: widget.navigationShell,
+              builder: (context, child) {
+                final progress = _animation.value;
+                final shift =
+                    (1 - progress) * _tabSwitchOffset * (_isForward ? 1 : -1);
+                return Transform.translate(
+                  offset: Offset(shift, 0),
+                  child: child,
+                );
+              },
+            ),
           ),
         ),
         Align(
@@ -135,4 +97,6 @@ class _DashboardShellState extends State<DashboardShell>
       ],
     );
   }
+
+  static const double _tabSwitchOffset = AppSpacing.s12;
 }

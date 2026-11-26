@@ -6,6 +6,15 @@ import 'package:lextari/features/stats/presentation/trend_metric.dart';
 import 'package:lextari/ui/ui.dart';
 import 'package:lextari/widgets/frosted_card.dart';
 
+const double _gridStroke = AppSizes.line;
+const double _indicatorStroke = 1.5;
+const double _lineWidth = 3;
+const double _dotRadius = 2.5;
+const double _dotStroke = 1.5;
+const double _touchDotRadius = 4.5;
+const double _curveSmoothness = 0.25;
+const double _areaAlpha = 0.28;
+
 /// Rounded frosted card containing the 30-day line chart for a [TrendMetric].
 ///
 /// Renders horizontal grid lines, labelled value and day axes, and a coloured
@@ -73,9 +82,8 @@ class _TrendChartCardState extends ConsumerState<TrendChartCard> {
               child: historyAsync.when(
                 loading: _buildLoading,
                 error: _buildError,
-                data: (points) => points.isEmpty
-                    ? _buildEmpty()
-                    : _buildChart(points),
+                data: (points) =>
+                    points.isEmpty ? _buildEmpty() : _buildChart(points),
               ),
             ),
           ),
@@ -128,8 +136,12 @@ class _TrendChartCardState extends ConsumerState<TrendChartCard> {
 
   Widget _buildChart(List<TelemetryHistoryPoint> points) {
     return LineChart(
-      _buildChartData(widget.metric, _spotsFromHistory(widget.metric, points)),
-      duration: const Duration(milliseconds: 450),
+      _buildChartData(
+        widget.metric,
+        _spotsFromHistory(widget.metric, points),
+        context,
+      ),
+      duration: AppMotionTokens.chart,
       curve: Curves.easeInOutCubic,
       transformationConfig: FlTransformationConfig(
         scaleAxis: FlScaleAxis.horizontal,
@@ -150,16 +162,27 @@ List<FlSpot> _spotsFromHistory(
   List<TelemetryHistoryPoint> points,
 ) {
   if (points.isEmpty) return const <FlSpot>[];
-  final sorted = [...points]..sort((a, b) => a.timestamp.compareTo(b.timestamp));
-  final sliced = sorted.length > 30 ? sorted.sublist(sorted.length - 30) : sorted;
+  final sorted = [...points]
+    ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
+  final sliced = sorted.length > 30
+      ? sorted.sublist(sorted.length - 30)
+      : sorted;
   return [
     for (var i = 0; i < sliced.length; i++)
-      FlSpot((i + 1).toDouble(), sliced[i].value.clamp(metric.minY, metric.maxY)),
+      FlSpot(
+        (i + 1).toDouble(),
+        sliced[i].value.clamp(metric.minY, metric.maxY),
+      ),
   ];
 }
 
 /// Builds the full [LineChartData] configuration for [metric].
-LineChartData _buildChartData(TrendMetric metric, List<FlSpot> spots) {
+LineChartData _buildChartData(
+  TrendMetric metric,
+  List<FlSpot> spots,
+  BuildContext context,
+) {
+  final scheme = context.colorScheme;
   final lineColor = metric.lineColor;
 
   return LineChartData(
@@ -172,37 +195,42 @@ LineChartData _buildChartData(TrendMetric metric, List<FlSpot> spots) {
       drawVerticalLine: false,
       horizontalInterval: metric.yInterval,
       getDrawingHorizontalLine: (value) => FlLine(
-        color: AppColors.offBlack.withValues(alpha: 0.08),
-        strokeWidth: 1,
+        color: scheme.outlineVariant.withValues(alpha: AppOpacity.soft),
+        strokeWidth: _gridStroke,
       ),
     ),
     borderData: FlBorderData(
       show: true,
       border: Border(
-        left: BorderSide(color: AppColors.offBlack.withValues(alpha: 0.15)),
-        bottom: BorderSide(color: AppColors.offBlack.withValues(alpha: 0.15)),
+        left: BorderSide(
+          color: scheme.outlineVariant.withValues(alpha: AppOpacity.strong),
+        ),
+        bottom: BorderSide(
+          color: scheme.outlineVariant.withValues(alpha: AppOpacity.strong),
+        ),
       ),
     ),
-    titlesData: _titlesData(metric),
-    lineBarsData: [_lineBar(metric, lineColor, spots)],
-    lineTouchData: _touchData(metric, lineColor),
+    titlesData: _titlesData(metric, context),
+    lineBarsData: [_lineBar(metric, lineColor, spots, scheme)],
+    lineTouchData: _touchData(metric, lineColor, context),
   );
 }
 
-FlTitlesData _titlesData(TrendMetric metric) {
+FlTitlesData _titlesData(TrendMetric metric, BuildContext context) {
+  final scheme = context.colorScheme;
   return FlTitlesData(
     topTitles: const AxisTitles(),
     rightTitles: const AxisTitles(),
     leftTitles: AxisTitles(
       axisNameWidget: Text(
         metric.unit,
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w700,
-          color: AppColors.textGrey,
-        ),
+        style: AppTextStyle.caption1
+            .of(context, emphasized: true)
+            .copyWith(
+              color: scheme.onSurfaceVariant,
+            ),
       ),
-      axisNameSize: 26,
+      axisNameSize: AppSpacing.s24,
       sideTitles: SideTitles(
         showTitles: true,
         interval: metric.yInterval,
@@ -212,10 +240,9 @@ FlTitlesData _titlesData(TrendMetric metric) {
           space: 6,
           child: Text(
             value.toStringAsFixed(0),
-            style: const TextStyle(
-              fontSize: 11,
-              color: AppColors.textGrey,
-            ),
+            style: AppTextStyle.caption2
+                .of(context)
+                .copyWith(color: scheme.onSurfaceVariant),
           ),
         ),
       ),
@@ -237,11 +264,9 @@ FlTitlesData _titlesData(TrendMetric metric) {
             space: 6,
             child: Text(
               'Day $day',
-              style: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textGrey,
-              ),
+              style: AppTextStyle.caption2
+                  .of(context, emphasized: true)
+                  .copyWith(color: scheme.onSurfaceVariant),
             ),
           );
         },
@@ -250,22 +275,27 @@ FlTitlesData _titlesData(TrendMetric metric) {
   );
 }
 
-LineChartBarData _lineBar(TrendMetric metric, Color lineColor, List<FlSpot> spots) {
+LineChartBarData _lineBar(
+  TrendMetric metric,
+  Color lineColor,
+  List<FlSpot> spots,
+  ColorScheme scheme,
+) {
   return LineChartBarData(
     spots: spots,
     isCurved: true,
-    curveSmoothness: 0.25,
+    curveSmoothness: _curveSmoothness,
     preventCurveOverShooting: true,
     color: lineColor,
-    barWidth: 3,
+    barWidth: _lineWidth,
     isStrokeCapRound: true,
     isStrokeJoinRound: true,
     dotData: FlDotData(
       getDotPainter: (spot, percent, bar, index) => FlDotCirclePainter(
-        radius: 2.5,
+        radius: _dotRadius,
         color: lineColor,
-        strokeWidth: 1.5,
-        strokeColor: AppColors.white,
+        strokeWidth: _dotStroke,
+        strokeColor: scheme.surface,
       ),
     ),
     belowBarData: BarAreaData(
@@ -274,7 +304,7 @@ LineChartBarData _lineBar(TrendMetric metric, Color lineColor, List<FlSpot> spot
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: [
-          lineColor.withValues(alpha: 0.28),
+          lineColor.withValues(alpha: _areaAlpha),
           lineColor.withValues(alpha: 0),
         ],
       ),
@@ -282,24 +312,28 @@ LineChartBarData _lineBar(TrendMetric metric, Color lineColor, List<FlSpot> spot
   );
 }
 
-LineTouchData _touchData(TrendMetric metric, Color lineColor) {
+LineTouchData _touchData(
+  TrendMetric metric,
+  Color lineColor,
+  BuildContext context,
+) {
+  final scheme = context.colorScheme;
   return LineTouchData(
     touchTooltipData: LineTouchTooltipData(
-      getTooltipColor: (_) => AppColors.offBlack.withValues(alpha: 0.88),
-      tooltipBorderRadius: BorderRadius.circular(12),
+      getTooltipColor: (_) => scheme.inverseSurface,
+      tooltipBorderRadius: BorderRadius.circular(AppRadii.sm),
       tooltipPadding: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 8,
+        horizontal: AppSpacing.s12,
+        vertical: AppSpacing.s8,
       ),
       getTooltipItems: (touchedSpots) => touchedSpots.map((spot) {
         return LineTooltipItem(
           'Day ${spot.x.round()}\n'
           '${spot.y.toStringAsFixed(1)} ${metric.unit}',
-          const TextStyle(
-            color: AppColors.white,
-            fontSize: 12,
+          TextStyle(
+            color: scheme.onInverseSurface,
+            fontSize: AppTextStyle.caption1.size,
             fontWeight: FontWeight.w600,
-            height: 1.4,
           ),
         );
       }).toList(),
@@ -307,14 +341,14 @@ LineTouchData _touchData(TrendMetric metric, Color lineColor) {
     getTouchedSpotIndicator: (bar, indexes) => indexes.map((index) {
       return TouchedSpotIndicatorData(
         FlLine(
-          color: lineColor.withValues(alpha: 0.5),
-          strokeWidth: 1.5,
+          color: lineColor.withValues(alpha: AppOpacity.muted),
+          strokeWidth: _indicatorStroke,
         ),
         FlDotData(
           getDotPainter: (spot, percent, bar, i) => FlDotCirclePainter(
-            radius: 4.5,
+            radius: _touchDotRadius,
             color: lineColor,
-            strokeColor: AppColors.white,
+            strokeColor: scheme.surface,
           ),
         ),
       );
@@ -333,57 +367,55 @@ class _ChartHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = context.colorScheme;
     final lineColor = metric.lineColor;
 
     return Row(
       children: [
         Container(
-          width: 36,
-          height: 36,
+          width: AppSizes.trendHeaderIcon,
+          height: AppSizes.trendHeaderIcon,
           decoration: BoxDecoration(
-            color: lineColor.withValues(alpha: 0.16),
-            borderRadius: BorderRadius.circular(12),
+            color: lineColor.withValues(alpha: AppOpacity.tint),
+            borderRadius: BorderRadius.circular(AppRadii.sm),
           ),
           child: GlyphIcon(metric.icon, color: lineColor),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppSpacing.s12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 metric.label,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.offBlack,
-                ),
+                style: AppTextStyle.headline
+                    .of(context, emphasized: true)
+                    .copyWith(color: scheme.onSurface),
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: AppSpacing.s2),
               Text(
                 metric.axisLabel,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.offBlack.withValues(alpha: 0.55),
-                ),
+                style: AppTextStyle.caption1
+                    .of(context)
+                    .copyWith(color: scheme.onSurfaceVariant),
               ),
             ],
           ),
         ),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.s10,
+            vertical: AppSpacing.s6,
+          ),
           decoration: BoxDecoration(
-            color: lineColor.withValues(alpha: 0.14),
-            borderRadius: BorderRadius.circular(50),
+            color: lineColor.withValues(alpha: AppOpacity.tint),
+            borderRadius: BorderRadius.circular(AppRadii.pill),
           ),
           child: Text(
             '30 Days',
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              color: lineColor,
-            ),
+            style: AppTextStyle.caption2
+                .of(context, emphasized: true)
+                .copyWith(color: lineColor),
           ),
         ),
       ],

@@ -650,6 +650,7 @@ class AppBar extends StatelessWidget {
               _ => true,
             },
             header: true,
+            headingLevel: 1,
             child: _AppBarTitleBox(child: title),
           ),
         ),

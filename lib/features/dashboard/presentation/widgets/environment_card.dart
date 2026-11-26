@@ -149,7 +149,6 @@ class _EnvironmentRow extends StatelessWidget {
     SensorKey.soilMoisture => 'Soil Moisture',
     SensorKey.waterLevel => 'Water Level',
   };
-
 }
 
 class _EnvironmentStatus extends StatelessWidget {
@@ -168,6 +167,29 @@ class _EnvironmentStatus extends StatelessWidget {
     if (reading == null) {
       return Text('No reading', style: DashboardText.label(context));
     }
+    if (reading.isStale) {
+      return Row(
+        children: [
+          Container(
+            width: AppSizes.dot,
+            height: AppSizes.dot,
+            decoration: BoxDecoration(
+              color: scheme.warning,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.s6),
+          Expanded(
+            child: Text(
+              'Last known · ${reading.ageLabel}',
+              style: AppTextStyle.caption1
+                  .of(context, emphasized: true)
+                  .copyWith(color: scheme.warning),
+            ),
+          ),
+        ],
+      );
+    }
     final status = _statusOf(reading.value);
     final color = switch (status.tone) {
       DashboardChipTone.ok => scheme.success,
@@ -183,11 +205,13 @@ class _EnvironmentStatus extends StatelessWidget {
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: AppSpacing.s6),
-        Text(
-          status.label,
-          style: AppTextStyle.caption1
-              .of(context, emphasized: true)
-              .copyWith(color: color),
+        Expanded(
+          child: Text(
+            status.label,
+            style: AppTextStyle.caption1
+                .of(context, emphasized: true)
+                .copyWith(color: color),
+          ),
         ),
       ],
     );
@@ -199,9 +223,9 @@ class _EnvironmentStatus extends StatelessWidget {
       SensorKey.humidity => _humidityStatus(value),
       SensorKey.soilMoisture => _soilStatus(value),
       SensorKey.waterLevel => (
-          label: 'Recorded',
-          tone: DashboardChipTone.idle,
-        ),
+        label: 'Recorded',
+        tone: DashboardChipTone.idle,
+      ),
     };
   }
 

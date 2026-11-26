@@ -28,23 +28,30 @@ class AppTheme {
             outline: AppColors.slate.withValues(alpha: 0.45),
           )
         : base.copyWith(
-            primary: AppColors.lime,
-            onPrimary: AppColors.forest,
-            secondary: AppColors.leaf,
-            onSecondary: AppColors.forest,
-            surface: AppColors.forest,
+            primary: AppColors.leaf,
+            onPrimary: AppColors.black,
+            secondary: AppColors.lime,
+            onSecondary: AppColors.black,
+            surface: AppColors.black,
+            surfaceDim: AppColors.black,
+            surfaceBright: AppColors.blackHigh,
+            surfaceContainerLowest: AppColors.black,
+            surfaceContainerLow: AppColors.blackSoft,
+            surfaceContainer: AppColors.blackRaised,
+            surfaceContainerHigh: AppColors.blackHigh,
+            surfaceContainerHighest: AppColors.blackHighest,
             onSurface: AppColors.cream,
             onSurfaceVariant: AppColors.mist,
             error: AppColors.danger,
-            onError: AppColors.paper,
-            outline: AppColors.lime.withValues(alpha: 0.35),
+            onError: AppColors.black,
+            outline: AppColors.leaf.withValues(alpha: 0.35),
           );
     return prism.ThemeData(
       colorScheme: scheme,
       fontFamily: 'Lexend',
       scaffoldBackgroundColor: brightness == Brightness.light
           ? AppColors.cream
-          : AppColors.forest,
+          : AppColors.black,
     );
   }
 }

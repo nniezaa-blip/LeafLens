@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lextari/features/dashboard/domain/telemetry_history_point.dart';
+import 'package:lextari/features/dashboard/providers/device_providers.dart';
 import 'package:lextari/features/dashboard/providers/telemetry_providers.dart';
 import 'package:lextari/features/stats/presentation/stats_screen.dart';
 import 'package:lextari/ui/ui.dart';
@@ -17,13 +18,17 @@ void main() {
     ];
   }
 
-  Widget buildTestApp({List<TelemetryHistoryPoint>? points}) {
+  Widget buildTestApp({
+    List<TelemetryHistoryPoint>? points,
+    bool hasDevice = true,
+  }) {
     return ProviderScope(
       overrides: [
         if (points != null)
           telemetryHistoryProvider.overrideWith(
             (ref, key) async => points,
           ),
+        hasLinkedDeviceProvider.overrideWithValue(AsyncValue.data(hasDevice)),
       ],
       child: const PrismApp(
         home: PrismScaffold(
@@ -85,7 +90,9 @@ void main() {
       expect(find.text('Moisture (%)'), findsOneWidget);
     });
 
-    testWidgets('shows an empty state when there is no history', (tester) async {
+    testWidgets('shows an empty state when there is no history', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildTestApp(points: const []));
       await tester.pump();
 

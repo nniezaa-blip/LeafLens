@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:go_router/go_router.dart';
+import 'package:lextari/core/router/app_routes.dart';
 import 'package:lextari/ui/ui.dart';
 import 'package:lextari/widgets/lextari_logo.dart';
 
@@ -64,7 +65,10 @@ class _SplashScreenState extends State<SplashScreen> {
   void _proceed() {
     if (!mounted) return;
     _timer?.cancel();
-    if (GoRouter.maybeOf(context) != null) context.navigateTo('/login');
+    final router = GoRouter.maybeOf(context);
+    if (router == null) return;
+    if (GoRouterState.of(context).matchedLocation != AppRoutes.splash) return;
+    router.go(AppRoutes.login);
   }
 
   @override

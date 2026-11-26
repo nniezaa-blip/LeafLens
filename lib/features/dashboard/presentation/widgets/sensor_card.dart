@@ -1,11 +1,12 @@
+import 'dart:math' as math;
+
 import 'package:lextari/features/dashboard/presentation/widgets/mini_gauge.dart';
 import 'package:lextari/ui/ui.dart';
 
 /// Sensor reading card displayed on the dashboard.
 ///
-/// Shows a [MiniGauge] on the left, the sensor name and unit on the
-/// top-right, a unit icon in the top-right corner, a status message, and a
-/// "More" link at the bottom-right.
+/// The gauge takes a share of the card's width and the reading column takes
+/// the rest, so the card grows from its content on any screen.
 class SensorCard extends StatelessWidget {
   /// Creates a [SensorCard].
   const SensorCard({
@@ -44,161 +45,110 @@ class SensorCard extends StatelessWidget {
   /// Whether the reading is stale.
   final bool isStale;
 
+  /// The gauge takes this share of the card's inner width.
+  static const double _gaugeWidthShare = 0.38;
+
   @override
   Widget build(BuildContext context) {
+    final scheme = context.colorScheme;
     return Container(
-      height: 191,
       decoration: BoxDecoration(
         color: AppColors.cardBackground,
-        borderRadius: BorderRadius.circular(25),
+        borderRadius: BorderRadius.circular(AppRadii.card),
       ),
-      child: Stack(
-        children: [
-          _GaugeSection(value: value, gaugeColor: gaugeColor),
-          _InfoSection(
-            sensorName: sensorName,
-            statusText: statusText,
-            statusColor: isStale ? AppColors.redAlert : gaugeColor,
-          ),
-          _UnitBadge(icon: unitIcon, unit: unit),
-          if (onMoreTap != null) _MoreLink(onTap: onMoreTap!),
-        ],
+      padding: const EdgeInsets.all(AppSpacing.s16),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final gaugeSize = math.min(
+            AppSizes.gaugeDefault,
+            constraints.maxWidth * _gaugeWidthShare,
+          );
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              MiniGauge(
+                value: (value / 100).clamp(0.0, 1.0),
+                color: gaugeColor,
+                size: gaugeSize,
+              ),
+              const SizedBox(width: AppSpacing.s16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _CardHeader(
+                      sensorName: sensorName,
+                      unitIcon: unitIcon,
+                      unit: unit,
+                    ),
+                    const SizedBox(height: AppSpacing.s8),
+                    Text(
+                      statusText,
+                      style: AppTextStyle.callout
+                          .of(context, emphasized: true)
+                          .copyWith(
+                            color: isStale ? AppColors.redAlert : gaugeColor,
+                          ),
+                    ),
+                    if (onMoreTap != null) ...[
+                      const SizedBox(height: AppSpacing.s12),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: _MoreLink(onTap: onMoreTap!),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(width: AppSpacing.s4),
+              GlyphIcon(
+                AppGlyphs.chevronForward,
+                size: AppSizes.iconSm,
+                color: scheme.onSurfaceVariant,
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 }
 
-//
-// Private widgets
-//
-
-class _GaugeSection extends StatelessWidget {
-  const _GaugeSection({required this.value, required this.gaugeColor});
-
-  final double value;
-  final Color gaugeColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      left: 8,
-      top: 0,
-      bottom: 0,
-      child: Center(
-        child: MiniGauge(
-          value: (value / 100).clamp(0.0, 1.0),
-          color: gaugeColor,
-        ),
-      ),
-    );
-  }
-}
-
-class _InfoSection extends StatelessWidget {
-  const _InfoSection({
+class _CardHeader extends StatelessWidget {
+  const _CardHeader({
     required this.sensorName,
-    required this.statusText,
-    required this.statusColor,
+    required this.unitIcon,
+    required this.unit,
   });
 
   final String sensorName;
-  final String statusText;
-  final Color statusColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      left: 168,
-      right: 44,
-      top: 20,
-      bottom: 20,
-      child: Stack(
-        children: [
-          _SensorTitle(name: sensorName),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: _StatusText(text: statusText, color: statusColor),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SensorTitle extends StatelessWidget {
-  const _SensorTitle({required this.name});
-
-  final String name;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      name,
-      style: const TextStyle(
-        fontWeight: FontWeight.w700,
-        fontSize: 20,
-        color: AppColors.offBlack,
-      ),
-    );
-  }
-}
-
-class _UnitBadge extends StatelessWidget {
-  const _UnitBadge({required this.icon, required this.unit});
-
-  final Glyph icon;
+  final Glyph unitIcon;
   final String unit;
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      top: 20,
-      right: 16,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          GlyphIcon(icon, size: 24, color: AppColors.offBlack),
-          const SizedBox(width: 4),
-          Text(
-            unit,
-            style: const TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 20,
-              color: AppColors.offBlack,
-            ),
+    final scheme = context.colorScheme;
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            sensorName,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTextStyle.title3
+                .of(context, emphasized: true)
+                .copyWith(color: scheme.onSurface),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StatusText extends StatelessWidget {
-  const _StatusText({required this.text, required this.color});
-
-  final String text;
-  final Color color;
-
-  /// Returns [color] with boosted saturation, full opacity, and a slightly
-  /// darker tone so the status line stays legible against the card background.
-  Color get _readableColor {
-    final hsl = HSLColor.fromColor(color);
-    return hsl
-        .withSaturation((hsl.saturation + 0.25).clamp(0.0, 1.0))
-        .withLightness((hsl.lightness * 0.7).clamp(0.0, 1.0))
-        .toColor();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: TextStyle(
-        fontWeight: FontWeight.w600,
-        fontStyle: FontStyle.italic,
-        fontSize: 16,
-        color: _readableColor,
-      ),
+        ),
+        GlyphIcon(unitIcon, size: AppSizes.iconAction, color: scheme.onSurface),
+        const SizedBox(width: AppSpacing.s4),
+        Text(
+          unit,
+          style: AppTextStyle.title3
+              .of(context, emphasized: true)
+              .copyWith(color: scheme.onSurface),
+        ),
+      ],
     );
   }
 }
@@ -210,31 +160,25 @@ class _MoreLink extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      right: 16,
-      bottom: 16,
-      child: GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: const Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'More',
-              style: TextStyle(
-                fontWeight: FontWeight.w800,
-                fontSize: 14,
-                color: AppColors.offBlack,
-              ),
-            ),
-            SizedBox(width: 4),
-            GlyphIcon(
-              AppGlyphs.doubleArrow,
-              size: 20,
-              color: AppColors.offBlack,
-            ),
-          ],
-        ),
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'More',
+            style: AppTextStyle.subheadline
+                .of(context, emphasized: true)
+                .copyWith(color: context.colorScheme.onSurface),
+          ),
+          const SizedBox(width: AppSpacing.s4),
+          GlyphIcon(
+            AppGlyphs.doubleArrow,
+            size: AppSizes.iconLg,
+            color: context.colorScheme.onSurface,
+          ),
+        ],
       ),
     );
   }

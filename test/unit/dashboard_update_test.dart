@@ -32,6 +32,29 @@ void main() {
         expect(telemetry.temperature, isNull);
       });
 
+      test('parses recorded timestamps', () {
+        final json = {
+          'type': 'telemetry',
+          'temperature': 22.0,
+          'recordedAt': {'temperature': 1792112400000},
+        };
+        final update = DashboardUpdate.fromJson(json);
+        final telemetry = update as TelemetryUpdate;
+        expect(telemetry.temperature, 22.0);
+        expect(telemetry.recordedAt, {'temperature': 1792112400000});
+      });
+
+      test('parses the reading source device', () {
+        final json = {
+          'type': 'telemetry',
+          'soilMoisture': 0.0,
+          'source': {'soilMoisture': 'Lextari Environment'},
+        };
+        final update = DashboardUpdate.fromJson(json);
+        final telemetry = update as TelemetryUpdate;
+        expect(telemetry.source, {'soilMoisture': 'Lextari Environment'});
+      });
+
       test('parses GHS update', () {
         final json = {
           'type': 'ghs',
@@ -43,6 +66,19 @@ void main() {
         final ghs = update as GHSUpdate;
         expect(ghs.score, 85.0);
         expect(ghs.status, 'optimal');
+        expect(ghs.stale, isFalse);
+      });
+
+      test('parses a stale GHS update', () {
+        final json = {
+          'type': 'ghs',
+          'score': 40.0,
+          'status': 'danger',
+          'stale': true,
+        };
+        final update = DashboardUpdate.fromJson(json);
+        final ghs = update as GHSUpdate;
+        expect(ghs.stale, isTrue);
       });
 
       test('parses water system update', () {

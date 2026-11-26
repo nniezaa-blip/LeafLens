@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lextari/core/config/app_config.dart';
 import 'package:lextari/features/auth/data/auth_api.dart';
 import 'package:lextari/features/auth/data/auth_session_store.dart';
 import 'package:lextari/features/auth/domain/auth_session.dart';
@@ -22,9 +23,13 @@ class AuthSessionManager extends ChangeNotifier {
 
   AuthSession? _session;
   Future<void>? _restoring;
+  Future<void>? _revalidation;
 
   /// The current session, or null when signed out.
   AuthSession? get currentSession => _session;
+
+  /// Completes when the restored token's background check finishes.
+  Future<void> get revalidation => _revalidation ?? Future<void>.value();
 
   /// Whether a session is currently held in memory.
   bool get isSignedIn => _session != null;
@@ -68,11 +73,25 @@ class AuthSessionManager extends ChangeNotifier {
     return session;
   }
 
-  /// Clears the local session, then asks the Worker to revoke it.
+  /// Asks the Worker to revoke the session, then clears it locally.
+  ///
+  /// The local session clears only after the revoke attempt or its timeout, so
+  /// the sign-out screen can show a loading state instead of jumping away.
   Future<void> logout() async {
     final token = _session?.accessToken;
+    final started = DateTime.now();
+    if (token != null) {
+      await _api
+          .logout(token)
+          .timeout(AppConfig.logoutTimeout, onTimeout: () {});
+    }
+    final elapsed = DateTime.now().difference(started);
+    if (elapsed < AppConfig.minLogoutDuration) {
+      await Future<void>.delayed(
+        AppConfig.minLogoutDuration - elapsed,
+      );
+    }
     await _clear();
-    if (token != null) await _api.logout(token);
   }
 
   /// Drops the session after the API rejected the token.
@@ -87,11 +106,13 @@ class AuthSessionManager extends ChangeNotifier {
       await _store.clear();
       return;
     }
-    if (!await _api.isTokenAccepted(stored.accessToken)) {
-      await _clear();
-      return;
-    }
     _publish(stored);
+    _revalidation = _revalidate(stored);
+  }
+
+  Future<void> _revalidate(AuthSession stored) async {
+    if (await _api.isTokenAccepted(stored.accessToken)) return;
+    if (_session?.accessToken == stored.accessToken) await _clear();
   }
 
   Future<void> _persist(AuthSession session) async {

@@ -10,6 +10,7 @@ import 'package:lextari/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:lextari/features/dashboard/presentation/dashboard_shell.dart';
 import 'package:lextari/features/dashboard/providers/device_providers.dart';
 import 'package:lextari/features/onboarding/presentation/onboarding_screen.dart';
+import 'package:lextari/features/onboarding/providers/onboarding_providers.dart';
 import 'package:lextari/features/settings/presentation/settings_screen.dart';
 import 'package:lextari/features/splash/presentation/splash_screen.dart';
 import 'package:lextari/features/stats/presentation/stats_screen.dart';
@@ -23,27 +24,31 @@ class AppRouter {
 
   static final Provider<GoRouter> provider = Provider<GoRouter>((ref) {
     final authManager = ref.watch(authManagerProvider);
-    final deviceState = ref.watch(hasLinkedDeviceProvider);
     final refresh = _RouterRefreshNotifier(authManager);
     ref
       ..onDispose(refresh.dispose)
-      ..listen(authManagerProvider, (_, _) => refresh.notify())
-      ..listen(hasLinkedDeviceProvider, (_, _) => refresh.notify());
+      ..listen(hasLinkedDeviceProvider, (_, _) => refresh.notify())
+      ..listen(deviceProvisioningSkippedProvider, (_, _) => refresh.notify());
     return GoRouter(
       navigatorKey: rootNavigatorKey,
-      initialLocation: AppRoutes.splash,
+      initialLocation: authManager.currentSession == null
+          ? AppRoutes.login
+          : AppRoutes.dashboard,
       refreshListenable: refresh,
       redirect: (context, state) {
         final session = authManager.currentSession;
+        final deviceState = ref.read(hasLinkedDeviceProvider);
         final hasLinkedDevice = deviceState.value ?? false;
-        final deviceCheckResolved =
-            deviceState.hasValue || deviceState.hasError;
+        final deviceCheckResolved = deviceState.hasValue;
         return AuthGuard.call(
           state: state,
           isLoggedIn: session != null,
           currentToken: session?.accessToken,
           hasLinkedDevice: hasLinkedDevice,
           deviceCheckResolved: deviceCheckResolved,
+          deviceProvisioningSkipped: ref.read(
+            deviceProvisioningSkippedProvider,
+          ),
         );
       },
       routes: <RouteBase>[

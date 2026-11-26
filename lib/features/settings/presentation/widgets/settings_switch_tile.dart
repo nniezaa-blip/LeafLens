@@ -33,19 +33,17 @@ class SettingsSwitchTile extends StatelessWidget {
       onTap: () => onChanged(!value),
       behavior: HitTestBehavior.opaque,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.s12),
         child: Row(
           children: [
             SettingsIconBadge(icon: icon),
-            const SizedBox(width: 14),
+            const SizedBox(width: AppSpacing.s14),
             Expanded(
               child: Text(
                 label,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                  color: AppColors.offBlack,
-                ),
+                style: AppTextStyle.callout
+                    .of(context, emphasized: true)
+                    .copyWith(color: context.colorScheme.onSurface),
               ),
             ),
             SettingsSwitch(value: value, onChanged: onChanged),

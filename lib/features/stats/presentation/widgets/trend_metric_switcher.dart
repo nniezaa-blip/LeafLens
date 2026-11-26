@@ -23,8 +23,8 @@ class TrendMetricSwitcher extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FrostedCard(
-      padding: const EdgeInsets.all(4),
-      borderRadius: 50,
+      padding: const EdgeInsets.all(AppSpacing.s4),
+      borderRadius: AppRadii.pill,
       blur: 10,
       child: Row(
         children: [
@@ -55,22 +55,23 @@ class _Segment extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = context.colorScheme;
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 220),
+        duration: AppMotionTokens.segment,
         curve: Curves.easeOutCubic,
-        height: 46,
+        height: AppSizes.trendSwitcherHeight,
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.mediumGreen : const Color(0x00000000),
-          borderRadius: BorderRadius.circular(50),
+          color: isSelected ? scheme.primary : AppColors.transparent,
+          borderRadius: BorderRadius.circular(AppRadii.pill),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: AppColors.mediumGreen.withValues(alpha: 0.35),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
+                    color: scheme.primary.withValues(alpha: AppOpacity.soft),
+                    blurRadius: AppSpacing.s10,
+                    offset: const Offset(0, AppSpacing.s4),
                   ),
                 ]
               : null,
@@ -78,13 +79,13 @@ class _Segment extends StatelessWidget {
         child: Center(
           child: Text(
             metric.label,
-            style: TextStyle(
-              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-              fontSize: 14,
-              color: isSelected
-                  ? AppColors.white
-                  : AppColors.offBlack.withValues(alpha: 0.65),
-            ),
+            style: AppTextStyle.subheadline
+                .of(context, emphasized: isSelected)
+                .copyWith(
+                  color: isSelected
+                      ? scheme.onPrimary
+                      : scheme.onSurfaceVariant,
+                ),
           ),
         ),
       ),

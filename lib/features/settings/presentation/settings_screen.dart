@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lextari/app/loading_provider.dart';
 import 'package:lextari/features/auth/domain/auth_actions.dart';
 import 'package:lextari/features/auth/providers/auth_providers.dart';
+import 'package:lextari/features/dashboard/providers/device_providers.dart';
 import 'package:lextari/features/settings/presentation/widgets/settings_card.dart';
 import 'package:lextari/features/settings/presentation/widgets/settings_nav_tile.dart';
 import 'package:lextari/features/settings/presentation/widgets/settings_switch_tile.dart';
@@ -16,88 +18,82 @@ class SettingsScreen extends ConsumerWidget {
     final prefs = ref.watch(settingsPreferencesProvider);
     return Scaffold(
       title: 'Settings',
-      body: Padding(
-        padding: EdgeInsets.fromLTRB(20, context.contentTopPadding, 20, 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: PullToRefresh(
+        onRefresh: () => _refresh(ref),
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.s20,
+            context.contentTopPadding + AppSpacing.s8,
+            AppSpacing.s20,
+            NavigationDock.insetOf(context) + AppSpacing.s24,
+          ),
           children: [
-            const SizedBox(height: 8),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.only(bottom: 120),
+            const _ProfileCard(),
+            const SizedBox(height: AppSpacing.s20),
+            const _SectionLabel('Preferences'),
+            const SizedBox(height: AppSpacing.s8),
+            SettingsCard(
+              child: Column(
                 children: [
-                  const _ProfileCard(),
-                  const SizedBox(height: 20),
-                  const _SectionLabel('Preferences'),
-                  const SizedBox(height: 8),
-                  SettingsCard(
-                    child: Column(
-                      children: [
-                        SettingsSwitchTile(
-                          icon: AppGlyphs.notificationsPaused,
-                          label: 'Pause notifications',
-                          value: prefs.pauseNotifications,
-                          onChanged: (value) => ref
-                              .read(settingsPreferencesProvider.notifier)
-                              .setPauseNotifications(value: value),
-                        ),
-                        const _CardDivider(),
-                        SettingsSwitchTile(
-                          icon: AppGlyphs.darkMode,
-                          label: 'Dark mode',
-                          value: prefs.darkMode,
-                          onChanged: (value) => ref
-                              .read(settingsPreferencesProvider.notifier)
-                              .setDarkMode(value: value),
-                        ),
-                      ],
-                    ),
+                  SettingsSwitchTile(
+                    icon: AppGlyphs.notificationsPaused,
+                    label: 'Pause notifications',
+                    value: prefs.pauseNotifications,
+                    onChanged: (value) => ref
+                        .read(settingsPreferencesProvider.notifier)
+                        .setPauseNotifications(value: value),
                   ),
-                  const SizedBox(height: 20),
-                  const _SectionLabel('General'),
-                  const SizedBox(height: 8),
-                  SettingsCard(
-                    child: Column(
-                      children: [
-                        SettingsNavTile(
-                          icon: AppGlyphs.tune,
-                          label: 'General Settings',
-                          onTap: () {},
-                        ),
-                        const _CardDivider(),
-                        SettingsNavTile(
-                          icon: AppGlyphs.language,
-                          label: 'Language',
-                          trailingText: 'English',
-                          onTap: () {},
-                        ),
-                        const _CardDivider(),
-                        SettingsNavTile(
-                          icon: AppGlyphs.description,
-                          label: 'Terms of Service',
-                          onTap: () {},
-                        ),
-                        const _CardDivider(),
-                        SettingsNavTile(
-                          icon: AppGlyphs.privacyTip,
-                          label: 'Privacy Policy',
-                          onTap: () {},
-                        ),
-                        const _CardDivider(),
-                        SettingsNavTile(
-                          icon: AppGlyphs.info,
-                          label: 'About Lextari',
-                          onTap: () {},
-                        ),
-                        const _CardDivider(),
-                        SettingsNavTile(
-                          icon: AppGlyphs.logout,
-                          label: 'Log out',
-                          onTap: () => ref.read(authActionsProvider).logout(),
-                        ),
-                      ],
-                    ),
+                  const _CardDivider(),
+                  SettingsSwitchTile(
+                    icon: AppGlyphs.darkMode,
+                    label: 'Dark mode',
+                    value: prefs.darkMode,
+                    onChanged: (value) => ref
+                        .read(settingsPreferencesProvider.notifier)
+                        .setDarkMode(value: value),
                   ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.s20),
+            const _SectionLabel('General'),
+            const SizedBox(height: AppSpacing.s8),
+            SettingsCard(
+              child: Column(
+                children: [
+                  SettingsNavTile(
+                    icon: AppGlyphs.tune,
+                    label: 'General Settings',
+                    onTap: () {},
+                  ),
+                  const _CardDivider(),
+                  SettingsNavTile(
+                    icon: AppGlyphs.language,
+                    label: 'Language',
+                    trailingText: 'English',
+                    onTap: () {},
+                  ),
+                  const _CardDivider(),
+                  SettingsNavTile(
+                    icon: AppGlyphs.description,
+                    label: 'Terms of Service',
+                    onTap: () {},
+                  ),
+                  const _CardDivider(),
+                  SettingsNavTile(
+                    icon: AppGlyphs.privacyTip,
+                    label: 'Privacy Policy',
+                    onTap: () {},
+                  ),
+                  const _CardDivider(),
+                  SettingsNavTile(
+                    icon: AppGlyphs.info,
+                    label: 'About Lextari',
+                    onTap: () {},
+                  ),
+                  const _CardDivider(),
+                  const _LogoutTile(),
                 ],
               ),
             ),
@@ -106,11 +102,61 @@ class SettingsScreen extends ConsumerWidget {
       ),
     );
   }
+
+  Future<void> _refresh(WidgetRef ref) async {
+    final started = DateTime.now();
+    ref.invalidate(deviceListProvider);
+    try {
+      await ref.read(deviceListProvider.future);
+    } on Object {
+      // Keeping the current profile and preferences is the safe fallback.
+    }
+    final elapsed = DateTime.now().difference(started);
+    if (elapsed < AppMotionTokens.minRefreshDuration) {
+      await Future<void>.delayed(
+        AppMotionTokens.minRefreshDuration - elapsed,
+      );
+    }
+  }
 }
 
 //
 // Private widgets
 //
+
+class _LogoutTile extends ConsumerStatefulWidget {
+  const _LogoutTile();
+
+  @override
+  ConsumerState<_LogoutTile> createState() => _LogoutTileState();
+}
+
+class _LogoutTileState extends ConsumerState<_LogoutTile> {
+  bool _isLoggingOut = false;
+
+  Future<void> _logout() async {
+    if (_isLoggingOut) return;
+    setState(() => _isLoggingOut = true);
+    ref.read(appLoadingProvider.notifier).show();
+    try {
+      await ref.read(authActionsProvider).logout();
+      await Future<void>.delayed(AppMotionTokens.card);
+    } finally {
+      ref.read(appLoadingProvider.notifier).hide();
+      if (mounted) setState(() => _isLoggingOut = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsNavTile(
+      icon: AppGlyphs.logout,
+      label: _isLoggingOut ? 'Logging out...' : 'Log out',
+      loading: _isLoggingOut,
+      onTap: _logout,
+    );
+  }
+}
 
 class _ProfileCard extends ConsumerWidget {
   const _ProfileCard();
@@ -120,11 +166,11 @@ class _ProfileCard extends ConsumerWidget {
     final profile = ref.watch(currentUserProfileProvider);
     final scheme = context.colorScheme;
     return SettingsCard(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(AppSpacing.s18),
       child: Row(
         children: [
-          UserAvatar(profile: profile, size: 60),
-          const SizedBox(width: 16),
+          UserAvatar(profile: profile, size: AppSizes.avatarLarge),
+          const SizedBox(width: AppSpacing.s16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -136,7 +182,7 @@ class _ProfileCard extends ConsumerWidget {
                       .copyWith(color: scheme.onSurface),
                 ),
                 if (profile.email.isNotEmpty) ...[
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.s4),
                   Text(
                     profile.email,
                     overflow: TextOverflow.ellipsis,
@@ -148,10 +194,10 @@ class _ProfileCard extends ConsumerWidget {
               ],
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.s8),
           GlyphIcon(
             AppGlyphs.chevronRight,
-            size: 24,
+            size: AppSizes.iconAction,
             color: scheme.onSurfaceVariant,
           ),
         ],
@@ -168,13 +214,15 @@ class _SectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 8),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontWeight: FontWeight.w600,
-          fontSize: 14,
-          color: AppColors.white.withValues(alpha: 0.9),
+      padding: const EdgeInsets.only(left: AppSpacing.s8),
+      child: Semantics(
+        header: true,
+        headingLevel: 2,
+        child: Text(
+          text,
+          style: AppTypography.labelMedium.copyWith(
+            color: context.colorScheme.onSurfaceVariant,
+          ),
         ),
       ),
     );
@@ -186,6 +234,6 @@ class _CardDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Divider(height: 1, thickness: 1);
+    return const Divider(height: AppSizes.line, thickness: AppSizes.line);
   }
 }

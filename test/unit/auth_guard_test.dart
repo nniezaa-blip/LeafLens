@@ -86,6 +86,17 @@ void main() {
         expect(result, '/dashboard');
       });
 
+      test(
+        'leaves /login for the dashboard before the device check resolves',
+        () {
+          final result = AuthGuard.call(
+            state: _state('/login'),
+            isLoggedIn: true,
+          );
+          expect(result, '/dashboard');
+        },
+      );
+
       test('redirects authenticated user away from /signup', () {
         final result = AuthGuard.call(
           state: _state('/signup'),
@@ -104,6 +115,16 @@ void main() {
           deviceCheckResolved: true,
         );
         expect(result, '/onboarding');
+      });
+
+      test('sends an authenticated skipper to the dashboard', () {
+        final result = AuthGuard.call(
+          state: _state('/login'),
+          isLoggedIn: true,
+          deviceCheckResolved: true,
+          deviceProvisioningSkipped: true,
+        );
+        expect(result, '/dashboard');
       });
     });
 
@@ -144,6 +165,16 @@ void main() {
           deviceCheckResolved: true,
         );
         expect(result, '/onboarding');
+      });
+
+      test('allows a skipper to stay on the dashboard', () {
+        final result = AuthGuard.call(
+          state: _state('/dashboard'),
+          isLoggedIn: true,
+          deviceCheckResolved: true,
+          deviceProvisioningSkipped: true,
+        );
+        expect(result, isNull);
       });
     });
 

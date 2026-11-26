@@ -60,7 +60,11 @@ class WsClient {
                 _authenticated = true;
                 _controller?.add(data);
               } else if (data['type'] == 'auth_error') {
-                _controller?.addError(StateError(data['message']?.toString() ?? 'WebSocket auth failed'));
+                _controller?.addError(
+                  StateError(
+                    data['message']?.toString() ?? 'WebSocket auth failed',
+                  ),
+                );
                 unawaited(_controller?.close());
               }
               return;
@@ -90,7 +94,7 @@ class WsClient {
     _reconnectTimer?.cancel();
     _reconnectTimer = Timer(delay, () {
       // sink.close() is fire-and-forget inside a timer callback.
-        unawaited(_channel?.sink.close());
+      unawaited(_channel?.sink.close());
       // _doConnect() returns void; no await needed here.
       _doConnect();
     });

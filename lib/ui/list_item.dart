@@ -76,7 +76,8 @@ final class _InputAction extends _ListItemAction {
 
 /// A single row in a grouped list.
 ///
-/// The named constructors cover the state row variants FlClash uses: a plain
+/// The named constructors cover the state row variants the design system uses:
+/// a plain
 /// row, one that opens a widget, one that picks an option, one that edits a
 /// value, a toggle and a checkbox.
 class ListItem<T> extends StatelessWidget {

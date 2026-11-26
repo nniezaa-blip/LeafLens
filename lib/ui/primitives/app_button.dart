@@ -9,6 +9,7 @@ class AppButton extends StatelessWidget {
     this.loading = false,
     this.variant = AppButtonVariant.primary,
     this.expand = false,
+    this.height,
     super.key,
   });
 
@@ -17,16 +18,36 @@ class AppButton extends StatelessWidget {
   final bool loading;
   final AppButtonVariant variant;
   final bool expand;
+  final double? height;
 
   @override
   Widget build(BuildContext context) {
     final effectiveOnPressed = loading ? null : onPressed;
     final child = loading ? const ActivityIndicator() : Text(label);
+    final style = height == null
+        ? null
+        : ButtonStyle(minimumSize: Size(0, height!));
     final button = switch (variant) {
-      AppButtonVariant.secondary => FilledButton(onPressed: effectiveOnPressed, child: child),
-      AppButtonVariant.outline => OutlinedButton(onPressed: effectiveOnPressed, child: child),
-      AppButtonVariant.text => TextButton(onPressed: effectiveOnPressed, child: child),
-      AppButtonVariant.primary => FilledButton(onPressed: effectiveOnPressed, child: child),
+      AppButtonVariant.secondary => FilledButton(
+        style: style,
+        onPressed: effectiveOnPressed,
+        child: child,
+      ),
+      AppButtonVariant.outline => OutlinedButton(
+        style: style,
+        onPressed: effectiveOnPressed,
+        child: child,
+      ),
+      AppButtonVariant.text => TextButton(
+        style: style,
+        onPressed: effectiveOnPressed,
+        child: child,
+      ),
+      AppButtonVariant.primary => FilledButton(
+        style: style,
+        onPressed: effectiveOnPressed,
+        child: child,
+      ),
     };
     if (!expand) return button;
     return SizedBox(width: double.infinity, child: button);

@@ -1,9 +1,11 @@
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lextari/app/loading_provider.dart';
 import 'package:lextari/app/router/app_router.dart';
 import 'package:lextari/features/settings/providers/settings_providers.dart';
 import 'package:lextari/managers/managers.dart';
 import 'package:lextari/ui/ui.dart';
+import 'package:lextari/widgets/app_loading_overlay.dart';
 
 class LextariApp extends ConsumerWidget {
   const LextariApp({super.key});
@@ -12,6 +14,7 @@ class LextariApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(AppRouter.provider);
     final preferences = ref.watch(settingsPreferencesProvider);
+    final loading = ref.watch(appLoadingProvider);
     return PrismApp.router(
       title: 'Lextari',
       theme: AppTheme.prismLight(),
@@ -29,14 +32,24 @@ class LextariApp extends ConsumerWidget {
         return ViewScope(
           size: size,
           isMobile: size.width < AppBreakpoints.mobile,
-          child: buildManagerStack(
-            child: child ?? const SizedBox.shrink(),
-            managers: [
-              (child) => ConnectivityManager(child: child),
-              (child) => SessionManager(child: child),
-              (child) => AppStateManager(child: child),
-              (child) => DashboardManager(child: child),
-            ],
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                buildManagerStack(
+                  child: child ?? const SizedBox.shrink(),
+                  managers: [
+                    (child) => ConnectivityManager(child: child),
+                    (child) => SessionManager(child: child),
+                    (child) => AppStateManager(child: child),
+                    (child) => DashboardManager(child: child),
+                  ],
+                ),
+                if (loading) const AppLoadingOverlay(),
+              ],
+            ),
           ),
         );
       },

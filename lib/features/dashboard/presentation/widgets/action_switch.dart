@@ -1,10 +1,10 @@
 import 'package:lextari/ui/ui.dart';
 
-/// Compact control tile used in the dashboard action row.
+/// Compact care-control pill.
 ///
-/// The tile carries the icon, label and current state. The icon fills and the
-/// tile tints when the control is active, so the row reads like a set of
-/// hardware buttons rather than a list of switches.
+/// Off is a quiet outlined pill. On fills the whole pill with the brand colour.
+/// Presses use the elastic press: the pill swells, tracks the finger and
+/// springs back, with a hover/press overlay inside the shape.
 class ActionSwitch extends StatelessWidget {
   /// Creates an [ActionSwitch].
   const ActionSwitch({
@@ -15,7 +15,7 @@ class ActionSwitch extends StatelessWidget {
     super.key,
   });
 
-  /// Icon displayed above the label.
+  /// Icon shown before the label.
   final Glyph icon;
 
   /// Text label for this control.
@@ -24,63 +24,93 @@ class ActionSwitch extends StatelessWidget {
   /// Whether the control is currently on.
   final bool value;
 
-  /// Called when the tile is tapped.
+  /// Called when the pill is tapped.
   final ValueChanged<bool> onChanged;
 
   @override
   Widget build(BuildContext context) {
     final scheme = context.colorScheme;
+    const shape = StadiumBorder();
     return Semantics(
       button: true,
-      label: '$label ${value ? 'on' : 'off'}',
-      child: AnimatedContainer(
-        duration: AppDurations.fast,
-        curve: AppCurves.emphasized,
-        decoration: ShapeDecoration(
-          color: value
-              ? scheme.primary.withValues(alpha: AppOpacity.tint)
-              : SurfaceLevel.block.colorOf(scheme),
-          shape: AppShape.all(AppRadii.md),
-        ),
-        child: PressSurface(
-          fill: Colors.transparent,
-          shape: AppShape.all(AppRadii.md),
-          onPressed: () => onChanged(!value),
-          childFills: true,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.s8,
-              vertical: AppSpacing.s12,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                AnimatedAppGlyph(
-                  glyph: icon,
-                  selected: value,
-                  size: AppSizes.iconXxl,
-                  color: scheme.onSurfaceVariant,
-                  selectedColor: scheme.primary,
+      toggled: value,
+      label: label,
+      child: ElasticPress(
+        child: TweenAnimationBuilder<double>(
+          tween: Tween<double>(end: value ? 1 : 0),
+          duration: AppMotionTokens.control,
+          curve: AppCurves.emphasized,
+          builder: (context, amount, _) {
+            final fill = Color.lerp(
+              AppColors.transparent,
+              scheme.primary,
+              amount,
+            )!;
+            final content = Color.lerp(
+              scheme.onSurfaceVariant,
+              scheme.onPrimary,
+              amount,
+            )!;
+            final border = Color.lerp(
+              scheme.outlineVariant.withValues(alpha: AppOpacity.strong),
+              scheme.primary,
+              amount,
+            )!;
+            return Container(
+              height: AppSizes.actionButtonHeight,
+              decoration: ShapeDecoration(
+                color: fill,
+                shape: shape.copyWith(side: BorderSide(color: border)),
+                shadows: amount > 0
+                    ? [
+                        BoxShadow(
+                          color: scheme.primary.withValues(
+                            alpha: AppOpacity.faint,
+                          ),
+                          blurRadius: AppSpacing.s12,
+                          offset: const Offset(0, AppSpacing.s4),
+                        ),
+                      ]
+                    : null,
+              ),
+              child: PressRegion(
+                shape: shape,
+                overlay: PressRegion.hoverOverlay,
+                excludeFromSemantics: true,
+                enableFeedback: false,
+                onTap: () => onChanged(!value),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.s12,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      AnimatedAppGlyph(
+                        glyph: icon,
+                        selected: value,
+                        size: AppSizes.iconLg,
+                        color: content,
+                        selectedColor: content,
+                      ),
+                      const SizedBox(width: AppSpacing.s6),
+                      Flexible(
+                        child: Text(
+                          label,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: false,
+                          style: AppTextStyle.caption1
+                              .of(context, emphasized: true)
+                              .copyWith(color: content),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: AppSpacing.s8),
-                Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTextStyle.caption1
-                      .of(context, emphasized: true)
-                      .copyWith(color: scheme.onSurface),
-                ),
-                const SizedBox(height: AppSpacing.s2),
-                Text(
-                  value ? 'On' : 'Off',
-                  style: AppTextStyle.caption2
-                      .of(context)
-                      .copyWith(color: scheme.onSurfaceVariant),
-                ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         ),
       ),
     );

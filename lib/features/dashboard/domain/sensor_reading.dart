@@ -8,6 +8,7 @@ class SensorReading {
     required this.value,
     required this.recordedAt,
     required this.unit,
+    this.source,
   });
 
   /// Creates a [SensorReading] from a normalised telemetry entry
@@ -20,6 +21,7 @@ class SensorReading {
       value: double.parse(json['value'] as String),
       recordedAt: DateTime.fromMillisecondsSinceEpoch(json['ts'] as int),
       unit: unit,
+      source: json['source'] as String?,
     );
   }
 
@@ -31,6 +33,9 @@ class SensorReading {
 
   /// The unit of measurement (e.g. '%', '°C').
   final String unit;
+
+  /// Name of the device that recorded this reading, when known.
+  final String? source;
 
   /// How long ago this reading was recorded.
   Duration get age => DateTime.now().difference(recordedAt);

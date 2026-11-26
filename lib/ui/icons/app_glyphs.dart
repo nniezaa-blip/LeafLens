@@ -9,6 +9,16 @@ abstract final class AppGlyphs {
   static const Glyph chevronRight = Glyphs.chevronForward;
   static const Glyph close = Glyphs.close;
   static const Glyph check = Glyphs.check;
+  static const plus = Glyph([
+    GlyphPolyline([
+      GlyphVertex(12, 5),
+      GlyphVertex(12, 19),
+    ]),
+    GlyphPolyline([
+      GlyphVertex(5, 12),
+      GlyphVertex(19, 12),
+    ]),
+  ]);
   static const Glyph eye = Glyphs.eye;
   static const Glyph eyeOff = Glyphs.eyeOff;
   static const Glyph visibility = Glyphs.eye;

@@ -2,7 +2,7 @@ import 'package:lextari/features/auth/domain/user_profile.dart';
 import 'package:lextari/ui/ui.dart';
 import 'package:lextari/widgets/user_avatar.dart';
 
-/// A profile avatar with a botanical ring and an optional presence dot.
+/// A profile avatar with a botanical ring.
 class ProfileBadge extends StatelessWidget {
   /// Creates a [ProfileBadge].
   const ProfileBadge({
@@ -10,7 +10,6 @@ class ProfileBadge extends StatelessWidget {
     super.key,
     this.size = AppSizes.profileBadge,
     this.onTap,
-    this.online = false,
   });
 
   /// Profile shown in the badge.
@@ -21,9 +20,6 @@ class ProfileBadge extends StatelessWidget {
 
   /// Opens the profile when set.
   final VoidCallback? onTap;
-
-  /// Whether the presence dot is filled.
-  final bool online;
 
   @override
   Widget build(BuildContext context) {
@@ -56,33 +52,14 @@ class ProfileBadge extends StatelessWidget {
         ),
       ),
     );
-    final presence = Container(
-      width: AppSizes.statusDot,
-      height: AppSizes.statusDot,
-      decoration: BoxDecoration(
-        color: online ? scheme.success : scheme.outline,
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: scheme.surface,
-          width: AppSizes.statusDotBorder,
-        ),
-      ),
-    );
-    final content = Stack(
-      clipBehavior: Clip.none,
-      children: [
-        badge,
-        Positioned(right: 0, bottom: 0, child: presence),
-      ],
-    );
-    if (onTap == null) return content;
+    if (onTap == null) return badge;
     return Semantics(
       button: true,
       label: 'Profile',
       child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
-        child: content,
+        child: badge,
       ),
     );
   }

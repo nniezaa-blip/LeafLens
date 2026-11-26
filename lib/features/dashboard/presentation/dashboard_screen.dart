@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lextari/core/config/app_config.dart';
 import 'package:lextari/core/router/app_routes.dart';
 import 'package:lextari/features/auth/providers/auth_providers.dart';
 import 'package:lextari/features/dashboard/domain/growth_health_score.dart';
@@ -73,12 +72,24 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     context.go(AppRoutes.settings);
   }
 
-  void _refresh() {
+  Future<void> _refresh() async {
+    final started = DateTime.now();
     ref
       ..invalidate(deviceListProvider)
       ..invalidate(dashboardStreamProvider);
     setState(() => _timedOut = false);
     _startLoadingTimeout();
+    try {
+      await ref.read(deviceListProvider.future);
+    } on Object {
+      // A failed refresh leaves the current readings on screen.
+    }
+    final elapsed = DateTime.now().difference(started);
+    if (elapsed < AppMotionTokens.minRefreshDuration) {
+      await Future<void>.delayed(
+        AppMotionTokens.minRefreshDuration - elapsed,
+      );
+    }
   }
 
   Future<void> _setMist(bool value) async {
@@ -128,98 +139,94 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final health = dashboard.healthScore;
     final waterLevel =
         dashboard.waterLevelPercent ?? telemetry[SensorKey.waterLevel]?.value;
+    final hasDevice = ref.watch(hasLinkedDeviceProvider);
 
     return Scaffold(
       title: 'Dashboard',
       actions: [
-        IconTap(
-          icon: GlyphIcon(
-            AppGlyphs.autorenew,
-            size: AppSizes.iconXl,
-            color: context.colorScheme.onSurfaceVariant,
-          ),
-          onPressed: _refresh,
-        ),
-        ProfileBadge(
-          profile: profile,
-          online: dashboard.lastUpdatedAt != null &&
-              DateTime.now().difference(dashboard.lastUpdatedAt!) <
-                  AppConfig.staleThreshold,
-          onTap: _openSettings,
-        ),
+        ProfileBadge(profile: profile, onTap: _openSettings),
       ],
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final density = DashboardDensity.of(constraints.biggest);
-          final side = dashboardMobileSideOf(constraints.maxWidth);
-          final bottom = NavigationDock.insetOf(context) + 24;
-          final waiting = telemetry.isEmpty && health == null;
-          final loading = waiting && !_timedOut;
-          final empty = waiting && _timedOut;
-          return DashboardDensityScope(
-            density: density,
-            scale: MediaQuery.textScalerOf(context)
-                .scale(1)
-                .clamp(
-                  AppMotionTokens.minTextScale,
-                  AppMotionTokens.maxTextScale,
-                ),
-            child: loading
-                ? _buildSkeletonBody(side, bottom)
-                : empty
-                    ? _buildEmptyBody()
-                    : _buildContentBody(
-                        side,
-                        bottom,
-                        dashboard,
-                        telemetry,
-                        health,
-                        waterLevel,
-                      ),
-          );
-        },
+      body: PullToRefresh(
+        onRefresh: _refresh,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final density = DashboardDensity.of(constraints.biggest);
+            final side = dashboardMobileSideOf(constraints.maxWidth);
+            final bottom = NavigationDock.insetOf(context) + AppSpacing.s24;
+            final noDevice = hasDevice.value == false;
+            final waiting = telemetry.isEmpty && health == null;
+            final loading = waiting && !_timedOut && !noDevice;
+            final empty = waiting && (_timedOut || noDevice);
+            return DashboardDensityScope(
+              density: density,
+              scale: MediaQuery.textScalerOf(context)
+                  .scale(1)
+                  .clamp(
+                    AppMotionTokens.minTextScale,
+                    AppMotionTokens.maxTextScale,
+                  ),
+              child: loading
+                  ? _buildSkeletonBody(side, bottom)
+                  : empty
+                  ? _buildEmptyBody(noDevice: noDevice)
+                  : _buildContentBody(
+                      side,
+                      bottom,
+                      dashboard,
+                      telemetry,
+                      health,
+                      waterLevel,
+                    ),
+            );
+          },
+        ),
       ),
     );
   }
 
   Widget _buildSkeletonBody(double side, double bottom) {
-    return Padding(
-      padding: EdgeInsets.only(top: context.contentTopPadding),
-      child: CustomScrollView(
-        slivers: [
-          SliverPadding(
-            padding: EdgeInsets.fromLTRB(
-              side,
-              AppSpacing.s0,
-              side,
-              bottom,
-            ),
-            sliver: const SliverToBoxAdapter(child: DashboardSkeleton()),
+    return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      slivers: [
+        SliverPadding(
+          padding: EdgeInsets.fromLTRB(
+            side,
+            context.contentTopPadding,
+            side,
+            bottom,
           ),
-        ],
-      ),
+          sliver: const SliverToBoxAdapter(child: DashboardSkeleton()),
+        ),
+      ],
     );
   }
 
-  Widget _buildEmptyBody() {
-    return Padding(
-      padding: EdgeInsets.only(top: context.contentTopPadding),
-      child: CustomScrollView(
-        slivers: [
-          SliverFillRemaining(
+  Widget _buildEmptyBody({required bool noDevice}) {
+    return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      slivers: [
+        SliverPadding(
+          padding: EdgeInsets.only(top: context.contentTopPadding),
+          sliver: SliverFillRemaining(
             hasScrollBody: false,
             child: EmptyState(
-              label: 'No telemetry yet',
-              description:
-                  'The dashboard will fill when the linked devices publish readings.',
+              illustration: noDevice
+                  ? NullStatusIllustration.devices
+                  : NullStatusIllustration.data,
+              label: noDevice ? 'No device linked' : 'No telemetry yet',
+              description: noDevice
+                  ? 'Add a FavorIoT device to start receiving readings.'
+                  : 'The dashboard will fill when the linked devices publish readings.',
               action: TextButton(
-                onPressed: _refresh,
-                child: const Text('Refresh'),
+                onPressed: noDevice
+                    ? () => unawaited(context.push(AppRoutes.onboarding))
+                    : () => unawaited(_refresh()),
+                child: Text(noDevice ? 'Add device' : 'Refresh'),
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -231,27 +238,32 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     HealthScoreResult? health,
     double? waterLevel,
   ) {
-    return Padding(
-      padding: EdgeInsets.only(top: context.contentTopPadding),
-      child: CustomScrollView(
-        slivers: [
-          SliverPadding(
-            padding: EdgeInsets.fromLTRB(
-              side,
-              AppSpacing.s0,
-              side,
-              bottom,
-            ),
-            sliver: SliverToBoxAdapter(
-              child: Column(
+    return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      slivers: [
+        SliverPadding(
+          padding: EdgeInsets.fromLTRB(
+            side,
+            context.contentTopPadding,
+            side,
+            bottom,
+          ),
+          sliver: SliverToBoxAdapter(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 HealthScoreCard(
                   score: health?.score ?? 0,
                   statusText: dashboard.statusText,
-                  gaugeColor: _healthColor(health?.status),
-                  warningText:
-                      dashboard.safetyLockout ? 'SAFETY LOCKOUT' : null,
+                  gaugeColor: _healthColor(
+                    health?.status,
+                    isStale: dashboard.healthIsStale,
+                  ),
+                  isStale: dashboard.healthIsStale,
+                  hasData: health != null,
+                  warningText: dashboard.safetyLockout
+                      ? 'SAFETY LOCKOUT'
+                      : null,
                 ),
                 const SizedBox(height: AppSpacing.s16),
                 CareControlsCard(
@@ -268,25 +280,33 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   onOpenTrend: _openTrend,
                 ),
                 const SizedBox(height: AppSpacing.s16),
-                  WaterSystemCard(
-                    waterLevel: waterLevel,
-                    refillActive: dashboard.refillActive,
-                    safetyLockout: dashboard.safetyLockout,
-                  ),
-                ],
-              ),
+                WaterSystemCard(
+                  reading:
+                      telemetry[SensorKey.waterLevel] ??
+                      (waterLevel == null
+                          ? null
+                          : SensorReading(
+                              value: waterLevel,
+                              recordedAt: DateTime.now(),
+                              unit: SensorKey.waterLevel.unit,
+                            )),
+                  refillActive: dashboard.refillActive,
+                  safetyLockout: dashboard.safetyLockout,
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Color _healthColor(HealthStatus? status) {
+  Color _healthColor(HealthStatus? status, {required bool isStale}) {
+    if (isStale || status == null) return context.colorScheme.onSurfaceVariant;
     return switch (status) {
       HealthStatus.optimal || HealthStatus.moderate => AppColors.success,
       HealthStatus.caution => AppColors.warning,
-      HealthStatus.danger || HealthStatus.critical || null => AppColors.danger,
+      HealthStatus.danger || HealthStatus.critical => AppColors.danger,
     };
   }
 }

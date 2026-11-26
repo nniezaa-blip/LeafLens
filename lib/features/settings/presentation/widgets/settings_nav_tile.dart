@@ -12,6 +12,7 @@ class SettingsNavTile extends StatelessWidget {
     super.key,
     this.trailingText,
     this.iconColor,
+    this.loading = false,
   });
 
   /// Leading icon for the row.
@@ -29,43 +30,46 @@ class SettingsNavTile extends StatelessWidget {
   /// Optional accent colour for the leading icon badge.
   final Color? iconColor;
 
+  /// Shows a spinner instead of the chevron and blocks taps.
+  final bool loading;
+
   @override
   Widget build(BuildContext context) {
+    final scheme = context.colorScheme;
     return GestureDetector(
-      onTap: onTap,
+      onTap: loading ? null : onTap,
       behavior: HitTestBehavior.opaque,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.s12),
         child: Row(
           children: [
             SettingsIconBadge(icon: icon, color: iconColor),
-            const SizedBox(width: 14),
+            const SizedBox(width: AppSpacing.s14),
             Expanded(
               child: Text(
                 label,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                  color: AppColors.offBlack,
-                ),
+                style: AppTextStyle.callout
+                    .of(context, emphasized: true)
+                    .copyWith(color: scheme.onSurface),
               ),
             ),
             if (trailingText != null) ...[
               Text(
                 trailingText!,
-                style: TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 14,
-                  color: AppColors.offBlack.withValues(alpha: 0.5),
-                ),
+                style: AppTextStyle.subheadline
+                    .of(context)
+                    .copyWith(color: scheme.onSurfaceVariant),
               ),
-              const SizedBox(width: 6),
+              const SizedBox(width: AppSpacing.s6),
             ],
-            const GlyphIcon(
-              AppGlyphs.chevronRight,
-              size: 24,
-              color: AppColors.mediumGrey,
-            ),
+            if (loading)
+              const PulsingDot()
+            else
+              GlyphIcon(
+                AppGlyphs.chevronRight,
+                size: AppSizes.iconAction,
+                color: scheme.onSurfaceVariant,
+              ),
           ],
         ),
       ),

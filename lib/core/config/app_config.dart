@@ -74,6 +74,18 @@ class AppConfig {
   /// Hive box for offline cache.
   static const String telemetryCacheBox = 'telemetry_cache';
 
+  /// Hive box for user preferences.
+  static const String settingsBox = 'settings';
+
   /// Data older than this shows a stale indicator.
   static const Duration staleThreshold = Duration(minutes: 30);
+
+  /// Upper bound for an HTTP request to the API.
+  static const Duration requestTimeout = Duration(seconds: 20);
+
+  /// How long logout waits for the Worker to revoke the token.
+  static const Duration logoutTimeout = Duration(seconds: 2);
+
+  /// The least time a sign-out spinner stays up.
+  static const Duration minLogoutDuration = Duration(milliseconds: 350);
 }

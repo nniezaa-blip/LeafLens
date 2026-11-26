@@ -73,6 +73,47 @@ void main() {
       expect(find.text('STOP WATERING!'), findsNothing);
     });
 
+    testWidgets('marks a stale score as last known', (tester) async {
+      await tester.pumpWidget(
+        const PrismApp(
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: HealthScoreCard(
+              score: 80,
+              statusText: 'Last known 41d ago. Health cannot be confirmed.',
+              gaugeColor: AppColors.leaf,
+              isStale: true,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Last known'), findsOneWidget);
+      expect(
+        find.text('Last known 41d ago. Health cannot be confirmed.'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('marks a score without readings as no data', (tester) async {
+      await tester.pumpWidget(
+        const PrismApp(
+          home: PrismScaffold(
+            bar: EmptyBar(),
+            body: HealthScoreCard(
+              score: 0,
+              statusText:
+                  'Waiting for soil, temperature and humidity readings.',
+              gaugeColor: AppColors.leaf,
+              hasData: false,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('No data'), findsOneWidget);
+    });
+
     testWidgets('renders gauge with score', (tester) async {
       await tester.pumpWidget(
         const PrismApp(

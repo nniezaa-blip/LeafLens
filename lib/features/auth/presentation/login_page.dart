@@ -11,10 +11,10 @@ import 'package:lextari/widgets/app_text_field.dart';
 /// Per-screen extensions keep build() readable without
 /// global namespace pollution.
 extension on BuildContext {
-  TextStyle get loginTitleStyle => const TextStyle(
+  TextStyle get loginTitleStyle => TextStyle(
     fontWeight: FontWeight.w600,
     fontSize: 46,
-    color: AppColors.deepGreen,
+    color: colorScheme.primary,
   );
 
   TextStyle get googleButtonStyle => const TextStyle(
@@ -29,13 +29,13 @@ extension on BuildContext {
   TextStyle get signUpMuted => TextStyle(
     fontWeight: FontWeight.w300,
     fontSize: 16,
-    color: AppColors.offBlack.withValues(alpha: 0.6),
+    color: colorScheme.onSurfaceVariant,
   );
 
-  TextStyle get signUpLink => const TextStyle(
+  TextStyle get signUpLink => TextStyle(
     fontWeight: FontWeight.w700,
     fontSize: 16,
-    color: AppColors.mediumGreen,
+    color: colorScheme.primary,
   );
 }
 
@@ -75,7 +75,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       await ref
           .read(authActionsProvider)
           .login(_emailCtrl.text.trim(), _passwordCtrl.text);
-      if (mounted) context.go('/dashboard');
     } on AuthFailure catch (e) {
       // Inline: stay on form so user can retry immediately.
       setState(() => _formError = e.message);
@@ -96,8 +95,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     });
 
     try {
-      final signedIn = await ref.read(authActionsProvider).signInWithGoogle();
-      if (mounted && signedIn) context.go('/dashboard');
+      await ref.read(authActionsProvider).signInWithGoogle();
     } on AuthFailure catch (e) {
       setState(() => _formError = e.message);
     } on Failure catch (e) {
@@ -113,7 +111,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   Widget build(BuildContext context) {
     return PrismScaffold(
       bar: const EmptyBar(),
-      backgroundColor: AppColors.offWhite,
+      backgroundColor: context.colorScheme.surface,
       body: SafeArea(
         child: Center(
           child: Form(
@@ -176,9 +174,23 @@ class _GoogleSignInButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = context.colorScheme;
+    final dark = scheme.brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.only(top: 32),
       child: FilledButton(
+        style: ButtonStyle(
+          backgroundColor: WidgetStatePropertyAll(
+            dark ? AppColors.blackRaised : AppColors.black,
+          ),
+          foregroundColor: const WidgetStatePropertyAll(AppColors.white),
+          side: WidgetStatePropertyAll(
+            BorderSide(
+              color: dark ? scheme.outline : AppColors.transparent,
+            ),
+          ),
+          minimumSize: const Size.fromHeight(AppSizes.authButtonHeight),
+        ),
         onPressed: loading ? null : onPressed,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -216,17 +228,27 @@ class _OrDivider extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 32),
       child: Row(
         children: [
-          Expanded(child: Container(height: 1, color: AppColors.greyLighter)),
+          Expanded(
+            child: Container(
+              height: 1,
+              color: context.colorScheme.outlineVariant,
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Text(
               'Or continue with Email',
               style: DefaultTextStyle.of(context).style.copyWith(
-                color: AppColors.textGrey,
+                color: context.colorScheme.onSurfaceVariant,
               ),
             ),
           ),
-          Expanded(child: Container(height: 1, color: AppColors.greyLighter)),
+          Expanded(
+            child: Container(
+              height: 1,
+              color: context.colorScheme.outlineVariant,
+            ),
+          ),
         ],
       ),
     );
@@ -283,14 +305,17 @@ class _LoginButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FilledButton(
+      style: const ButtonStyle(
+        minimumSize: Size.fromHeight(AppSizes.authButtonHeight),
+      ),
       onPressed: loading ? null : onPressed,
       child: loading
-          ? const SizedBox(
+          ? SizedBox(
               width: 20,
               height: 20,
               child: ActivityIndicator(
                 size: 20,
-                color: AppColors.offWhite,
+                color: context.colorScheme.onPrimary,
               ),
             )
           : Text('Login', style: context.loginButtonStyle),
@@ -325,8 +350,8 @@ class _FormErrorBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       message,
-      style: const TextStyle(
-        color: AppColors.redDark,
+      style: TextStyle(
+        color: context.colorScheme.error,
         fontSize: 14,
       ),
     );

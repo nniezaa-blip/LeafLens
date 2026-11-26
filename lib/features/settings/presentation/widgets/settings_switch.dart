@@ -24,33 +24,31 @@ class SettingsSwitch extends StatelessWidget {
       onTap: () => onChanged(!value),
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
-        width: 52,
-        height: 30,
+        duration: AppMotionTokens.control,
+        curve: AppCurves.emphasized,
+        width: AppSizes.switchWidth,
+        height: AppSizes.switchHeight,
         decoration: BoxDecoration(
-          color: value ? AppColors.mediumGreen : AppColors.greyLighter,
-          borderRadius: BorderRadius.circular(25),
+          color: value
+              ? context.colorScheme.primary
+              : context.colorScheme.surfaceContainerHighest,
+          borderRadius: BorderRadius.circular(AppRadii.pill),
         ),
         child: AnimatedAlign(
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
+          duration: AppMotionTokens.control,
+          curve: AppCurves.emphasized,
           alignment: value ? Alignment.centerRight : Alignment.centerLeft,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 3),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSizes.switchInset,
+            ),
             child: Container(
-              width: 24,
-              height: 24,
+              width: AppSizes.switchThumb,
+              height: AppSizes.switchThumb,
               decoration: BoxDecoration(
                 color: AppColors.white,
                 shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.offBlack.withValues(alpha: 0.2),
-                    blurRadius: 4,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
+                boxShadow: AppShadows.thumb,
               ),
             ),
           ),

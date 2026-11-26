@@ -26,17 +26,33 @@ class AppTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
+    final field = TextFormField(
       controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
       validator: validator,
       enabled: enabled,
+      onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
       decoration: InputDecoration(
         hintText: hint ?? label,
         prefixIcon: prefixIcon,
         suffixIcon: suffixIcon,
       ),
+    );
+    final fieldLabel = label;
+    if (fieldLabel == null) return field;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          fieldLabel,
+          style: AppTextStyle.caption1
+              .of(context, emphasized: true)
+              .copyWith(color: context.colorScheme.onSurfaceVariant),
+        ),
+        const SizedBox(height: AppSpacing.s6),
+        field,
+      ],
     );
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:lextari/features/dashboard/presentation/widgets/dashboard_card.dart';
 import 'package:lextari/features/dashboard/presentation/widgets/mini_gauge.dart';
 import 'package:lextari/ui/ui.dart';
@@ -12,6 +14,8 @@ class HealthScoreCard extends StatelessWidget {
     required this.statusText,
     required this.gaugeColor,
     super.key,
+    this.isStale = false,
+    this.hasData = true,
     this.warningText,
     this.actionLabel,
     this.onAction,
@@ -26,6 +30,12 @@ class HealthScoreCard extends StatelessWidget {
   /// Colour of the gauge arc.
   final Color gaugeColor;
 
+  /// Whether the score comes from readings older than the staleness limit.
+  final bool isStale;
+
+  /// Whether every required reading exists for a score.
+  final bool hasData;
+
   /// Optional warning line shown below the score.
   final String? warningText;
 
@@ -34,6 +44,9 @@ class HealthScoreCard extends StatelessWidget {
 
   /// Called when the call to action is pressed.
   final VoidCallback? onAction;
+
+  /// The gauge takes this share of the card's inner width.
+  static const double _gaugeWidthShare = 0.32;
 
   @override
   Widget build(BuildContext context) {
@@ -50,46 +63,56 @@ class HealthScoreCard extends StatelessWidget {
               DashboardChip(
                 label: _statusLabel(),
                 tone: _scoreTone(),
-                dot: true,
+                dot: hasData,
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.s14),
-          Row(
-            children: [
-              MiniGauge(
-                value: score / 100,
-                color: gaugeColor,
-                size: AppSizes.gauge,
-              ),
-              const SizedBox(width: AppSpacing.s16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      warningText ?? statusText,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTextStyle.subheadline
-                          .of(context, emphasized: true)
-                          .copyWith(
-                            color: warningText != null
-                                ? scheme.error
-                                : scheme.onSurface,
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final gaugeSize = math.min(
+                AppSizes.gauge,
+                constraints.maxWidth * _gaugeWidthShare,
+              );
+              return Row(
+                children: [
+                  MiniGauge(
+                    value: score / 100,
+                    color: isStale || !hasData
+                        ? scheme.onSurfaceVariant
+                        : gaugeColor,
+                    size: gaugeSize,
+                  ),
+                  const SizedBox(width: AppSpacing.s16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          warningText ?? statusText,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTextStyle.subheadline
+                              .of(context, emphasized: true)
+                              .copyWith(
+                                color: warningText != null
+                                    ? scheme.error
+                                    : scheme.onSurface,
+                              ),
+                        ),
+                        if (actionLabel != null) ...[
+                          const SizedBox(height: AppSpacing.s8),
+                          TextButton(
+                            onPressed: onAction,
+                            child: Text(actionLabel!),
                           ),
+                        ],
+                      ],
                     ),
-                    if (actionLabel != null) ...[
-                      const SizedBox(height: AppSpacing.s8),
-                      TextButton(
-                        onPressed: onAction,
-                        child: Text(actionLabel!),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ],
+                  ),
+                ],
+              );
+            },
           ),
         ],
       ),
@@ -97,6 +120,8 @@ class HealthScoreCard extends StatelessWidget {
   }
 
   String _statusLabel() {
+    if (!hasData) return 'No data';
+    if (isStale) return 'Last known';
     if (score >= 80) return 'Optimal';
     if (score >= 65) return 'Moderate';
     if (score >= 50) return 'Caution';
@@ -105,6 +130,8 @@ class HealthScoreCard extends StatelessWidget {
   }
 
   DashboardChipTone _scoreTone() {
+    if (!hasData) return DashboardChipTone.idle;
+    if (isStale) return DashboardChipTone.warn;
     if (score >= 65) return DashboardChipTone.ok;
     if (score >= 50) return DashboardChipTone.warn;
     return DashboardChipTone.danger;

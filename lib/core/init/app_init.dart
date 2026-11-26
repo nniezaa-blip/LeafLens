@@ -40,5 +40,6 @@ void _initNotifications() {
 /// Initialises Hive for local caching.
 Future<void> _initStorage() async {
   await Hive.initFlutter();
-  await Hive.openBox<Map<String, dynamic>>(AppConfig.telemetryCacheBox);
+  await Hive.openBox<dynamic>(AppConfig.telemetryCacheBox);
+  await Hive.openBox<dynamic>(AppConfig.settingsBox);
 }

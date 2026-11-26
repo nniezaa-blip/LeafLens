@@ -153,11 +153,11 @@ return ack(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( double? soilMoisture,  double? temperature,  double? humidity,  double? waterLevel)?  telemetry,TResult Function( double score,  String status)?  ghs,TResult Function(@JsonKey(name: 'water_level')  double tankLevelPercent, @JsonKey(name: 'refill_active')  bool refillActive, @JsonKey(name: 'safety_lockout')  bool safetyLockout)?  waterSystem,TResult Function( String type,  bool success)?  ack,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( double? soilMoisture,  double? temperature,  double? humidity,  double? waterLevel,  Map<String, int>? recordedAt,  Map<String, String>? source)?  telemetry,TResult Function( double score,  String status,  bool stale)?  ghs,TResult Function(@JsonKey(name: 'water_level')  double tankLevelPercent, @JsonKey(name: 'refill_active')  bool refillActive, @JsonKey(name: 'safety_lockout')  bool safetyLockout)?  waterSystem,TResult Function( String type,  bool success)?  ack,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case TelemetryUpdate() when telemetry != null:
-return telemetry(_that.soilMoisture,_that.temperature,_that.humidity,_that.waterLevel);case GHSUpdate() when ghs != null:
-return ghs(_that.score,_that.status);case WaterSystemUpdate() when waterSystem != null:
+return telemetry(_that.soilMoisture,_that.temperature,_that.humidity,_that.waterLevel,_that.recordedAt,_that.source);case GHSUpdate() when ghs != null:
+return ghs(_that.score,_that.status,_that.stale);case WaterSystemUpdate() when waterSystem != null:
 return waterSystem(_that.tankLevelPercent,_that.refillActive,_that.safetyLockout);case AckUpdate() when ack != null:
 return ack(_that.type,_that.success);case _:
   return orElse();
@@ -177,11 +177,11 @@ return ack(_that.type,_that.success);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( double? soilMoisture,  double? temperature,  double? humidity,  double? waterLevel)  telemetry,required TResult Function( double score,  String status)  ghs,required TResult Function(@JsonKey(name: 'water_level')  double tankLevelPercent, @JsonKey(name: 'refill_active')  bool refillActive, @JsonKey(name: 'safety_lockout')  bool safetyLockout)  waterSystem,required TResult Function( String type,  bool success)  ack,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( double? soilMoisture,  double? temperature,  double? humidity,  double? waterLevel,  Map<String, int>? recordedAt,  Map<String, String>? source)  telemetry,required TResult Function( double score,  String status,  bool stale)  ghs,required TResult Function(@JsonKey(name: 'water_level')  double tankLevelPercent, @JsonKey(name: 'refill_active')  bool refillActive, @JsonKey(name: 'safety_lockout')  bool safetyLockout)  waterSystem,required TResult Function( String type,  bool success)  ack,}) {final _that = this;
 switch (_that) {
 case TelemetryUpdate():
-return telemetry(_that.soilMoisture,_that.temperature,_that.humidity,_that.waterLevel);case GHSUpdate():
-return ghs(_that.score,_that.status);case WaterSystemUpdate():
+return telemetry(_that.soilMoisture,_that.temperature,_that.humidity,_that.waterLevel,_that.recordedAt,_that.source);case GHSUpdate():
+return ghs(_that.score,_that.status,_that.stale);case WaterSystemUpdate():
 return waterSystem(_that.tankLevelPercent,_that.refillActive,_that.safetyLockout);case AckUpdate():
 return ack(_that.type,_that.success);}
 }
@@ -197,11 +197,11 @@ return ack(_that.type,_that.success);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( double? soilMoisture,  double? temperature,  double? humidity,  double? waterLevel)?  telemetry,TResult? Function( double score,  String status)?  ghs,TResult? Function(@JsonKey(name: 'water_level')  double tankLevelPercent, @JsonKey(name: 'refill_active')  bool refillActive, @JsonKey(name: 'safety_lockout')  bool safetyLockout)?  waterSystem,TResult? Function( String type,  bool success)?  ack,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( double? soilMoisture,  double? temperature,  double? humidity,  double? waterLevel,  Map<String, int>? recordedAt,  Map<String, String>? source)?  telemetry,TResult? Function( double score,  String status,  bool stale)?  ghs,TResult? Function(@JsonKey(name: 'water_level')  double tankLevelPercent, @JsonKey(name: 'refill_active')  bool refillActive, @JsonKey(name: 'safety_lockout')  bool safetyLockout)?  waterSystem,TResult? Function( String type,  bool success)?  ack,}) {final _that = this;
 switch (_that) {
 case TelemetryUpdate() when telemetry != null:
-return telemetry(_that.soilMoisture,_that.temperature,_that.humidity,_that.waterLevel);case GHSUpdate() when ghs != null:
-return ghs(_that.score,_that.status);case WaterSystemUpdate() when waterSystem != null:
+return telemetry(_that.soilMoisture,_that.temperature,_that.humidity,_that.waterLevel,_that.recordedAt,_that.source);case GHSUpdate() when ghs != null:
+return ghs(_that.score,_that.status,_that.stale);case WaterSystemUpdate() when waterSystem != null:
 return waterSystem(_that.tankLevelPercent,_that.refillActive,_that.safetyLockout);case AckUpdate() when ack != null:
 return ack(_that.type,_that.success);case _:
   return null;
@@ -215,13 +215,31 @@ return ack(_that.type,_that.success);case _:
 @JsonSerializable()
 
 class TelemetryUpdate implements DashboardUpdate {
-  const TelemetryUpdate({this.soilMoisture, this.temperature, this.humidity, this.waterLevel,  String? $type}): $type = $type ?? 'telemetry';
+  const TelemetryUpdate({this.soilMoisture, this.temperature, this.humidity, this.waterLevel,  Map<String, int>? recordedAt,  Map<String, String>? source,  String? $type}): _recordedAt = recordedAt,_source = source,$type = $type ?? 'telemetry';
   factory TelemetryUpdate.fromJson(Map<String, dynamic> json) => _$TelemetryUpdateFromJson(json);
 
  final  double? soilMoisture;
  final  double? temperature;
  final  double? humidity;
  final  double? waterLevel;
+ final  Map<String, int>? _recordedAt;
+ Map<String, int>? get recordedAt {
+  final value = _recordedAt;
+  if (value == null) return null;
+  if (_recordedAt is EqualUnmodifiableMapView) return _recordedAt;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(value);
+}
+
+ final  Map<String, String>? _source;
+ Map<String, String>? get source {
+  final value = _source;
+  if (value == null) return null;
+  if (_source is EqualUnmodifiableMapView) return _source;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableMapView(value);
+}
+
 
 @JsonKey(name: 'type')
 final String $type;
@@ -240,18 +258,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is TelemetryUpdate&&(identical(other.soilMoisture, soilMoisture) || other.soilMoisture == soilMoisture)&&(identical(other.temperature, temperature) || other.temperature == temperature)&&(identical(other.humidity, humidity) || other.humidity == humidity)&&(identical(other.waterLevel, waterLevel) || other.waterLevel == waterLevel));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is TelemetryUpdate&&(identical(other.soilMoisture, soilMoisture) || other.soilMoisture == soilMoisture)&&(identical(other.temperature, temperature) || other.temperature == temperature)&&(identical(other.humidity, humidity) || other.humidity == humidity)&&(identical(other.waterLevel, waterLevel) || other.waterLevel == waterLevel)&&const DeepCollectionEquality().equals(other.recordedAt, _recordedAt)&&const DeepCollectionEquality().equals(other.source, _source));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,soilMoisture,temperature,humidity,waterLevel);
+    return Object.hash(runtimeType,soilMoisture,temperature,humidity,waterLevel,const DeepCollectionEquality().hash(_recordedAt),const DeepCollectionEquality().hash(_source));
 }
 
 @override
 String toString() {
-    return 'DashboardUpdate.telemetry(soilMoisture: $soilMoisture, temperature: $temperature, humidity: $humidity, waterLevel: $waterLevel)';
+    return 'DashboardUpdate.telemetry(soilMoisture: $soilMoisture, temperature: $temperature, humidity: $humidity, waterLevel: $waterLevel, recordedAt: $recordedAt, source: $source)';
 }
 
 
@@ -262,7 +280,7 @@ abstract mixin class $TelemetryUpdateCopyWith<$Res> implements $DashboardUpdateC
   factory $TelemetryUpdateCopyWith(TelemetryUpdate value, $Res Function(TelemetryUpdate) _then) = _$TelemetryUpdateCopyWithImpl;
 @useResult
 $Res call({
- double? soilMoisture, double? temperature, double? humidity, double? waterLevel
+ double? soilMoisture, double? temperature, double? humidity, double? waterLevel, Map<String, int>? recordedAt, Map<String, String>? source
 });
 
 
@@ -279,13 +297,15 @@ class _$TelemetryUpdateCopyWithImpl<$Res>
 
 /// Create a copy of DashboardUpdate
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? soilMoisture = freezed,Object? temperature = freezed,Object? humidity = freezed,Object? waterLevel = freezed,}) {
+@pragma('vm:prefer-inline') $Res call({Object? soilMoisture = freezed,Object? temperature = freezed,Object? humidity = freezed,Object? waterLevel = freezed,Object? recordedAt = freezed,Object? source = freezed,}) {
   return _then(TelemetryUpdate(
 soilMoisture: freezed == soilMoisture ? _self.soilMoisture : soilMoisture // ignore: cast_nullable_to_non_nullable
 as double?,temperature: freezed == temperature ? _self.temperature : temperature // ignore: cast_nullable_to_non_nullable
 as double?,humidity: freezed == humidity ? _self.humidity : humidity // ignore: cast_nullable_to_non_nullable
 as double?,waterLevel: freezed == waterLevel ? _self.waterLevel : waterLevel // ignore: cast_nullable_to_non_nullable
-as double?,
+as double?,recordedAt: freezed == recordedAt ? _self._recordedAt : recordedAt // ignore: cast_nullable_to_non_nullable
+as Map<String, int>?,source: freezed == source ? _self._source : source // ignore: cast_nullable_to_non_nullable
+as Map<String, String>?,
   ));
 }
 
@@ -296,11 +316,12 @@ as double?,
 @JsonSerializable()
 
 class GHSUpdate implements DashboardUpdate {
-  const GHSUpdate({required this.score, required this.status,  String? $type}): $type = $type ?? 'ghs';
+  const GHSUpdate({required this.score, required this.status, this.stale = false,  String? $type}): $type = $type ?? 'ghs';
   factory GHSUpdate.fromJson(Map<String, dynamic> json) => _$GHSUpdateFromJson(json);
 
  final  double score;
  final  String status;
+@JsonKey() final  bool stale;
 
 @JsonKey(name: 'type')
 final String $type;
@@ -319,18 +340,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is GHSUpdate&&(identical(other.score, score) || other.score == score)&&(identical(other.status, status) || other.status == status));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is GHSUpdate&&(identical(other.score, score) || other.score == score)&&(identical(other.status, status) || other.status == status)&&(identical(other.stale, stale) || other.stale == stale));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,score,status);
+    return Object.hash(runtimeType,score,status,stale);
 }
 
 @override
 String toString() {
-    return 'DashboardUpdate.ghs(score: $score, status: $status)';
+    return 'DashboardUpdate.ghs(score: $score, status: $status, stale: $stale)';
 }
 
 
@@ -341,7 +362,7 @@ abstract mixin class $GHSUpdateCopyWith<$Res> implements $DashboardUpdateCopyWit
   factory $GHSUpdateCopyWith(GHSUpdate value, $Res Function(GHSUpdate) _then) = _$GHSUpdateCopyWithImpl;
 @useResult
 $Res call({
- double score, String status
+ double score, String status, bool stale
 });
 
 
@@ -358,11 +379,12 @@ class _$GHSUpdateCopyWithImpl<$Res>
 
 /// Create a copy of DashboardUpdate
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? score = null,Object? status = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? score = null,Object? status = null,Object? stale = null,}) {
   return _then(GHSUpdate(
 score: null == score ? _self.score : score // ignore: cast_nullable_to_non_nullable
 as double,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String,
+as String,stale: null == stale ? _self.stale : stale // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

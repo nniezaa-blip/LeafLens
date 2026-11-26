@@ -5,6 +5,7 @@ import 'package:prism_ui/prism_ui.dart';
 /// Illustrations for Lextari's empty and error pages.
 enum NullStatusIllustration implements Illustration {
   data,
+  devices,
   logs,
   proxies,
   profile,
@@ -27,6 +28,7 @@ enum NullStatusIllustration implements Illustration {
   @override
   Glyph get glyph => switch (this) {
     data => AppGlyphs.barChart,
+    devices => AppGlyphs.device,
     logs => AppGlyphs.description,
     proxies => AppGlyphs.device,
     profile => AppGlyphs.home,

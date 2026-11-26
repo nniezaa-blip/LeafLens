@@ -1,3 +1,4 @@
+import 'package:lextari/features/dashboard/domain/sensor_reading.dart';
 import 'package:lextari/features/dashboard/presentation/widgets/dashboard_card.dart';
 import 'package:lextari/ui/ui.dart';
 
@@ -5,14 +6,14 @@ import 'package:lextari/ui/ui.dart';
 class WaterSystemCard extends StatelessWidget {
   /// Creates a [WaterSystemCard].
   const WaterSystemCard({
-    required this.waterLevel,
+    required this.reading,
     required this.refillActive,
     required this.safetyLockout,
     super.key,
   });
 
-  /// Latest water level. Values above 100 are shown as raw sensor counts.
-  final double? waterLevel;
+  /// Latest water level reading. Values above 100 are shown as raw counts.
+  final SensorReading? reading;
 
   /// Whether the refill valve is active.
   final bool refillActive;
@@ -23,7 +24,8 @@ class WaterSystemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = context.colorScheme;
-    final level = waterLevel;
+    final reading = this.reading;
+    final level = reading?.value;
     final displayLevel = (level ?? 0).clamp(0.0, 100.0);
     final raw = level != null && level > 100;
     final label = level == null
@@ -66,6 +68,15 @@ class WaterSystemCard extends StatelessWidget {
                     Text('Water Level', style: DashboardText.label(context)),
                     const SizedBox(height: AppSpacing.s2),
                     Text(label, style: DashboardText.figure(context)),
+                    if (reading != null && reading.isStale) ...[
+                      const SizedBox(height: AppSpacing.s4),
+                      Text(
+                        'Last known · ${reading.ageLabel}',
+                        style: AppTextStyle.caption1
+                            .of(context, emphasized: true)
+                            .copyWith(color: scheme.warning),
+                      ),
+                    ],
                     const SizedBox(height: AppSpacing.s10),
                     _StateRow(
                       icon: AppGlyphs.refill,

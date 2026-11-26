@@ -1,19 +1,16 @@
-import 'dart:ui';
-
 import 'package:lextari/ui/ui.dart';
 
 /// Translucent, frosted-glass surface used for cards and panels.
 ///
-/// Blurs whatever sits behind it and overlays a light translucent white
-/// fill, a subtle highlight border, and a soft drop shadow to create a
-/// glassmorphism effect.
+/// Kept as the feature-facing name for [GlassCard] so charts and existing
+/// callers share the same Botanical Glass treatment as the dashboard.
 class FrostedCard extends StatelessWidget {
   /// Creates a [FrostedCard].
   const FrostedCard({
     required this.child,
     super.key,
-    this.padding = const EdgeInsets.all(18),
-    this.borderRadius = 20,
+    this.padding = const EdgeInsets.all(AppSpacing.s18),
+    this.borderRadius = AppRadii.md,
     this.blur = 14,
     this.tint,
   });
@@ -30,43 +27,17 @@ class FrostedCard extends StatelessWidget {
   /// Blur strength applied to the backdrop behind the card.
   final double blur;
 
-  /// Optional colour overlay replacing the default translucent white fill.
+  /// Optional colour overlay replacing the default translucent fill.
   final Color? tint;
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(borderRadius);
-
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: radius,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.offBlack.withValues(alpha: 0.12),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: radius,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: tint ?? AppColors.white.withValues(alpha: 0.55),
-              borderRadius: radius,
-              border: Border.all(
-                color: AppColors.white.withValues(alpha: 0.6),
-              ),
-            ),
-            child: Padding(
-              padding: padding,
-              child: child,
-            ),
-          ),
-        ),
-      ),
+    return GlassCard(
+      padding: padding,
+      borderRadius: borderRadius,
+      blur: blur,
+      tint: tint,
+      child: child,
     );
   }
 }

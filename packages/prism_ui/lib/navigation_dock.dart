@@ -318,11 +318,15 @@ class NavigationDock extends StatelessWidget {
     required this.destinations,
     required this.selectedIndex,
     required this.onSelected,
+    this.showSelectionBackground = true,
   });
 
   final List<NavigationDockDestination> destinations;
   final int selectedIndex;
   final ValueChanged<int> onSelected;
+
+  /// Draws the moving lens behind the selected destination.
+  final bool showSelectionBackground;
 
   static double heightOf(BuildContext context) {
     return _barHeight +
@@ -367,6 +371,7 @@ class NavigationDock extends StatelessWidget {
                       destinations: destinations,
                       selectedIndex: selectedIndex,
                       onSelected: onSelected,
+                      showSelectionBackground: showSelectionBackground,
                     ),
                   ),
                 ),
@@ -881,11 +886,13 @@ class FloatingNavigationBar extends StatefulWidget {
     required this.destinations,
     required this.selectedIndex,
     required this.onSelected,
+    this.showSelectionBackground = true,
   });
 
   final List<NavigationDockDestination> destinations;
   final int selectedIndex;
   final ValueChanged<int> onSelected;
+  final bool showSelectionBackground;
 
   @override
   State<FloatingNavigationBar> createState() => _FloatingNavigationBarState();
@@ -1279,7 +1286,9 @@ class _FloatingNavigationBarState extends State<FloatingNavigationBar>
       glow: _touchGlow,
       child: Surface(
         color: glass
-            ? Colors.transparent
+            ? SurfaceLevel.floatingOf(
+                colorScheme,
+              ).colorOf(colorScheme).withValues(alpha: 0.55)
             : SurfaceLevel.floatingOf(colorScheme).colorOf(colorScheme),
         shape: AppShape.full,
         // Raw pointers rather than recognizers: a drag has nothing to win the
@@ -1345,12 +1354,14 @@ class _FloatingNavigationBarState extends State<FloatingNavigationBar>
                         ],
                       ),
                     );
-                    final lensed =
-                        glass && _lifted && widget.destinations.isNotEmpty;
+                    final selected =
+                        widget.showSelectionBackground &&
+                        widget.destinations.isNotEmpty;
+                    final lensed = glass && _lifted && selected;
                     return Stack(
                       clipBehavior: Clip.none,
                       children: [
-                        if (widget.destinations.isNotEmpty)
+                        if (selected)
                           AnimatedBuilder(
                             animation: _motion,
                             builder: (_, _) => _Lens(
@@ -1371,7 +1382,7 @@ class _FloatingNavigationBarState extends State<FloatingNavigationBar>
                               opacity: _hoverShow.value,
                             ),
                           ),
-                        if (glass && widget.destinations.isNotEmpty)
+                        if (selected && glass)
                           AnimatedBuilder(
                             animation: _motion,
                             builder: (_, _) =>
@@ -1453,19 +1464,20 @@ class _Lens extends StatelessWidget {
   final Rect rect;
   final double lift;
 
-  /// On glass the lens rests as a platter in the secondary hue, sunk in dark
-  /// mode as iOS's tab bar marks its selection, and clears as it lifts into
-  /// the [_GlassLens].
+  /// On glass the lens rests as a darker neutral platter, and clears as it
+  /// lifts into the [_GlassLens].
   final bool glass;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
     final lifted = lift.clamp(0.0, 1.0);
-    final tone = colorScheme.brightness == Brightness.dark ? 4.0 : 90.0;
-    final secondary = Hct.fromInt(colorScheme.secondary.toARGB32());
-    final hct = Hct.from(secondary.hue, secondary.chroma, tone);
-    final platter = Color(hct.toInt()).withValues(alpha: 0.85);
+    final dark = colorScheme.brightness == Brightness.dark;
+    final neutral = dark ? const Color(0xB3000000) : const Color(0x14000000);
+    final resting = Color.alphaBlend(
+      neutral,
+      SurfaceLevel.floatingOf(colorScheme).colorOf(colorScheme),
+    );
     return PositionedDirectional(
       start: rect.left,
       top: rect.top,
@@ -1474,12 +1486,10 @@ class _Lens extends StatelessWidget {
       child: DecoratedBox(
         decoration: ShapeDecoration(
           color: glass
-              ? platter.withValues(alpha: platter.a * (1 - lifted))
+              ? neutral.withValues(alpha: neutral.a * (1 - lifted))
               : Color.alphaBlend(
                   colorScheme.onSurface.withValues(alpha: 0.08 * lifted),
-                  SurfaceLevel.floatingOf(
-                    colorScheme,
-                  ).next.colorOf(colorScheme),
+                  resting,
                 ),
           shape: AppShape.full,
         ),
@@ -1668,7 +1678,9 @@ class _FloatingBarItemState extends State<_FloatingBarItem> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
-    final color = colorScheme.onSurfaceVariant;
+    final color = widget.selected
+        ? colorScheme.primary
+        : colorScheme.onSurfaceVariant;
     var tint = colorScheme.primary;
     if (widget.part == _LensPart.inside &&
         LiquidGlassScope.qualityOf(context) == LiquidGlassQuality.standard) {

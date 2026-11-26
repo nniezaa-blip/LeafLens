@@ -11,11 +11,14 @@ sealed class DashboardUpdate with _$DashboardUpdate {
     double? temperature,
     double? humidity,
     double? waterLevel,
+    Map<String, int>? recordedAt,
+    Map<String, String>? source,
   }) = TelemetryUpdate;
 
   const factory DashboardUpdate.ghs({
     required double score,
     required String status,
+    @Default(false) bool stale,
   }) = GHSUpdate;
 
   const factory DashboardUpdate.waterSystem({

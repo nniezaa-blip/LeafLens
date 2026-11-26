@@ -41,8 +41,14 @@ class ApiClient {
     Map<String, String>? params,
   }) async {
     final uri = Uri.parse('$baseUrl$path').replace(queryParameters: params);
-    final response = await http.get(uri, headers: _headers);
-    return _handle(response);
+    try {
+      final response = await http
+          .get(uri, headers: _headers)
+          .timeout(AppConfig.requestTimeout);
+      return _handle(response);
+    } on TimeoutException {
+      throw const NetworkFailure();
+    }
   }
 
   /// Sends a POST request to [path] with an optional JSON [body].
@@ -52,12 +58,18 @@ class ApiClient {
     Map<String, dynamic>? body,
   }) async {
     final uri = Uri.parse('$baseUrl$path');
-    final response = await http.post(
-      uri,
-      headers: _headers,
-      body: body != null ? jsonEncode(body) : null,
-    );
-    return _handle(response);
+    try {
+      final response = await http
+          .post(
+            uri,
+            headers: _headers,
+            body: body != null ? jsonEncode(body) : null,
+          )
+          .timeout(AppConfig.requestTimeout);
+      return _handle(response);
+    } on TimeoutException {
+      throw const NetworkFailure();
+    }
   }
 
   /// POST without auth header (for login/register).
@@ -66,12 +78,18 @@ class ApiClient {
     Map<String, dynamic>? body,
   }) async {
     final uri = Uri.parse('$baseUrl$path');
-    final response = await http.post(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-      body: body != null ? jsonEncode(body) : null,
-    );
-    return _handle(response);
+    try {
+      final response = await http
+          .post(
+            uri,
+            headers: {'Content-Type': 'application/json'},
+            body: body != null ? jsonEncode(body) : null,
+          )
+          .timeout(AppConfig.requestTimeout);
+      return _handle(response);
+    } on TimeoutException {
+      throw const NetworkFailure();
+    }
   }
 
   Map<String, dynamic> _handle(http.Response response) {

@@ -1,6 +1,7 @@
 export 'package:lextari/ui/ui.dart';
 
 export 'active_polling.dart';
+export 'app_loading_overlay.dart';
 export 'app_text_field.dart';
 export 'background_ellipse.dart';
 export 'chip_title.dart';

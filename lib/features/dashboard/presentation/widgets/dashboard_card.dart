@@ -44,36 +44,15 @@ class DashboardCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final density = DashboardDensityScope.of(context);
-    final colors = DashboardColors.of(context);
-    final shape = AppShape.all(
-      density.isDesktop
+    return GlassCard(
+      padding: padding ?? dashboardCardPadding(density),
+      borderRadius: density.isDesktop
           ? DashboardCorner.desktopCard
           : DashboardCorner.mobileCard,
-    );
-    final content = Padding(
-      padding: padding ?? dashboardCardPadding(density),
+      shadows: DashboardShadows.e1(context),
+      onTap: onTap,
+      semanticLabel: semanticLabel,
       child: child,
-    );
-    final card = Container(
-      decoration: ShapeDecoration(
-        color: colors.card,
-        shape: shape,
-        shadows: DashboardShadows.e1(context),
-      ),
-      child: onTap == null
-          ? content
-          : PressSurface(
-              fill: AppColors.transparent,
-              shape: shape,
-              onPressed: onTap,
-              childFills: true,
-              child: content,
-            ),
-    );
-    return Semantics(
-      container: true,
-      label: semanticLabel,
-      child: card,
     );
   }
 }
@@ -111,11 +90,15 @@ class DashboardCardHeader extends StatelessWidget {
           const SizedBox(width: AppSpacing.s8),
         ],
         Expanded(
-          child: Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: DashboardText.title(context),
+          child: Semantics(
+            header: true,
+            headingLevel: 2,
+            child: Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: DashboardText.title(context),
+            ),
           ),
         ),
         ...trailing,

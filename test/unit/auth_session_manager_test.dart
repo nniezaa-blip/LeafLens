@@ -104,6 +104,7 @@ void main() {
       final manager = AuthSessionManager(api, store);
 
       await manager.ensureRestored();
+      await manager.revalidation;
 
       expect(manager.currentSession?.accessToken, 'token.value');
     });
@@ -142,6 +143,7 @@ void main() {
       final manager = AuthSessionManager(api, store);
 
       await manager.ensureRestored();
+      await manager.revalidation;
 
       expect(manager.currentSession, isNull);
       expect(store.session, isNull);
@@ -157,6 +159,7 @@ void main() {
       final manager = AuthSessionManager(api, store);
 
       await manager.ensureRestored();
+      await manager.revalidation;
 
       expect(manager.currentSession?.accessToken, 'token.value');
     });
