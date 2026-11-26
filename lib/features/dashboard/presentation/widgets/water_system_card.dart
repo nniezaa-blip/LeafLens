@@ -54,19 +54,19 @@ class WaterSystemCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: AppSpacing.s14),
           Row(
             children: [
               _Tank(level: displayLevel),
-              const SizedBox(width: 16),
+              const SizedBox(width: AppSpacing.s16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Water Level', style: DashboardText.label(context)),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: AppSpacing.s2),
                     Text(label, style: DashboardText.figure(context)),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: AppSpacing.s10),
                     _StateRow(
                       icon: AppGlyphs.refill,
                       label: refillActive ? 'Refill active' : 'Refill idle',
@@ -74,7 +74,7 @@ class WaterSystemCard extends StatelessWidget {
                           ? scheme.primary
                           : scheme.onSurfaceVariant,
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: AppSpacing.s6),
                     _StateRow(
                       icon: AppGlyphs.settings,
                       label: safetyLockout
@@ -110,8 +110,8 @@ class _Tank extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = context.colorScheme;
     return Container(
-      width: 58,
-      height: 96,
+      width: AppSizes.tankWidth,
+      height: AppSizes.tankHeight,
       decoration: ShapeDecoration(
         color: SurfaceLevel.inset.colorOf(scheme),
         shape: AppShape.all(AppRadii.md),
@@ -138,8 +138,8 @@ class _Tank extends StatelessWidget {
           Center(
             child: GlyphIcon(
               AppGlyphs.waterDrop,
-              size: 22,
-              color: scheme.onSurface.withValues(alpha: 0.7),
+              size: AppSizes.iconXl,
+              color: scheme.onSurface.withValues(alpha: AppOpacity.strong),
             ),
           ),
         ],
@@ -163,8 +163,8 @@ class _StateRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        GlyphIcon(icon, size: 16, color: color),
-        const SizedBox(width: 6),
+        GlyphIcon(icon, size: AppSizes.iconSm, color: color),
+        const SizedBox(width: AppSpacing.s6),
         Expanded(
           child: Text(
             label,

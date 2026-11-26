@@ -4,16 +4,16 @@ import 'package:lextari/ui/ui.dart';
 EdgeInsets dashboardCardPadding(DashboardDensity density) {
   return switch (density) {
     DashboardDensity.standard => const EdgeInsets.symmetric(
-      horizontal: 22,
-      vertical: 20,
+      horizontal: AppSpacing.s22,
+      vertical: AppSpacing.s20,
     ),
     DashboardDensity.compact => const EdgeInsets.symmetric(
-      horizontal: 20,
-      vertical: 16,
+      horizontal: AppSpacing.s20,
+      vertical: AppSpacing.s16,
     ),
     DashboardDensity.mobile => const EdgeInsets.symmetric(
-      horizontal: 20,
-      vertical: 18,
+      horizontal: AppSpacing.s20,
+      vertical: AppSpacing.s18,
     ),
   };
 }
@@ -63,7 +63,7 @@ class DashboardCard extends StatelessWidget {
       child: onTap == null
           ? content
           : PressSurface(
-              fill: const Color(0x00000000),
+              fill: AppColors.transparent,
               shape: shape,
               onPressed: onTap,
               childFills: true,
@@ -103,8 +103,12 @@ class DashboardCardHeader extends StatelessWidget {
     return Row(
       children: [
         if (glyph != null) ...[
-          GlyphIcon(glyph!, size: 18, color: scheme.primary),
-          const SizedBox(width: 8),
+          GlyphIcon(
+            glyph!,
+            size: AppSizes.iconMd,
+            color: scheme.primary,
+          ),
+          const SizedBox(width: AppSpacing.s8),
         ],
         Expanded(
           child: Text(
@@ -147,24 +151,27 @@ class DashboardChip extends StatelessWidget {
     final color = _colorOf(context.colorScheme);
     return DecoratedBox(
       decoration: ShapeDecoration(
-        color: color.withValues(alpha: 0.12),
+        color: color.withValues(alpha: AppOpacity.faint),
         shape: AppShape.full,
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.s8,
+          vertical: AppSpacing.s4,
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (dot) ...[
               Container(
-                width: 6,
-                height: 6,
+                width: AppSizes.dot,
+                height: AppSizes.dot,
                 decoration: BoxDecoration(
                   color: color,
                   shape: BoxShape.circle,
                 ),
               ),
-              const SizedBox(width: 6),
+              const SizedBox(width: AppSpacing.s6),
             ],
             Text(
               label,
@@ -205,7 +212,7 @@ abstract final class DashboardText {
       .copyWith(
         color: context.colorScheme.onSurface,
         fontFeatures: const [FontFeature.tabularFigures()],
-        letterSpacing: -0.6,
+        letterSpacing: AppTypography.figureLetterSpacing,
       );
 
   static TextStyle unit(BuildContext context) => AppTextStyle.subheadline

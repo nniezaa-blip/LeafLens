@@ -35,7 +35,7 @@ class CareControlsCard extends StatelessWidget {
               DashboardChip(label: 'Tap to toggle'),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: AppSpacing.s14),
           Row(
             children: [
               Expanded(
@@ -46,7 +46,7 @@ class CareControlsCard extends StatelessWidget {
                   onChanged: onMistChanged,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.s8),
               Expanded(
                 child: ActionSwitch(
                   icon: AppGlyphs.waterDrop,
@@ -55,7 +55,7 @@ class CareControlsCard extends StatelessWidget {
                   onChanged: onWaterChanged,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.s8),
               Expanded(
                 child: ActionSwitch(
                   icon: AppGlyphs.refill,

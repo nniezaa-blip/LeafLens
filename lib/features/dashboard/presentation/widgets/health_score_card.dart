@@ -1,9 +1,10 @@
 import 'package:lextari/features/dashboard/presentation/widgets/dashboard_card.dart';
 import 'package:lextari/features/dashboard/presentation/widgets/mini_gauge.dart';
 import 'package:lextari/ui/ui.dart';
-import 'package:lextari/widgets/last_update_time_text.dart';
 
-/// The dashboard's hero card: score, status and the readings that drive it.
+/// The dashboard's hero card: overall score, status and a short explanation.
+///
+/// Per-sensor status lives on each environment row, not here.
 class HealthScoreCard extends StatelessWidget {
   /// Creates a [HealthScoreCard].
   const HealthScoreCard({
@@ -12,35 +13,19 @@ class HealthScoreCard extends StatelessWidget {
     required this.gaugeColor,
     super.key,
     this.warningText,
-    this.soilMoisture,
-    this.temperature,
-    this.humidity,
-    this.lastUpdatedAt,
   });
 
   /// GHS score as a percentage (0 to 100).
   final double score;
 
-  /// Combined status description.
+  /// Informational summary of the overall score.
   final String statusText;
 
   /// Colour of the gauge arc.
   final Color gaugeColor;
 
-  /// Optional warning line shown below the status.
+  /// Optional warning line shown below the summary.
   final String? warningText;
-
-  /// Latest soil moisture reading.
-  final double? soilMoisture;
-
-  /// Latest temperature reading.
-  final double? temperature;
-
-  /// Latest humidity reading.
-  final double? humidity;
-
-  /// When the app last received a telemetry update.
-  final DateTime? lastUpdatedAt;
 
   @override
   Widget build(BuildContext context) {
@@ -61,15 +46,15 @@ class HealthScoreCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.s14),
           Row(
             children: [
               MiniGauge(
                 value: score / 100,
                 color: gaugeColor,
-                size: 112,
+                size: AppSizes.gauge,
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: AppSpacing.s16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,8 +67,15 @@ class HealthScoreCard extends StatelessWidget {
                           .of(context, emphasized: true)
                           .copyWith(color: scheme.onSurface),
                     ),
+                    const SizedBox(height: AppSpacing.s8),
+                    Text(
+                      'Overall score from soil moisture, temperature and humidity.',
+                      style: AppTextStyle.caption1
+                          .of(context)
+                          .copyWith(color: scheme.onSurfaceVariant),
+                    ),
                     if (warningText != null) ...[
-                      const SizedBox(height: 6),
+                      const SizedBox(height: AppSpacing.s8),
                       Text(
                         warningText!,
                         style: AppTextStyle.caption1
@@ -91,65 +83,14 @@ class HealthScoreCard extends StatelessWidget {
                             .copyWith(color: scheme.error),
                       ),
                     ],
-                    const SizedBox(height: 10),
-                    Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
-                      children: [
-                        _driverChip(
-                          'Soil',
-                          soilMoisture,
-                          '%',
-                          _moistureTone,
-                        ),
-                        _driverChip(
-                          'Temp',
-                          temperature,
-                          '°C',
-                          _temperatureTone,
-                        ),
-                        _driverChip(
-                          'Humidity',
-                          humidity,
-                          '%',
-                          _humidityTone,
-                        ),
-                      ],
-                    ),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          LastUpdateTimeText(
-            lastUpdateDate: lastUpdatedAt,
-            style: DashboardText.label(context),
-          ),
         ],
       ),
     );
-  }
-
-  Widget _driverChip(
-    String label,
-    double? value,
-    String unit,
-    DashboardChipTone Function(double value) toneOf,
-  ) {
-    if (value == null) {
-      return DashboardChip(label: '$label no reading');
-    }
-    return DashboardChip(
-      label: '$label ${_format(value)}$unit',
-      tone: toneOf(value),
-    );
-  }
-
-  String _format(double value) {
-    return value == value.roundToDouble()
-        ? value.toStringAsFixed(0)
-        : value.toStringAsFixed(1);
   }
 
   String _statusLabel() {
@@ -164,23 +105,5 @@ class HealthScoreCard extends StatelessWidget {
     if (score >= 65) return DashboardChipTone.ok;
     if (score >= 50) return DashboardChipTone.warn;
     return DashboardChipTone.danger;
-  }
-
-  DashboardChipTone _moistureTone(double value) {
-    if (value < 20) return DashboardChipTone.danger;
-    if (value < 35 || value > 80) return DashboardChipTone.warn;
-    return DashboardChipTone.ok;
-  }
-
-  DashboardChipTone _temperatureTone(double value) {
-    if (value < 10 || value > 35) return DashboardChipTone.danger;
-    if (value < 15 || value > 30) return DashboardChipTone.warn;
-    return DashboardChipTone.ok;
-  }
-
-  DashboardChipTone _humidityTone(double value) {
-    if (value < 30 || value > 80) return DashboardChipTone.danger;
-    if (value < 40 || value > 70) return DashboardChipTone.warn;
-    return DashboardChipTone.ok;
   }
 }

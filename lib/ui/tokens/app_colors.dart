@@ -42,6 +42,7 @@ class AppColors {
   static const Color offBlack = ink;
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
+  static const Color transparent = Color(0x00000000);
   static const Color darkCharcoal = forest;
   static const Color textDark = Color(0xFF2E4A3D);
   static const Color textGrey = slate;

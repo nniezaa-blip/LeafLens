@@ -9,6 +9,7 @@ import 'package:lextari/features/dashboard/domain/sensor_reading.dart';
 import 'package:lextari/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:lextari/features/dashboard/presentation/dashboard_view_model.dart';
 import 'package:lextari/features/dashboard/presentation/widgets/action_switch.dart';
+import 'package:lextari/features/dashboard/presentation/widgets/dashboard_skeleton.dart';
 import 'package:lextari/ui/ui.dart';
 import 'package:lextari/widgets/user_avatar.dart';
 
@@ -68,12 +69,12 @@ void main() {
     );
   }
 
-  Widget buildTestApp() {
+  Widget buildTestApp({DashboardViewState? state}) {
     return ProviderScope(
       overrides: [
         currentUserProfileProvider.overrideWithValue(testProfile),
         dashboardViewModelProvider.overrideWith(
-          () => FakeDashboardViewModel(testState()),
+          () => FakeDashboardViewModel(state ?? testState()),
         ),
       ],
       child: const PrismApp(
@@ -214,6 +215,29 @@ void main() {
       expect(find.text('Humidity'), findsOneWidget);
       expect(find.text('Soil Moisture'), findsOneWidget);
       expect(find.text('Water Level'), findsOneWidget);
+    });
+
+    testWidgets('shows each environment reading with its own status', (
+      tester,
+    ) async {
+      await tester.pumpWidget(buildTestApp());
+
+      expect(find.text('Optimal'), findsNWidgets(2));
+      expect(find.text('Wet'), findsOneWidget);
+    });
+
+    testWidgets('shows skeleton then an empty state when no data arrives', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        buildTestApp(state: const DashboardViewState()),
+      );
+
+      expect(find.byType(DashboardSkeleton), findsOneWidget);
+
+      await tester.pump(const Duration(seconds: 9));
+      expect(find.text('No telemetry yet'), findsOneWidget);
+      expect(find.byType(DashboardSkeleton), findsNothing);
     });
   });
 }

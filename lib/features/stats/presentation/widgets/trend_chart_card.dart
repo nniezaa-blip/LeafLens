@@ -85,7 +85,27 @@ class _TrendChartCardState extends ConsumerState<TrendChartCard> {
   }
 
   Widget _buildLoading() {
-    return const Center(child: ActivityIndicator());
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(
+          child: LayoutBuilder(
+            builder: (context, constraints) => SkeletonPill(
+              width: constraints.maxWidth,
+              height: constraints.maxHeight,
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            for (var index = 0; index < 5; index++)
+              const SkeletonPill(width: 26, height: 8),
+          ],
+        ),
+      ],
+    );
   }
 
   Widget _buildError(Object error, StackTrace stackTrace) {

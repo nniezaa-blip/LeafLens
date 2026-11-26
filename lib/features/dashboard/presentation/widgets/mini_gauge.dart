@@ -12,7 +12,7 @@ class MiniGauge extends StatelessWidget {
     required this.value,
     required this.color,
     super.key,
-    this.size = 152,
+    this.size = AppSizes.gaugeDefault,
   });
 
   /// Normalised value between 0.0 and 1.0.
@@ -45,7 +45,7 @@ class MiniGauge extends StatelessWidget {
             '${(clamped * 100).round()}%',
             style: TextStyle(
               fontWeight: FontWeight.w700,
-              fontSize: size * 0.24,
+              fontSize: size * AppSizes.gaugeLabelRatio,
               color: context.colorScheme.onSurface,
             ),
           ),
@@ -74,13 +74,13 @@ class _GaugePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2;
-    const strokeWidth = 12.0;
+    const strokeWidth = AppSizes.gaugeStroke;
     const startAngle = -math.pi / 2;
     final sweepAngle = 2 * math.pi * value;
 
     // Background circle
     final bgPaint = Paint()
-      ..color = color.withValues(alpha: 0.14)
+      ..color = color.withValues(alpha: AppOpacity.tint)
       ..style = PaintingStyle.fill;
     canvas.drawCircle(center, radius, bgPaint);
 
@@ -104,7 +104,11 @@ class _GaugePainter extends CustomPainter {
     final innerPaint = Paint()
       ..color = innerColor
       ..style = PaintingStyle.fill;
-    canvas.drawCircle(center, radius - strokeWidth - 4, innerPaint);
+    canvas.drawCircle(
+      center,
+      radius - strokeWidth - AppSizes.gaugeInnerGap,
+      innerPaint,
+    );
   }
 
   @override

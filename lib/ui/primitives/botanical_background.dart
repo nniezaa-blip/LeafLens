@@ -2,6 +2,7 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/widgets.dart';
 import 'package:lextari/ui/tokens/app_colors.dart';
+import 'package:lextari/ui/tokens/app_tokens.dart';
 import 'package:prism_ui/prism_ui.dart';
 
 /// The soft botanical page background used by the app shell.
@@ -31,14 +32,14 @@ class BotanicalBackground extends StatelessWidget {
                   ? [
                       AppColors.forest,
                       Color.alphaBlend(
-                        scheme.primary.withValues(alpha: 0.12),
+                        scheme.primary.withValues(alpha: AppBotanical.washAlphaDark),
                         AppColors.forest,
                       ),
                     ]
                   : [
                       AppColors.cream,
                       Color.alphaBlend(
-                        scheme.primary.withValues(alpha: 0.08),
+                        scheme.primary.withValues(alpha: AppBotanical.washAlpha),
                         AppColors.cream,
                       ),
                     ],
@@ -46,28 +47,30 @@ class BotanicalBackground extends StatelessWidget {
           ),
         ),
         Positioned(
-          top: -140,
-          left: -90,
+          top: AppBotanical.glowTop,
+          left: AppBotanical.glowLeft,
           child: _BotanicalGlow(
-            size: 380,
+            size: AppBotanical.glowLarge,
             color: scheme.primary.withValues(alpha: dark ? 0.38 : 0.22),
           ),
         ),
         Positioned(
-          bottom: -160,
-          right: -110,
+          bottom: AppBotanical.glowBottom,
+          right: AppBotanical.glowRight,
           child: _BotanicalGlow(
-            size: 460,
+            size: AppBotanical.glowXLarge,
             color: scheme.secondary.withValues(alpha: dark ? 0.28 : 0.18),
           ),
         ),
         Positioned(
-          top: 190,
-          right: -80,
+          top: AppBotanical.accentTop,
+          right: AppBotanical.accentRight,
           child: _BotanicalGlow(
-            size: 260,
+            size: AppBotanical.glowSmall,
             color: (dark ? AppColors.sky : AppColors.lime).withValues(
-              alpha: dark ? 0.18 : 0.28,
+              alpha: dark
+                ? AppBotanical.glowAlphaAccentDark
+                : AppBotanical.glowAlphaAccent,
             ),
           ),
         ),
@@ -87,7 +90,10 @@ class _BotanicalGlow extends StatelessWidget {
   Widget build(BuildContext context) {
     return IgnorePointer(
       child: ImageFiltered(
-        imageFilter: ImageFilter.blur(sigmaX: 70, sigmaY: 70),
+        imageFilter: ImageFilter.blur(
+            sigmaX: AppBotanical.glowBlur,
+            sigmaY: AppBotanical.glowBlur,
+          ),
         child: Container(
           width: size,
           height: size,

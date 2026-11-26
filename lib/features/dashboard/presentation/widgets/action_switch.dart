@@ -38,7 +38,7 @@ class ActionSwitch extends StatelessWidget {
         curve: AppCurves.emphasized,
         decoration: ShapeDecoration(
           color: value
-              ? scheme.primary.withValues(alpha: 0.14)
+              ? scheme.primary.withValues(alpha: AppOpacity.tint)
               : SurfaceLevel.block.colorOf(scheme),
           shape: AppShape.all(AppRadii.md),
         ),
@@ -48,18 +48,21 @@ class ActionSwitch extends StatelessWidget {
           onPressed: () => onChanged(!value),
           childFills: true,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.s8,
+              vertical: AppSpacing.s12,
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 AnimatedAppGlyph(
                   glyph: icon,
                   selected: value,
-                  size: 26,
+                  size: AppSizes.iconXxl,
                   color: scheme.onSurfaceVariant,
                   selectedColor: scheme.primary,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacing.s8),
                 Text(
                   label,
                   maxLines: 1,
@@ -68,7 +71,7 @@ class ActionSwitch extends StatelessWidget {
                       .of(context, emphasized: true)
                       .copyWith(color: scheme.onSurface),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: AppSpacing.s2),
                 Text(
                   value ? 'On' : 'Off',
                   style: AppTextStyle.caption2

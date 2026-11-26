@@ -1,16 +1,12 @@
 import 'dart:math' as math;
 
-import 'package:flutter/widgets.dart';
-import 'package:prism_ui/prism_ui.dart';
-
-const _minDesktopWidth = 640.0;
-const _minStandardWidth = 1040.0;
-const _minStandardHeight = 824.0;
-const _maxMobileWidth = 560.0;
+import 'package:lextari/ui/ui.dart';
 
 /// The horizontal side inset that keeps a mobile dashboard column centered.
-double dashboardMobileSideOf(double width) =>
-    math.max(16, (width - _maxMobileWidth) / 2);
+double dashboardMobileSideOf(double width) => math.max(
+      AppSpacing.s16,
+      (width - AppBreakpoints.dashboardMaxWidth) / 2,
+    );
 
 /// How much room the dashboard has.
 enum DashboardDensity {
@@ -23,8 +19,9 @@ enum DashboardDensity {
   bool get isCompact => this == compact;
 
   static DashboardDensity of(Size size) {
-    if (size.width < _minDesktopWidth) return mobile;
-    if (size.width < _minStandardWidth || size.height < _minStandardHeight) {
+    if (size.width < AppBreakpoints.dashboardDesktop) return mobile;
+    if (size.width < AppBreakpoints.dashboardStandard ||
+        size.height < AppBreakpoints.dashboardStandardHeight) {
       return compact;
     }
     return standard;
@@ -90,54 +87,22 @@ class DashboardColors {
 /// The dashboard's two shadow levels.
 abstract final class DashboardShadows {
   static List<BoxShadow> e1(BuildContext context) =>
-      context.colorScheme.brightness == Brightness.dark ? _e1Dark : _e1Light;
+      context.colorScheme.brightness == Brightness.dark
+          ? AppShadows.cardDark
+          : AppShadows.cardLight;
 
   static List<BoxShadow> e2(BuildContext context) =>
-      context.colorScheme.brightness == Brightness.dark ? _e2Dark : _e2Light;
-
-  static BoxShadow _shadow(
-    int alpha,
-    double y,
-    double blur, [
-    double spread = 0,
-  ]) {
-    return BoxShadow(
-      color: Color.fromARGB(alpha, 0, 0, 0),
-      offset: Offset(0, y),
-      blurRadius: blur,
-      spreadRadius: spread,
-    );
-  }
-
-  static final List<BoxShadow> _e1Light = [
-    _shadow(0x0D, 0.5, 1),
-    _shadow(0x0A, 2, 6),
-    _shadow(0x17, 12, 32, -6),
-  ];
-
-  static final List<BoxShadow> _e1Dark = [
-    _shadow(0x80, 1, 2),
-    _shadow(0x8C, 10, 28, -6),
-  ];
-
-  static final List<BoxShadow> _e2Light = [
-    _shadow(0x0F, 1, 3),
-    _shadow(0x14, 10, 24),
-    _shadow(0x38, 32, 64, -12),
-  ];
-
-  static final List<BoxShadow> _e2Dark = [
-    _shadow(0x80, 2, 6),
-    _shadow(0xB3, 32, 64, -12),
-  ];
+      context.colorScheme.brightness == Brightness.dark
+          ? AppShadows.raisedDark
+          : AppShadows.raisedLight;
 }
 
 /// Dashboard corner radii, larger than the rest of the app's surfaces.
 abstract final class DashboardCorner {
-  static const double desktopCard = 32;
-  static const double mobileCard = 34;
-  static const double block = 20;
-  static const double mobileBlock = 22;
-  static const double tab = 16;
-  static const double badge = 14;
+  static const double desktopCard = AppRadii.xl;
+  static const double mobileCard = AppRadii.xxl;
+  static const double block = AppRadii.md;
+  static const double mobileBlock = AppRadii.block;
+  static const double tab = AppSpacing.s16;
+  static const double badge = AppSpacing.s14;
 }

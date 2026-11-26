@@ -53,7 +53,7 @@ class EnvironmentCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: AppSpacing.s6),
           for (var index = 0; index < _sensors.length; index++) ...[
             if (index > 0) const _RowDivider(),
             _EnvironmentRow(
@@ -89,16 +89,23 @@ class _EnvironmentRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = context.colorScheme;
     return PressSurface(
-      fill: const Color(0x00000000),
+      fill: AppColors.transparent,
       shape: AppShape.all(AppRadii.sm),
       onPressed: onTap,
       childFills: true,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.s4,
+          vertical: AppSpacing.s10,
+        ),
         child: Row(
           children: [
-            GlyphIcon(_iconOf(sensorKey), size: 20, color: scheme.primary),
-            const SizedBox(width: 12),
+            GlyphIcon(
+              _iconOf(sensorKey),
+              size: AppSizes.iconLg,
+              color: scheme.primary,
+            ),
+            const SizedBox(width: AppSpacing.s12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,20 +114,20 @@ class _EnvironmentRow extends StatelessWidget {
                     _labelOf(sensorKey),
                     style: DashboardText.title(context),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    _statusOf(reading),
-                    style: DashboardText.label(context),
+                  const SizedBox(height: AppSpacing.s2),
+                  _EnvironmentStatus(
+                    sensorKey: sensorKey,
+                    reading: reading,
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.s12),
             _ReadingValue(reading: reading),
-            const SizedBox(width: 6),
+            const SizedBox(width: AppSpacing.s6),
             GlyphIcon(
               AppGlyphs.chevronForward,
-              size: 16,
+              size: AppSizes.iconSm,
               color: scheme.onSurfaceVariant,
             ),
           ],
@@ -143,10 +150,84 @@ class _EnvironmentRow extends StatelessWidget {
     SensorKey.waterLevel => 'Water Level',
   };
 
-  String _statusOf(SensorReading? reading) {
-    if (reading == null) return 'No reading';
-    if (reading.isStale) return 'Last known ${reading.ageLabel}';
-    return 'Updated ${reading.ageLabel}';
+}
+
+class _EnvironmentStatus extends StatelessWidget {
+  const _EnvironmentStatus({
+    required this.sensorKey,
+    required this.reading,
+  });
+
+  final SensorKey sensorKey;
+  final SensorReading? reading;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = context.colorScheme;
+    final reading = this.reading;
+    if (reading == null) {
+      return Text('No reading', style: DashboardText.label(context));
+    }
+    final status = _statusOf(reading.value);
+    final color = switch (status.tone) {
+      DashboardChipTone.ok => scheme.success,
+      DashboardChipTone.warn => scheme.warning,
+      DashboardChipTone.danger => scheme.error,
+      DashboardChipTone.idle => scheme.onSurfaceVariant,
+    };
+    return Row(
+      children: [
+        Container(
+          width: AppSizes.dot,
+          height: AppSizes.dot,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: AppSpacing.s6),
+        Text(
+          status.label,
+          style: AppTextStyle.caption1
+              .of(context, emphasized: true)
+              .copyWith(color: color),
+        ),
+      ],
+    );
+  }
+
+  ({String label, DashboardChipTone tone}) _statusOf(double value) {
+    return switch (sensorKey) {
+      SensorKey.temperature => _temperatureStatus(value),
+      SensorKey.humidity => _humidityStatus(value),
+      SensorKey.soilMoisture => _soilStatus(value),
+      SensorKey.waterLevel => (
+          label: 'Recorded',
+          tone: DashboardChipTone.idle,
+        ),
+    };
+  }
+
+  ({String label, DashboardChipTone tone}) _temperatureStatus(double value) {
+    if (value < 10 || value > 35) {
+      return (label: 'Out of range', tone: DashboardChipTone.danger);
+    }
+    if (value < 15) return (label: 'Cool', tone: DashboardChipTone.warn);
+    if (value > 30) return (label: 'Warm', tone: DashboardChipTone.warn);
+    return (label: 'Optimal', tone: DashboardChipTone.ok);
+  }
+
+  ({String label, DashboardChipTone tone}) _humidityStatus(double value) {
+    if (value < 30 || value > 80) {
+      return (label: 'Out of range', tone: DashboardChipTone.danger);
+    }
+    if (value < 40) return (label: 'Low', tone: DashboardChipTone.warn);
+    if (value > 70) return (label: 'High', tone: DashboardChipTone.warn);
+    return (label: 'Optimal', tone: DashboardChipTone.ok);
+  }
+
+  ({String label, DashboardChipTone tone}) _soilStatus(double value) {
+    if (value < 20) return (label: 'Dry', tone: DashboardChipTone.danger);
+    if (value < 35) return (label: 'Low', tone: DashboardChipTone.warn);
+    if (value > 80) return (label: 'Wet', tone: DashboardChipTone.warn);
+    return (label: 'Optimal', tone: DashboardChipTone.ok);
   }
 }
 
@@ -189,8 +270,10 @@ class _RowDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 1,
-      color: context.colorScheme.outlineVariant.withValues(alpha: 0.4),
+      height: AppSizes.line,
+      color: context.colorScheme.outlineVariant.withValues(
+        alpha: AppOpacity.soft,
+      ),
     );
   }
 }

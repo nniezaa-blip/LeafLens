@@ -8,10 +8,12 @@ import 'package:lextari/core/router/app_routes.dart';
 import 'package:lextari/features/auth/providers/auth_providers.dart';
 import 'package:lextari/features/dashboard/domain/growth_health_score.dart';
 import 'package:lextari/features/dashboard/domain/sensor_key.dart';
+import 'package:lextari/features/dashboard/domain/sensor_reading.dart';
 import 'package:lextari/features/dashboard/presentation/dashboard_style.dart';
 import 'package:lextari/features/dashboard/presentation/dashboard_view_model.dart';
 import 'package:lextari/features/dashboard/presentation/widgets/care_controls_card.dart';
 import 'package:lextari/features/dashboard/presentation/widgets/dashboard_card.dart';
+import 'package:lextari/features/dashboard/presentation/widgets/dashboard_skeleton.dart';
 import 'package:lextari/features/dashboard/presentation/widgets/environment_card.dart';
 import 'package:lextari/features/dashboard/presentation/widgets/health_score_card.dart';
 import 'package:lextari/features/dashboard/presentation/widgets/water_system_card.dart';
@@ -38,6 +40,31 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   bool _mistOn = false;
   bool _waterOn = false;
   bool _refillOn = false;
+  Timer? _loadingTimeout;
+  bool _timedOut = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final state = ref.read(dashboardViewModelProvider);
+    if (state.telemetry.isEmpty && state.healthScore == null) {
+      _startLoadingTimeout();
+    }
+  }
+
+  @override
+  void dispose() {
+    _loadingTimeout?.cancel();
+    super.dispose();
+  }
+
+  void _startLoadingTimeout() {
+    _loadingTimeout?.cancel();
+    _loadingTimeout = Timer(AppMotionTokens.loadingTimeout, () {
+      if (!mounted) return;
+      setState(() => _timedOut = true);
+    });
+  }
 
   void _openTrend(TrendMetric metric) {
     ref.read(selectedTrendMetricProvider.notifier).select(metric);
@@ -52,6 +79,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     ref
       ..invalidate(deviceListProvider)
       ..invalidate(dashboardStreamProvider);
+    setState(() => _timedOut = false);
+    _startLoadingTimeout();
   }
 
   Future<void> _setMist(bool value) async {
@@ -109,15 +138,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         IconTap(
           icon: GlyphIcon(
             AppGlyphs.autorenew,
-            size: 22,
+            size: AppSizes.iconXl,
             color: context.colorScheme.onSurfaceVariant,
           ),
           onPressed: _refresh,
         ),
         UserAvatar(
           profile: profile,
-          size: 28,
-          fontSize: 14,
+          size: AppSizes.barAvatar,
+          fontSize: AppSizes.barAvatarFont,
           onTap: _openSettings,
         ),
       ],
@@ -126,66 +155,123 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           final density = DashboardDensity.of(constraints.biggest);
           final side = dashboardMobileSideOf(constraints.maxWidth);
           final bottom = NavigationDock.insetOf(context) + 24;
+          final waiting = telemetry.isEmpty && health == null;
+          final loading = waiting && !_timedOut;
+          final empty = waiting && _timedOut;
           return DashboardDensityScope(
             density: density,
-            scale: MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 1.4),
-            child: CustomScrollView(
-              slivers: [
-                SliverPadding(
-                  padding: EdgeInsets.fromLTRB(
-                    side,
-                    context.contentTopPadding,
-                    side,
-                    bottom,
-                  ),
-                  sliver: SliverToBoxAdapter(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        HealthScoreCard(
-                          score: health?.score ?? 0,
-                          statusText: dashboard.statusText,
-                          gaugeColor: _healthColor(health?.status),
-                          warningText: dashboard.safetyLockout
-                              ? 'SAFETY LOCKOUT'
-                              : null,
-                          soilMoisture:
-                              telemetry[SensorKey.soilMoisture]?.value,
-                          temperature: telemetry[SensorKey.temperature]?.value,
-                          humidity: telemetry[SensorKey.humidity]?.value,
-                          lastUpdatedAt: dashboard.lastUpdatedAt,
-                        ),
-                        const SizedBox(height: 16),
-                        CareControlsCard(
-                          mistOn: _mistOn,
-                          waterOn: _waterOn,
-                          refillOn: _refillOn || dashboard.refillActive,
-                          onMistChanged: (value) => unawaited(_setMist(value)),
-                          onWaterChanged: (value) =>
-                              unawaited(_setWater(value)),
-                          onRefillChanged: (value) =>
-                              unawaited(_setRefill(value)),
-                        ),
-                        const SizedBox(height: 16),
-                        EnvironmentCard(
-                          telemetry: telemetry,
-                          onOpenTrend: _openTrend,
-                        ),
-                        const SizedBox(height: 16),
-                        WaterSystemCard(
-                          waterLevel: waterLevel,
-                          refillActive: dashboard.refillActive,
-                          safetyLockout: dashboard.safetyLockout,
-                        ),
-                      ],
-                    ),
-                  ),
+            scale: MediaQuery.textScalerOf(context)
+                .scale(1)
+                .clamp(
+                  AppMotionTokens.minTextScale,
+                  AppMotionTokens.maxTextScale,
                 ),
-              ],
-            ),
+            child: loading
+                ? _buildSkeletonBody(side, bottom)
+                : empty
+                    ? _buildEmptyBody()
+                    : _buildContentBody(
+                        side,
+                        bottom,
+                        dashboard,
+                        telemetry,
+                        health,
+                        waterLevel,
+                      ),
           );
         },
       ),
+    );
+  }
+
+  Widget _buildSkeletonBody(double side, double bottom) {
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: EdgeInsets.fromLTRB(
+            side,
+            context.contentTopPadding,
+            side,
+            bottom,
+          ),
+          sliver: const SliverToBoxAdapter(child: DashboardSkeleton()),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEmptyBody() {
+    return CustomScrollView(
+      slivers: [
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: EmptyState(
+            label: 'No telemetry yet',
+            description:
+                'The dashboard will fill when the linked devices publish readings.',
+            action: TextButton(
+              onPressed: _refresh,
+              child: const Text('Refresh'),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildContentBody(
+    double side,
+    double bottom,
+    DashboardViewState dashboard,
+    Map<SensorKey, SensorReading> telemetry,
+    HealthScoreResult? health,
+    double? waterLevel,
+  ) {
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: EdgeInsets.fromLTRB(
+            side,
+            context.contentTopPadding,
+            side,
+            bottom,
+          ),
+          sliver: SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                HealthScoreCard(
+                  score: health?.score ?? 0,
+                  statusText: dashboard.statusText,
+                  gaugeColor: _healthColor(health?.status),
+                  warningText:
+                      dashboard.safetyLockout ? 'SAFETY LOCKOUT' : null,
+                ),
+                const SizedBox(height: AppSpacing.s16),
+                CareControlsCard(
+                  mistOn: _mistOn,
+                  waterOn: _waterOn,
+                  refillOn: _refillOn || dashboard.refillActive,
+                  onMistChanged: (value) => unawaited(_setMist(value)),
+                  onWaterChanged: (value) => unawaited(_setWater(value)),
+                  onRefillChanged: (value) => unawaited(_setRefill(value)),
+                ),
+                const SizedBox(height: AppSpacing.s16),
+                EnvironmentCard(
+                  telemetry: telemetry,
+                  onOpenTrend: _openTrend,
+                ),
+                const SizedBox(height: AppSpacing.s16),
+                WaterSystemCard(
+                  waterLevel: waterLevel,
+                  refillActive: dashboard.refillActive,
+                  safetyLockout: dashboard.safetyLockout,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 

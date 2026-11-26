@@ -1,7 +1,20 @@
 export 'package:lextari/ui/ui.dart';
 
 export 'active_polling.dart';
+export 'app_text_field.dart';
+export 'background_ellipse.dart';
 export 'chip_title.dart';
 export 'config_item.dart';
+export 'frosted_card.dart';
+export 'health_gauge.dart';
 export 'input.dart';
 export 'last_update_time_text.dart';
+export 'lextari_logo.dart';
+export 'notifications/app_dialog.dart';
+export 'notifications/lextari_notification_overlay.dart';
+export 'notifications/lextari_toast.dart';
+export 'offline_banner.dart';
+export 'sensor_error_boundary.dart';
+export 'sensor_tile.dart';
+export 'status_badge.dart';
+export 'user_avatar.dart';

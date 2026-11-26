@@ -77,6 +77,8 @@ class AppTypography {
     fontSize: 12,
     height: 1.4,
   );
+  static const double figureLetterSpacing = -0.6;
+
   static const TextStyle graphLabelLarge = TextStyle(
     fontWeight: FontWeight.w500,
     fontSize: 18,

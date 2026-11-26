@@ -28,7 +28,7 @@ class LextariApp extends ConsumerWidget {
         final size = MediaQuery.sizeOf(context);
         return ViewScope(
           size: size,
-          isMobile: size.width < 600,
+          isMobile: size.width < AppBreakpoints.mobile,
           child: buildManagerStack(
             child: child ?? const SizedBox.shrink(),
             managers: [

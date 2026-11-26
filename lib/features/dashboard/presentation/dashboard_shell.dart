@@ -32,11 +32,11 @@ class _DashboardShellState extends State<DashboardShell>
     _previousIndex = widget.navigationShell.currentIndex;
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 320),
+      duration: AppMotionTokens.page,
     );
     _animation = CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeOutCubic,
+      curve: AppCurves.settle,
     );
     _controller.value = 1;
   }
@@ -86,11 +86,11 @@ class _DashboardShellState extends State<DashboardShell>
             builder: (context, _) {
               final t = _animation.value;
               final enteringOffset = Offset(
-                (_isForward ? 1 : -1) * (1 - t) * 0.08,
+                (_isForward ? 1 : -1) * (1 - t) * AppMotionTokens.pageEnterOffset,
                 0,
               );
               final leavingOffset = Offset(
-                (_isForward ? -1 : 1) * t * 0.03,
+                (_isForward ? -1 : 1) * t * AppMotionTokens.pageLeaveOffset,
                 0,
               );
               return Stack(
