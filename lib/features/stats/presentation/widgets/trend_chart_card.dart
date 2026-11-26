@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lextari/features/dashboard/domain/telemetry_history_point.dart';
@@ -58,10 +57,8 @@ class _TrendChartCardState extends ConsumerState<TrendChartCard> {
 
   @override
   Widget build(BuildContext context) {
-    final historyAsync = ref.watch(telemetryHistoryProvider(widget.metric.apiKey));
-    final spots = historyAsync.maybeWhen(
-      data: (points) => _spotsFromHistory(widget.metric, points),
-      orElse: () => _trendSpots(widget.metric),
+    final historyAsync = ref.watch(
+      telemetryHistoryProvider(widget.metric.apiKey),
     );
     return FrostedCard(
       padding: const EdgeInsets.fromLTRB(18, 18, 12, 14),
@@ -73,20 +70,52 @@ class _TrendChartCardState extends ConsumerState<TrendChartCard> {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(right: 6, top: 4),
-              child: LineChart(
-                _buildChartData(widget.metric, spots),
-                duration: const Duration(milliseconds: 450),
-                curve: Curves.easeInOutCubic,
-                transformationConfig: FlTransformationConfig(
-                  scaleAxis: FlScaleAxis.horizontal,
-                  maxScale: _initialScale,
-                  scaleEnabled: false,
-                  transformationController: _controller,
-                ),
+              child: historyAsync.when(
+                loading: _buildLoading,
+                error: _buildError,
+                data: (points) => points.isEmpty
+                    ? _buildEmpty()
+                    : _buildChart(points),
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLoading() {
+    return const Center(child: ActivityIndicator());
+  }
+
+  Widget _buildError(Object error, StackTrace stackTrace) {
+    return const Center(
+      child: ErrorState(
+        label: 'Could not load trend',
+        description: 'Check your connection and try again.',
+      ),
+    );
+  }
+
+  Widget _buildEmpty() {
+    return const Center(
+      child: EmptyState(
+        label: 'No telemetry yet',
+        description: 'Readings from the last 30 days will appear here.',
+      ),
+    );
+  }
+
+  Widget _buildChart(List<TelemetryHistoryPoint> points) {
+    return LineChart(
+      _buildChartData(widget.metric, _spotsFromHistory(widget.metric, points)),
+      duration: const Duration(milliseconds: 450),
+      curve: Curves.easeInOutCubic,
+      transformationConfig: FlTransformationConfig(
+        scaleAxis: FlScaleAxis.horizontal,
+        maxScale: _initialScale,
+        scaleEnabled: false,
+        transformationController: _controller,
       ),
     );
   }
@@ -96,8 +125,11 @@ class _TrendChartCardState extends ConsumerState<TrendChartCard> {
 // Chart data
 //
 
-List<FlSpot> _spotsFromHistory(TrendMetric metric, List<TelemetryHistoryPoint> points) {
-  if (points.isEmpty) return _trendSpots(metric);
+List<FlSpot> _spotsFromHistory(
+  TrendMetric metric,
+  List<TelemetryHistoryPoint> points,
+) {
+  if (points.isEmpty) return const <FlSpot>[];
   final sorted = [...points]..sort((a, b) => a.timestamp.compareTo(b.timestamp));
   final sliced = sorted.length > 30 ? sorted.sublist(sorted.length - 30) : sorted;
   return [
@@ -268,37 +300,6 @@ LineTouchData _touchData(TrendMetric metric, Color lineColor) {
       );
     }).toList(),
   );
-}
-
-/// Generates deterministic sample spots for [metric] across 30 days.
-///
-/// A sine wave provides the seasonal shape and a smaller ripple adds texture,
-/// so the placeholder data reads like a real monthly trend. Replace with
-/// telemetry once historical sensor data is wired up.
-List<FlSpot> _trendSpots(TrendMetric metric) {
-  final (baseline, amplitude) = switch (metric) {
-    TrendMetric.temperature => (22.0, 7.0),
-    TrendMetric.humidity => (62.0, 15.0),
-    TrendMetric.moisture => (55.0, 24.0),
-  };
-
-  return [
-    for (var day = 1; day <= 30; day++)
-      FlSpot(
-        day.toDouble(),
-        _valueFor(
-          day,
-          baseline,
-          amplitude,
-        ).clamp(metric.minY, metric.maxY),
-      ),
-  ];
-}
-
-double _valueFor(int day, double baseline, double amplitude) {
-  final wave = math.sin(day / 30 * 2 * math.pi) * amplitude;
-  final ripple = math.sin(day * 1.6) * amplitude * 0.25;
-  return baseline + wave + ripple;
 }
 
 //
