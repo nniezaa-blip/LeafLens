@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive/hive.dart';
+import 'package:lextari/core/config/app_config.dart';
 import 'package:lextari/features/dashboard/domain/dashboard_action.dart';
 import 'package:lextari/features/dashboard/domain/dashboard_actions.dart';
 import 'package:lextari/features/dashboard/domain/dashboard_update.dart';
@@ -55,7 +59,50 @@ class DashboardViewModel extends Notifier<DashboardViewState> {
     ref.listen(dashboardStreamProvider, (_, next) {
       next.whenData(_handleEvent);
     });
-    return const DashboardViewState();
+    final cached = _readCachedTelemetry();
+    return DashboardViewState(
+      telemetry: cached,
+      healthScore: cached.isEmpty
+          ? null
+          : GrowthHealthScore.compute(cached, const HealthConfig()),
+      statusText: cached.isEmpty
+          ? 'Waiting for telemetry...'
+          : 'Last known telemetry',
+    );
+  }
+
+  Map<SensorKey, SensorReading> _readCachedTelemetry() {
+    if (!Hive.isBoxOpen(AppConfig.telemetryCacheBox)) {
+      return const <SensorKey, SensorReading>{};
+    }
+    final box = Hive.box<Map<String, dynamic>>(AppConfig.telemetryCacheBox);
+    final readings = <SensorKey, SensorReading>{};
+    for (final key in SensorKey.values) {
+      final raw = box.get(key.telemetryKey);
+      if (raw == null) continue;
+      final value = (raw['value'] as num?)?.toDouble();
+      final recordedAt = raw['recordedAt'] as int?;
+      if (value == null || recordedAt == null) continue;
+      readings[key] = SensorReading(
+        value: value,
+        recordedAt: DateTime.fromMillisecondsSinceEpoch(recordedAt),
+        unit: key.unit,
+      );
+    }
+    return readings;
+  }
+
+  void _persistTelemetry(Map<SensorKey, SensorReading> readings) {
+    if (!Hive.isBoxOpen(AppConfig.telemetryCacheBox)) return;
+    final box = Hive.box<Map<String, dynamic>>(AppConfig.telemetryCacheBox);
+    for (final entry in readings.entries) {
+      unawaited(
+        box.put(entry.key.telemetryKey, <String, dynamic>{
+          'value': entry.value.value,
+          'recordedAt': entry.value.recordedAt.millisecondsSinceEpoch,
+        }),
+      );
+    }
   }
 
   void _handleEvent(WsEvent event) {
@@ -100,6 +147,7 @@ class DashboardViewModel extends Notifier<DashboardViewState> {
           nextTelemetry,
           const HealthConfig(),
         );
+        _persistTelemetry(nextTelemetry);
         state = state.copyWith(
           telemetry: nextTelemetry,
           healthScore: score,

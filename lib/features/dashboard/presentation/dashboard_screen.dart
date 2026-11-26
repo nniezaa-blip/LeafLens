@@ -5,6 +5,7 @@ import 'package:lextari/features/auth/domain/user_profile.dart';
 import 'package:lextari/features/auth/providers/auth_providers.dart';
 import 'package:lextari/features/dashboard/domain/growth_health_score.dart';
 import 'package:lextari/features/dashboard/domain/sensor_key.dart';
+import 'package:lextari/features/dashboard/domain/sensor_reading.dart';
 import 'package:lextari/features/dashboard/presentation/dashboard_view_model.dart';
 import 'package:lextari/features/dashboard/presentation/widgets/action_switch.dart';
 import 'package:lextari/features/dashboard/presentation/widgets/health_score_card.dart';
@@ -40,11 +41,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final profile = ref.watch(currentUserProfileProvider);
     final dashboard = ref.watch(dashboardViewModelProvider);
     final telemetry = dashboard.telemetry;
-    final temperature = telemetry[SensorKey.temperature]?.value;
-    final humidity = telemetry[SensorKey.humidity]?.value;
-    final moisture = telemetry[SensorKey.soilMoisture]?.value;
-    final waterLevel =
-        dashboard.waterLevelPercent ?? telemetry[SensorKey.waterLevel]?.value;
+    final temperatureReading = telemetry[SensorKey.temperature];
+    final humidityReading = telemetry[SensorKey.humidity];
+    final moistureReading = telemetry[SensorKey.soilMoisture];
+    final waterReading = telemetry[SensorKey.waterLevel];
+    final temperature = temperatureReading?.value;
+    final humidity = humidityReading?.value;
+    final moisture = moistureReading?.value;
+    final waterLevel = dashboard.waterLevelPercent ?? waterReading?.value;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(22, 24, 22, 0),
@@ -99,9 +103,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   value: temperature ?? 0,
                   unit: '°C',
                   unitIcon: AppGlyphs.thermostat,
-                  statusText: temperature == null
-                      ? 'Waiting for data'
-                      : 'Live telemetry',
+                  statusText: _statusTextFor(temperatureReading),
+                  isStale: temperatureReading?.isStale ?? false,
                   gaugeColor: AppColors.gaugeGreen,
                   onMoreTap: () => _openTrend(TrendMetric.temperature),
                 ),
@@ -111,9 +114,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   value: humidity ?? 0,
                   unit: 'RH',
                   unitIcon: AppGlyphs.waterDrop,
-                  statusText: humidity == null
-                      ? 'Waiting for data'
-                      : 'Live telemetry',
+                  statusText: _statusTextFor(humidityReading),
+                  isStale: humidityReading?.isStale ?? false,
                   gaugeColor: AppColors.gaugeGreen,
                   onMoreTap: () => _openTrend(TrendMetric.humidity),
                 ),
@@ -123,9 +125,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   value: moisture ?? 0,
                   unit: '%',
                   unitIcon: AppGlyphs.grass,
-                  statusText: moisture == null
-                      ? 'Waiting for data'
-                      : 'Live telemetry',
+                  statusText: _statusTextFor(moistureReading),
+                  isStale: moistureReading?.isStale ?? false,
                   gaugeColor: AppColors.redAlert,
                   onMoreTap: () => _openTrend(TrendMetric.moisture),
                 ),
@@ -135,9 +136,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   value: waterLevel ?? 0,
                   unit: '%',
                   unitIcon: AppGlyphs.waves,
-                  statusText: waterLevel == null
-                      ? 'Waiting for data'
-                      : 'Live telemetry',
+                  statusText: _statusTextFor(
+                    waterReading,
+                    hasValue: waterLevel != null,
+                  ),
+                  isStale: waterReading?.isStale ?? false,
                   gaugeColor: AppColors.gaugeOrange,
                 ),
               ],
@@ -146,6 +149,15 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         ],
       ),
     );
+  }
+
+  String _statusTextFor(SensorReading? reading, {bool hasValue = false}) {
+    if (reading == null) {
+      return hasValue ? 'Live telemetry' : 'Waiting for data';
+    }
+    return reading.isStale
+        ? 'Last known ${reading.ageLabel}'
+        : 'Live telemetry';
   }
 
   Color _healthColor(HealthStatus? status) {
