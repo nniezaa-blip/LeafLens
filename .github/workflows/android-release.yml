@@ -38,6 +38,16 @@ jobs:
       - name: Install packages
         run: flutter pub get
 
+      - name: Write environment file
+        run: |
+          cat > .env <<'EOF'
+          API_URL=https://lextari-api.danialsanusi.com
+          WS_URL=wss://lextari-api.danialsanusi.com/ws
+          AUTH_URL=https://lextari-auth.danialsanusi.com
+          GOOGLE_SERVER_CLIENT_ID=895978130173-rcgggovg11jj6d1unudbs2n6iea2sbp7.apps.googleusercontent.com
+          GOOGLE_IOS_CLIENT_ID=895978130173-n4vp1dc564tt2miuqookm2lc2lv2kvjq.apps.googleusercontent.com
+          EOF
+
       - name: Analyze
         run: flutter analyze
 
