@@ -14,93 +14,95 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final prefs = ref.watch(settingsPreferencesProvider);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(22, 24, 22, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const _Header(),
-          const SizedBox(height: 20),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.only(bottom: 120),
-              children: [
-                const _ProfileCard(),
-                const SizedBox(height: 20),
-                const _SectionLabel('Preferences'),
-                const SizedBox(height: 8),
-                SettingsCard(
-                  child: Column(
-                    children: [
-                      SettingsSwitchTile(
-                        icon: AppGlyphs.notificationsPaused,
-                        label: 'Pause notifications',
-                        value: prefs.pauseNotifications,
-                        onChanged: (value) => ref
-                            .read(settingsPreferencesProvider.notifier)
-                            .setPauseNotifications(value: value),
-                      ),
-                      const _CardDivider(),
-                      SettingsSwitchTile(
-                        icon: AppGlyphs.darkMode,
-                        label: 'Dark mode',
-                        value: prefs.darkMode,
-                        onChanged: (value) => ref
-                            .read(settingsPreferencesProvider.notifier)
-                            .setDarkMode(value: value),
-                      ),
-                    ],
+    return Scaffold(
+      title: 'Settings',
+      body: Padding(
+        padding: EdgeInsets.fromLTRB(20, context.contentTopPadding, 20, 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 8),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.only(bottom: 120),
+                children: [
+                  const _ProfileCard(),
+                  const SizedBox(height: 20),
+                  const _SectionLabel('Preferences'),
+                  const SizedBox(height: 8),
+                  SettingsCard(
+                    child: Column(
+                      children: [
+                        SettingsSwitchTile(
+                          icon: AppGlyphs.notificationsPaused,
+                          label: 'Pause notifications',
+                          value: prefs.pauseNotifications,
+                          onChanged: (value) => ref
+                              .read(settingsPreferencesProvider.notifier)
+                              .setPauseNotifications(value: value),
+                        ),
+                        const _CardDivider(),
+                        SettingsSwitchTile(
+                          icon: AppGlyphs.darkMode,
+                          label: 'Dark mode',
+                          value: prefs.darkMode,
+                          onChanged: (value) => ref
+                              .read(settingsPreferencesProvider.notifier)
+                              .setDarkMode(value: value),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                const _SectionLabel('General'),
-                const SizedBox(height: 8),
-                SettingsCard(
-                  child: Column(
-                    children: [
-                      SettingsNavTile(
-                        icon: AppGlyphs.tune,
-                        label: 'General Settings',
-                        onTap: () {},
-                      ),
-                      const _CardDivider(),
-                      SettingsNavTile(
-                        icon: AppGlyphs.language,
-                        label: 'Language',
-                        trailingText: 'English',
-                        onTap: () {},
-                      ),
-                      const _CardDivider(),
-                      SettingsNavTile(
-                        icon: AppGlyphs.description,
-                        label: 'Terms of Service',
-                        onTap: () {},
-                      ),
-                      const _CardDivider(),
-                      SettingsNavTile(
-                        icon: AppGlyphs.privacyTip,
-                        label: 'Privacy Policy',
-                        onTap: () {},
-                      ),
-                      const _CardDivider(),
-                      SettingsNavTile(
-                        icon: AppGlyphs.info,
-                        label: 'About Lextari',
-                        onTap: () {},
-                      ),
-                      const _CardDivider(),
-                      SettingsNavTile(
-                        icon: AppGlyphs.logout,
-                        label: 'Log out',
-                        onTap: () => ref.read(authActionsProvider).logout(),
-                      ),
-                    ],
+                  const SizedBox(height: 20),
+                  const _SectionLabel('General'),
+                  const SizedBox(height: 8),
+                  SettingsCard(
+                    child: Column(
+                      children: [
+                        SettingsNavTile(
+                          icon: AppGlyphs.tune,
+                          label: 'General Settings',
+                          onTap: () {},
+                        ),
+                        const _CardDivider(),
+                        SettingsNavTile(
+                          icon: AppGlyphs.language,
+                          label: 'Language',
+                          trailingText: 'English',
+                          onTap: () {},
+                        ),
+                        const _CardDivider(),
+                        SettingsNavTile(
+                          icon: AppGlyphs.description,
+                          label: 'Terms of Service',
+                          onTap: () {},
+                        ),
+                        const _CardDivider(),
+                        SettingsNavTile(
+                          icon: AppGlyphs.privacyTip,
+                          label: 'Privacy Policy',
+                          onTap: () {},
+                        ),
+                        const _CardDivider(),
+                        SettingsNavTile(
+                          icon: AppGlyphs.info,
+                          label: 'About Lextari',
+                          onTap: () {},
+                        ),
+                        const _CardDivider(),
+                        SettingsNavTile(
+                          icon: AppGlyphs.logout,
+                          label: 'Log out',
+                          onTap: () => ref.read(authActionsProvider).logout(),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -110,43 +112,13 @@ class SettingsScreen extends ConsumerWidget {
 // Private widgets
 //
 
-class _Header extends StatelessWidget {
-  const _Header();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Settings',
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.w700,
-            color: AppColors.white,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'Manage your account and preferences',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: AppColors.white.withValues(alpha: 0.85),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class _ProfileCard extends ConsumerWidget {
   const _ProfileCard();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(currentUserProfileProvider);
-
+    final scheme = context.colorScheme;
     return SettingsCard(
       padding: const EdgeInsets.all(18),
       child: Row(
@@ -159,32 +131,28 @@ class _ProfileCard extends ConsumerWidget {
               children: [
                 Text(
                   profile.name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 18,
-                    color: AppColors.offBlack,
-                  ),
+                  style: AppTextStyle.title3
+                      .of(context, emphasized: true)
+                      .copyWith(color: scheme.onSurface),
                 ),
                 if (profile.email.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Text(
                     profile.email,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 14,
-                      color: AppColors.textGrey,
-                    ),
+                    style: AppTextStyle.footnote
+                        .of(context)
+                        .copyWith(color: scheme.onSurfaceVariant),
                   ),
                 ],
               ],
             ),
           ),
           const SizedBox(width: 8),
-          const GlyphIcon(
+          GlyphIcon(
             AppGlyphs.chevronRight,
             size: 24,
-            color: AppColors.mediumGrey,
+            color: scheme.onSurfaceVariant,
           ),
         ],
       ),

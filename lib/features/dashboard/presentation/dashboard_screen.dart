@@ -1,23 +1,33 @@
 import 'dart:async';
+
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:lextari/features/auth/domain/user_profile.dart';
+import 'package:lextari/core/config/app_config.dart';
+import 'package:lextari/core/router/app_routes.dart';
 import 'package:lextari/features/auth/providers/auth_providers.dart';
 import 'package:lextari/features/dashboard/domain/growth_health_score.dart';
 import 'package:lextari/features/dashboard/domain/sensor_key.dart';
-import 'package:lextari/features/dashboard/domain/sensor_reading.dart';
+import 'package:lextari/features/dashboard/presentation/dashboard_style.dart';
 import 'package:lextari/features/dashboard/presentation/dashboard_view_model.dart';
-import 'package:lextari/features/dashboard/presentation/widgets/action_switch.dart';
+import 'package:lextari/features/dashboard/presentation/widgets/care_controls_card.dart';
+import 'package:lextari/features/dashboard/presentation/widgets/dashboard_card.dart';
+import 'package:lextari/features/dashboard/presentation/widgets/environment_card.dart';
 import 'package:lextari/features/dashboard/presentation/widgets/health_score_card.dart';
-import 'package:lextari/features/dashboard/presentation/widgets/sensor_card.dart';
+import 'package:lextari/features/dashboard/presentation/widgets/water_system_card.dart';
+import 'package:lextari/features/dashboard/providers/dashboard_providers.dart';
+import 'package:lextari/features/dashboard/providers/device_providers.dart';
 import 'package:lextari/features/stats/presentation/trend_metric.dart';
 import 'package:lextari/features/stats/presentation/trend_metric_provider.dart';
 import 'package:lextari/ui/ui.dart';
+import 'package:lextari/widgets/last_update_time_text.dart';
+import 'package:lextari/widgets/notifications/app_dialog.dart';
 import 'package:lextari/widgets/user_avatar.dart';
 
-/// Main dashboard screen showing live sensor readings, action toggles,
-/// and the overall Growth Health Score.
+/// Main dashboard screen showing plant health, environment readings and care
+/// controls.
 class DashboardScreen extends ConsumerStatefulWidget {
+  /// Creates a [DashboardScreen].
   const DashboardScreen({super.key});
 
   @override
@@ -29,11 +39,58 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   bool _waterOn = false;
   bool _refillOn = false;
 
-  Future<void> _logout() => ref.read(authManagerProvider).logout();
-
   void _openTrend(TrendMetric metric) {
     ref.read(selectedTrendMetricProvider.notifier).select(metric);
-    context.go('/stats');
+    context.go(AppRoutes.stats);
+  }
+
+  void _openSettings() {
+    context.go(AppRoutes.settings);
+  }
+
+  void _refresh() {
+    ref
+      ..invalidate(deviceListProvider)
+      ..invalidate(dashboardStreamProvider);
+  }
+
+  Future<void> _setMist(bool value) async {
+    unawaited(HapticFeedback.selectionClick());
+    setState(() => _mistOn = value);
+    await ref.read(dashboardViewModelProvider.notifier).setMist(enabled: value);
+  }
+
+  Future<void> _setWater(bool value) async {
+    unawaited(HapticFeedback.selectionClick());
+    setState(() => _waterOn = value);
+    await ref
+        .read(dashboardViewModelProvider.notifier)
+        .setWater(enabled: value);
+  }
+
+  Future<void> _setRefill(bool value) async {
+    if (!value) {
+      unawaited(HapticFeedback.selectionClick());
+      setState(() => _refillOn = false);
+      await ref
+          .read(dashboardViewModelProvider.notifier)
+          .setRefill(enabled: false);
+      return;
+    }
+    final confirmed = await showAppDialog<bool>(
+      context: context,
+      title: 'Refill water tank?',
+      message:
+          'This opens the solenoid valve. The safety cutoff closes it if the tank does not fill in time.',
+      confirmLabel: 'Start refill',
+      cancelLabel: 'Cancel',
+    );
+    if (confirmed != true) return;
+    unawaited(HapticFeedback.selectionClick());
+    setState(() => _refillOn = true);
+    await ref
+        .read(dashboardViewModelProvider.notifier)
+        .setRefill(enabled: true);
   }
 
   @override
@@ -41,233 +98,121 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final profile = ref.watch(currentUserProfileProvider);
     final dashboard = ref.watch(dashboardViewModelProvider);
     final telemetry = dashboard.telemetry;
-    final temperatureReading = telemetry[SensorKey.temperature];
-    final humidityReading = telemetry[SensorKey.humidity];
-    final moistureReading = telemetry[SensorKey.soilMoisture];
-    final waterReading = telemetry[SensorKey.waterLevel];
-    final temperature = temperatureReading?.value;
-    final humidity = humidityReading?.value;
-    final moisture = moistureReading?.value;
-    final waterLevel = dashboard.waterLevelPercent ?? waterReading?.value;
+    final health = dashboard.healthScore;
+    final waterLevel =
+        dashboard.waterLevelPercent ?? telemetry[SensorKey.waterLevel]?.value;
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(22, 24, 22, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _GreetingHeader(profile: profile, onAvatarTap: _logout),
-          const SizedBox(height: 16),
-          _ActionSwitchesRow(
-            mistOn: _mistOn,
-            waterOn: _waterOn,
-            refillOn: _refillOn || dashboard.refillActive,
-            onMistChanged: (value) {
-              setState(() => _mistOn = value);
-              unawaited(
-                ref
-                    .read(dashboardViewModelProvider.notifier)
-                    .setMist(enabled: value),
-              );
-            },
-            onWaterChanged: (value) {
-              setState(() => _waterOn = value);
-              unawaited(
-                ref
-                    .read(dashboardViewModelProvider.notifier)
-                    .setWater(enabled: value),
-              );
-            },
-            onRefillChanged: (value) {
-              setState(() => _refillOn = value);
-              unawaited(
-                ref
-                    .read(dashboardViewModelProvider.notifier)
-                    .setRefill(enabled: value),
-              );
-            },
+    return Scaffold(
+      title: 'Dashboard',
+      actions: [
+        _LiveStatusChip(lastUpdatedAt: dashboard.lastUpdatedAt),
+        IconTap(
+          icon: GlyphIcon(
+            AppGlyphs.autorenew,
+            size: 22,
+            color: context.colorScheme.onSurfaceVariant,
           ),
-          const SizedBox(height: 16),
-          HealthScoreCard(
-            score: dashboard.healthScore?.score ?? 0,
-            statusText: dashboard.statusText,
-            gaugeColor: _healthColor(dashboard.healthScore?.status),
-            warningText: dashboard.safetyLockout ? 'SAFETY LOCKOUT' : null,
-          ),
-          const SizedBox(height: 12),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.only(bottom: 120),
-              children: [
-                SensorCard(
-                  sensorName: 'Temperature',
-                  value: temperature ?? 0,
-                  unit: '°C',
-                  unitIcon: AppGlyphs.thermostat,
-                  statusText: _statusTextFor(temperatureReading),
-                  isStale: temperatureReading?.isStale ?? false,
-                  gaugeColor: AppColors.gaugeGreen,
-                  onMoreTap: () => _openTrend(TrendMetric.temperature),
-                ),
-                const SizedBox(height: 12),
-                SensorCard(
-                  sensorName: 'Humidity',
-                  value: humidity ?? 0,
-                  unit: 'RH',
-                  unitIcon: AppGlyphs.waterDrop,
-                  statusText: _statusTextFor(humidityReading),
-                  isStale: humidityReading?.isStale ?? false,
-                  gaugeColor: AppColors.gaugeGreen,
-                  onMoreTap: () => _openTrend(TrendMetric.humidity),
-                ),
-                const SizedBox(height: 12),
-                SensorCard(
-                  sensorName: 'Soil Moisture',
-                  value: moisture ?? 0,
-                  unit: '%',
-                  unitIcon: AppGlyphs.grass,
-                  statusText: _statusTextFor(moistureReading),
-                  isStale: moistureReading?.isStale ?? false,
-                  gaugeColor: AppColors.redAlert,
-                  onMoreTap: () => _openTrend(TrendMetric.moisture),
-                ),
-                const SizedBox(height: 12),
-                SensorCard(
-                  sensorName: 'Water Level',
-                  value: waterLevel ?? 0,
-                  unit: '%',
-                  unitIcon: AppGlyphs.waves,
-                  statusText: _statusTextFor(
-                    waterReading,
-                    hasValue: waterLevel != null,
+          onPressed: _refresh,
+        ),
+        UserAvatar(
+          profile: profile,
+          size: 28,
+          fontSize: 14,
+          onTap: _openSettings,
+        ),
+      ],
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final density = DashboardDensity.of(constraints.biggest);
+          final side = dashboardMobileSideOf(constraints.maxWidth);
+          final bottom = NavigationDock.insetOf(context) + 24;
+          return DashboardDensityScope(
+            density: density,
+            scale: MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 1.4),
+            child: CustomScrollView(
+              slivers: [
+                SliverPadding(
+                  padding: EdgeInsets.fromLTRB(
+                    side,
+                    context.contentTopPadding,
+                    side,
+                    bottom,
                   ),
-                  isStale: waterReading?.isStale ?? false,
-                  gaugeColor: AppColors.gaugeOrange,
+                  sliver: SliverToBoxAdapter(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        HealthScoreCard(
+                          score: health?.score ?? 0,
+                          statusText: dashboard.statusText,
+                          gaugeColor: _healthColor(health?.status),
+                          warningText: dashboard.safetyLockout
+                              ? 'SAFETY LOCKOUT'
+                              : null,
+                          soilMoisture:
+                              telemetry[SensorKey.soilMoisture]?.value,
+                          temperature: telemetry[SensorKey.temperature]?.value,
+                          humidity: telemetry[SensorKey.humidity]?.value,
+                          lastUpdatedAt: dashboard.lastUpdatedAt,
+                        ),
+                        const SizedBox(height: 16),
+                        CareControlsCard(
+                          mistOn: _mistOn,
+                          waterOn: _waterOn,
+                          refillOn: _refillOn || dashboard.refillActive,
+                          onMistChanged: (value) => unawaited(_setMist(value)),
+                          onWaterChanged: (value) =>
+                              unawaited(_setWater(value)),
+                          onRefillChanged: (value) =>
+                              unawaited(_setRefill(value)),
+                        ),
+                        const SizedBox(height: 16),
+                        EnvironmentCard(
+                          telemetry: telemetry,
+                          onOpenTrend: _openTrend,
+                        ),
+                        const SizedBox(height: 16),
+                        WaterSystemCard(
+                          waterLevel: waterLevel,
+                          refillActive: dashboard.refillActive,
+                          safetyLockout: dashboard.safetyLockout,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
-  }
-
-  String _statusTextFor(SensorReading? reading, {bool hasValue = false}) {
-    if (reading == null) {
-      return hasValue ? 'Live telemetry' : 'Waiting for data';
-    }
-    return reading.isStale
-        ? 'Last known ${reading.ageLabel}'
-        : 'Live telemetry';
   }
 
   Color _healthColor(HealthStatus? status) {
     return switch (status) {
-      HealthStatus.optimal || HealthStatus.moderate => AppColors.gaugeGreen,
-      HealthStatus.caution => AppColors.gaugeOrange,
-      HealthStatus.danger ||
-      HealthStatus.critical ||
-      null => AppColors.redAlert,
+      HealthStatus.optimal || HealthStatus.moderate => AppColors.success,
+      HealthStatus.caution => AppColors.warning,
+      HealthStatus.danger || HealthStatus.critical || null => AppColors.danger,
     };
   }
 }
 
-class _GreetingHeader extends StatelessWidget {
-  const _GreetingHeader({required this.profile, required this.onAvatarTap});
+class _LiveStatusChip extends StatelessWidget {
+  const _LiveStatusChip({required this.lastUpdatedAt});
 
-  final UserProfile profile;
-  final VoidCallback onAvatarTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        UserAvatar(
-          profile: profile,
-          fontSize: 32,
-          onTap: onAvatarTap,
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                _timeGreeting(),
-                style: AppTypography.bodyLarge.copyWith(
-                  color: AppColors.white,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                profile.name,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 18,
-                  color: AppColors.offBlack,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  static String _timeGreeting() {
-    final hour = DateTime.now().hour;
-    if (hour < 12) return 'Good Morning';
-    if (hour < 17) return 'Good Afternoon';
-    if (hour < 21) return 'Good Evening';
-    return 'Good Night';
-  }
-}
-
-class _ActionSwitchesRow extends StatelessWidget {
-  const _ActionSwitchesRow({
-    required this.mistOn,
-    required this.waterOn,
-    required this.refillOn,
-    required this.onMistChanged,
-    required this.onWaterChanged,
-    required this.onRefillChanged,
-  });
-
-  final bool mistOn;
-  final bool waterOn;
-  final bool refillOn;
-  final ValueChanged<bool> onMistChanged;
-  final ValueChanged<bool> onWaterChanged;
-  final ValueChanged<bool> onRefillChanged;
+  final DateTime? lastUpdatedAt;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 62,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: [
-          ActionSwitch(
-            icon: AppGlyphs.cloud,
-            label: 'Mist',
-            value: mistOn,
-            onChanged: onMistChanged,
-          ),
-          const SizedBox(width: 10),
-          ActionSwitch(
-            icon: AppGlyphs.waterDrop,
-            label: 'Water',
-            value: waterOn,
-            onChanged: onWaterChanged,
-          ),
-          const SizedBox(width: 10),
-          ActionSwitch(
-            icon: AppGlyphs.autorenew,
-            label: 'Refill',
-            value: refillOn,
-            onChanged: onRefillChanged,
-          ),
-        ],
-      ),
+    final updated = lastUpdatedAt;
+    final stale =
+        updated == null ||
+        DateTime.now().difference(updated) > AppConfig.staleThreshold;
+    return DashboardChip(
+      label: updated == null ? 'Waiting' : formatLastUpdate(updated),
+      tone: stale ? DashboardChipTone.warn : DashboardChipTone.ok,
+      dot: !stale,
     );
   }
 }

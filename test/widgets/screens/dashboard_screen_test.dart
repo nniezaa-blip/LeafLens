@@ -10,6 +10,7 @@ import 'package:lextari/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:lextari/features/dashboard/presentation/dashboard_view_model.dart';
 import 'package:lextari/features/dashboard/presentation/widgets/action_switch.dart';
 import 'package:lextari/ui/ui.dart';
+import 'package:lextari/widgets/user_avatar.dart';
 
 class FakeDashboardViewModel extends DashboardViewModel {
   FakeDashboardViewModel(this.initial);
@@ -85,21 +86,11 @@ void main() {
   }
 
   group('DashboardScreen', () {
-    testWidgets('renders greeting header', (tester) async {
+    testWidgets('renders the page title and profile avatar', (tester) async {
       await tester.pumpWidget(buildTestApp());
 
-      expect(find.text('Aishah Abdul Aziz'), findsOneWidget);
-
-      final greetings = [
-        'Good Morning',
-        'Good Afternoon',
-        'Good Evening',
-        'Good Night',
-      ];
-      final foundGreeting = greetings.any(
-        (g) => find.text(g).evaluate().isNotEmpty,
-      );
-      expect(foundGreeting, isTrue);
+      expect(find.text('Dashboard'), findsOneWidget);
+      expect(find.byType(UserAvatar), findsOneWidget);
     });
 
     testWidgets('renders avatar', (tester) async {
@@ -111,67 +102,42 @@ void main() {
     testWidgets('renders all three action switches', (tester) async {
       await tester.pumpWidget(buildTestApp());
 
-      expect(find.text('Mist'), findsOneWidget);
-      expect(find.text('Water'), findsOneWidget);
-      expect(find.text('Refill'), findsOneWidget);
       expect(
         find.byWidgetPredicate(
-          (w) => w is GlyphIcon && w.glyph == AppGlyphs.cloud,
+          (w) => w is ActionSwitch && w.label == 'Mist',
         ),
         findsOneWidget,
       );
-      // water_drop_outlined appears in Water switch + Humidity sensor card
       expect(
         find.byWidgetPredicate(
-          (w) => w is GlyphIcon && w.glyph == AppGlyphs.waterDrop,
+          (w) => w is ActionSwitch && w.label == 'Water',
         ),
-        findsNWidgets(2),
+        findsOneWidget,
       );
       expect(
         find.byWidgetPredicate(
-          (w) => w is GlyphIcon && w.glyph == AppGlyphs.autorenew,
+          (w) => w is ActionSwitch && w.label == 'Refill',
         ),
         findsOneWidget,
       );
     });
 
-    testWidgets('renders visible sensor cards', (tester) async {
+    testWidgets('renders all four sensor tiles', (tester) async {
       await tester.pumpWidget(buildTestApp());
 
-      // Temperature and Humidity fit in viewport; Soil Moisture needs scroll
       expect(find.text('Temperature'), findsOneWidget);
       expect(find.text('Humidity'), findsOneWidget);
-      expect(find.text('Water Level'), findsNothing);
+      expect(find.text('Soil Moisture'), findsOneWidget);
+      expect(find.text('Water Level'), findsOneWidget);
     });
 
-    testWidgets('scrolls to reveal soil moisture card', (tester) async {
+    testWidgets('renders sensor values with units', (tester) async {
       await tester.pumpWidget(buildTestApp());
 
-      // Soil Moisture is below the fold — scroll it into view
-      final soilCard = find.text('Soil Moisture');
-      await tester.scrollUntilVisible(
-        soilCard,
-        300,
-        scrollable: find.byType(Scrollable).last,
-      );
-      expect(soilCard, findsOneWidget);
-    });
-
-    testWidgets('renders sensor gauge percentages', (tester) async {
-      await tester.pumpWidget(buildTestApp());
-
-      // MiniGauge renders value as XX% — first two cards visible
-      expect(find.text('26%'), findsOneWidget);
-      expect(find.text('64%'), findsOneWidget);
-
-      // 90% is on the Soil Moisture card — scroll to it
-      final gauge90 = find.text('90%');
-      await tester.scrollUntilVisible(
-        gauge90,
-        300,
-        scrollable: find.byType(Scrollable).last,
-      );
-      expect(gauge90, findsOneWidget);
+      expect(find.text('26 °C'), findsOneWidget);
+      expect(find.text('64 %'), findsOneWidget);
+      expect(find.text('90 %'), findsOneWidget);
+      expect(find.text('45%'), findsOneWidget);
     });
 
     testWidgets('renders health score card', (tester) async {
@@ -220,7 +186,9 @@ void main() {
       expect(widget.value, isTrue);
     });
 
-    testWidgets('toggles refill switch', (tester) async {
+    testWidgets('confirming refill turns the refill control on', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildTestApp());
 
       final refillSwitch = find.byWidgetPredicate(
@@ -228,33 +196,23 @@ void main() {
       );
       expect(refillSwitch, findsOneWidget);
 
-      var widget = tester.widget<ActionSwitch>(refillSwitch);
-      expect(widget.value, isFalse);
-
       await tester.tap(refillSwitch);
       await tester.pumpAndSettle();
+      expect(find.text('Refill water tank?'), findsOneWidget);
 
-      widget = tester.widget<ActionSwitch>(refillSwitch);
+      await tester.tap(find.text('Start refill'));
+      await tester.pumpAndSettle();
+
+      final widget = tester.widget<ActionSwitch>(refillSwitch);
       expect(widget.value, isTrue);
     });
 
-    testWidgets('all sensor cards exist', (tester) async {
+    testWidgets('all sensor tiles exist', (tester) async {
       await tester.pumpWidget(buildTestApp());
 
       expect(find.text('Temperature'), findsOneWidget);
       expect(find.text('Humidity'), findsOneWidget);
-
-      await tester.scrollUntilVisible(
-        find.text('Soil Moisture'),
-        300,
-        scrollable: find.byType(Scrollable).last,
-      );
       expect(find.text('Soil Moisture'), findsOneWidget);
-      await tester.scrollUntilVisible(
-        find.text('Water Level'),
-        300,
-        scrollable: find.byType(Scrollable).last,
-      );
       expect(find.text('Water Level'), findsOneWidget);
     });
   });

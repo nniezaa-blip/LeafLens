@@ -14,6 +14,7 @@ export 'primitives/app_button.dart';
 export 'primitives/app_card.dart';
 export 'primitives/app_scaffold.dart';
 export 'primitives/app_section.dart';
+export 'primitives/botanical_background.dart';
 export 'primitives/empty_bar.dart';
 export 'primitives/icon_tap.dart';
 export 'scaffold/scaffold.dart';

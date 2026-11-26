@@ -1,6 +1,7 @@
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lextari/app/router/app_router.dart';
+import 'package:lextari/features/settings/providers/settings_providers.dart';
 import 'package:lextari/managers/managers.dart';
 import 'package:lextari/ui/ui.dart';
 
@@ -10,10 +11,13 @@ class LextariApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(AppRouter.provider);
+    final preferences = ref.watch(settingsPreferencesProvider);
     return PrismApp.router(
       title: 'Lextari',
       theme: AppTheme.prismLight(),
       darkTheme: AppTheme.prismDark(),
+      themeMode: preferences.darkMode ? ThemeMode.dark : ThemeMode.light,
+      liquidGlass: LiquidGlassQuality.standard,
       routerConfig: router,
       localizationsDelegates: const [
         DefaultUiLocalizations.delegate,

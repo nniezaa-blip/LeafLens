@@ -18,26 +18,29 @@ class StatsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selected = ref.watch(selectedTrendMetricProvider);
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(22, 24, 22, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const _Header(),
-          const SizedBox(height: 20),
-          TrendMetricSwitcher(
-            selected: selected,
-            onChanged: (metric) =>
-                ref.read(selectedTrendMetricProvider.notifier).select(metric),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 120),
-              child: TrendChartCard(metric: selected),
+    return Scaffold(
+      title: 'Stats',
+      body: Padding(
+        padding: EdgeInsets.fromLTRB(20, context.contentTopPadding, 20, 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const _Header(),
+            const SizedBox(height: 20),
+            TrendMetricSwitcher(
+              selected: selected,
+              onChanged: (metric) =>
+                  ref.read(selectedTrendMetricProvider.notifier).select(metric),
             ),
-          ),
-        ],
+            const SizedBox(height: 16),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 120),
+                child: TrendChartCard(metric: selected),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -51,21 +54,17 @@ class _Header extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           '30-Day Trends',
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.w700,
-            color: AppColors.white,
+          style: AppTypography.headlineMedium.copyWith(
+            color: context.colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: 4),
         Text(
           'Average readings across the last month',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: AppColors.white.withValues(alpha: 0.85),
+          style: AppTypography.bodyMedium.copyWith(
+            color: context.colorScheme.onSurfaceVariant,
           ),
         ),
       ],

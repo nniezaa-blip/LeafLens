@@ -1,10 +1,10 @@
 import 'package:lextari/ui/ui.dart';
 
-/// Toggle switch pill used in the dashboard action row.
+/// Compact control tile used in the dashboard action row.
 ///
-/// Shows an icon, a label, and a toggle indicator.
-/// The pill background is semi-transparent green; the toggle track
-/// is dark teal with a white circle when active.
+/// The tile carries the icon, label and current state. The icon fills and the
+/// tile tints when the control is active, so the row reads like a set of
+/// hardware buttons rather than a list of switches.
 class ActionSwitch extends StatelessWidget {
   /// Creates an [ActionSwitch].
   const ActionSwitch({
@@ -15,84 +15,67 @@ class ActionSwitch extends StatelessWidget {
     super.key,
   });
 
-  /// Icon displayed on the left side of the pill.
+  /// Icon displayed above the label.
   final Glyph icon;
 
-  /// Text label for this switch.
+  /// Text label for this control.
   final String label;
 
-  /// Whether the switch is currently on.
+  /// Whether the control is currently on.
   final bool value;
 
-  /// Called when the user taps the switch.
+  /// Called when the tile is tapped.
   final ValueChanged<bool> onChanged;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => onChanged(!value),
-      child: Container(
-        width: 180,
-        height: 62,
-        decoration: BoxDecoration(
-          color: AppColors.switchBackground,
-          borderRadius: BorderRadius.circular(25),
+    final scheme = context.colorScheme;
+    return Semantics(
+      button: true,
+      label: '$label ${value ? 'on' : 'off'}',
+      child: AnimatedContainer(
+        duration: AppDurations.fast,
+        curve: AppCurves.emphasized,
+        decoration: ShapeDecoration(
+          color: value
+              ? scheme.primary.withValues(alpha: 0.14)
+              : SurfaceLevel.block.colorOf(scheme),
+          shape: AppShape.all(AppRadii.md),
         ),
-        child: Row(
-          children: [
-            const SizedBox(width: 19),
-            GlyphIcon(icon, size: 26, color: AppColors.offBlack),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                label,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
-                  color: AppColors.offBlack,
+        child: PressSurface(
+          fill: Colors.transparent,
+          shape: AppShape.all(AppRadii.md),
+          onPressed: () => onChanged(!value),
+          childFills: true,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AnimatedAppGlyph(
+                  glyph: icon,
+                  selected: value,
+                  size: 26,
+                  color: scheme.onSurfaceVariant,
+                  selectedColor: scheme.primary,
                 ),
-              ),
-            ),
-            _ToggleTrack(value: value),
-            const SizedBox(width: 15),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-//
-// Private widgets
-//
-
-class _ToggleTrack extends StatelessWidget {
-  const _ToggleTrack({required this.value});
-
-  final bool value;
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      width: 59,
-      height: 32,
-      decoration: BoxDecoration(
-        color: AppColors.switchTrack,
-        borderRadius: BorderRadius.circular(25),
-      ),
-      child: AnimatedAlign(
-        duration: const Duration(milliseconds: 200),
-        alignment: value ? Alignment.centerRight : Alignment.centerLeft,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 6),
-          child: Container(
-            width: 20,
-            height: 20,
-            decoration: const BoxDecoration(
-              color: AppColors.white,
-              shape: BoxShape.circle,
+                const SizedBox(height: 8),
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTextStyle.caption1
+                      .of(context, emphasized: true)
+                      .copyWith(color: scheme.onSurface),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value ? 'On' : 'Off',
+                  style: AppTextStyle.caption2
+                      .of(context)
+                      .copyWith(color: scheme.onSurfaceVariant),
+                ),
+              ],
             ),
           ),
         ),

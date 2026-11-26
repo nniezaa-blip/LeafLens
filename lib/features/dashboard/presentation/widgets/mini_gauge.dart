@@ -38,6 +38,7 @@ class MiniGauge extends StatelessWidget {
             painter: _GaugePainter(
               value: clamped,
               color: color,
+              innerColor: context.colorScheme.surface,
             ),
           ),
           Text(
@@ -45,7 +46,7 @@ class MiniGauge extends StatelessWidget {
             style: TextStyle(
               fontWeight: FontWeight.w700,
               fontSize: size * 0.24,
-              color: AppColors.offBlack,
+              color: context.colorScheme.onSurface,
             ),
           ),
         ],
@@ -59,10 +60,15 @@ class MiniGauge extends StatelessWidget {
 //
 
 class _GaugePainter extends CustomPainter {
-  const _GaugePainter({required this.value, required this.color});
+  const _GaugePainter({
+    required this.value,
+    required this.color,
+    required this.innerColor,
+  });
 
   final double value;
   final Color color;
+  final Color innerColor;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -74,7 +80,7 @@ class _GaugePainter extends CustomPainter {
 
     // Background circle
     final bgPaint = Paint()
-      ..color = AppColors.greyLighter
+      ..color = color.withValues(alpha: 0.14)
       ..style = PaintingStyle.fill;
     canvas.drawCircle(center, radius, bgPaint);
 
@@ -94,9 +100,9 @@ class _GaugePainter extends CustomPainter {
       );
     }
 
-    // White inner circle
+    // Inner circle
     final innerPaint = Paint()
-      ..color = AppColors.white
+      ..color = innerColor
       ..style = PaintingStyle.fill;
     canvas.drawCircle(center, radius - strokeWidth - 4, innerPaint);
   }

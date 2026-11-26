@@ -20,6 +20,7 @@ class DashboardViewState {
     this.waterLevelPercent,
     this.refillActive = false,
     this.safetyLockout = false,
+    this.lastUpdatedAt,
   });
 
   final Map<SensorKey, SensorReading> telemetry;
@@ -28,6 +29,7 @@ class DashboardViewState {
   final double? waterLevelPercent;
   final bool refillActive;
   final bool safetyLockout;
+  final DateTime? lastUpdatedAt;
 
   DashboardViewState copyWith({
     Map<SensorKey, SensorReading>? telemetry,
@@ -36,6 +38,7 @@ class DashboardViewState {
     double? waterLevelPercent,
     bool? refillActive,
     bool? safetyLockout,
+    DateTime? lastUpdatedAt,
   }) {
     return DashboardViewState(
       telemetry: telemetry ?? this.telemetry,
@@ -44,6 +47,7 @@ class DashboardViewState {
       waterLevelPercent: waterLevelPercent ?? this.waterLevelPercent,
       refillActive: refillActive ?? this.refillActive,
       safetyLockout: safetyLockout ?? this.safetyLockout,
+      lastUpdatedAt: lastUpdatedAt ?? this.lastUpdatedAt,
     );
   }
 }
@@ -60,6 +64,7 @@ class DashboardViewModel extends Notifier<DashboardViewState> {
       next.whenData(_handleEvent);
     });
     final cached = _readCachedTelemetry();
+    final latest = _latestRecordedAt(cached);
     return DashboardViewState(
       telemetry: cached,
       healthScore: cached.isEmpty
@@ -68,6 +73,7 @@ class DashboardViewModel extends Notifier<DashboardViewState> {
       statusText: cached.isEmpty
           ? 'Waiting for telemetry...'
           : 'Last known telemetry',
+      lastUpdatedAt: latest,
     );
   }
 
@@ -90,6 +96,16 @@ class DashboardViewModel extends Notifier<DashboardViewState> {
       );
     }
     return readings;
+  }
+
+  DateTime? _latestRecordedAt(Map<SensorKey, SensorReading> readings) {
+    DateTime? latest;
+    for (final reading in readings.values) {
+      if (latest == null || reading.recordedAt.isAfter(latest)) {
+        latest = reading.recordedAt;
+      }
+    }
+    return latest;
   }
 
   void _persistTelemetry(Map<SensorKey, SensorReading> readings) {
@@ -153,6 +169,7 @@ class DashboardViewModel extends Notifier<DashboardViewState> {
           healthScore: score,
           statusText: score.status.name,
           waterLevelPercent: waterLevel ?? state.waterLevelPercent,
+          lastUpdatedAt: now,
         );
       case GHSUpdate(:final score, :final status):
         final existing = state.healthScore;

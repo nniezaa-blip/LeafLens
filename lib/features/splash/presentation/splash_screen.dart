@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:go_router/go_router.dart';
 import 'package:lextari/ui/ui.dart';
-import 'package:lextari/widgets/background_ellipse.dart';
 import 'package:lextari/widgets/lextari_logo.dart';
 
 /// Per-screen extensions keep build() readable without
@@ -75,7 +74,7 @@ class _SplashScreenState extends State<SplashScreen> {
       backgroundColor: AppColors.lightGreenBg,
       body: Stack(
         children: [
-          BackgroundEllipse(),
+          BotanicalBackground(),
           SafeArea(child: _SplashContent()),
         ],
       ),

@@ -3,7 +3,6 @@ import 'package:lextari/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:lextari/features/settings/presentation/settings_screen.dart';
 import 'package:lextari/features/stats/presentation/stats_screen.dart';
 import 'package:lextari/ui/ui.dart';
-import 'package:lextari/widgets/background_ellipse.dart';
 
 class DashboardShell extends StatefulWidget {
   const DashboardShell({required this.navigationShell, super.key});
@@ -22,7 +21,7 @@ class _DashboardShellState extends State<DashboardShell>
   bool _isForward = true;
 
   static const _destinations = [
-    NavigationDockDestination(glyph: AppGlyphs.home, label: 'Home'),
+    NavigationDockDestination(glyph: AppGlyphs.sprout, label: 'Home'),
     NavigationDockDestination(glyph: AppGlyphs.barChart, label: 'Stats'),
     NavigationDockDestination(glyph: AppGlyphs.settings, label: 'Settings'),
   ];
@@ -76,70 +75,64 @@ class _DashboardShellState extends State<DashboardShell>
   Widget build(BuildContext context) {
     final currentIndex = widget.navigationShell.currentIndex;
     final bottomInset = NavigationDock.insetOf(context);
-    return PrismScaffold(
-      bar: const EmptyBar(),
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          const BackgroundEllipse(),
-          SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: EdgeInsets.only(bottom: bottomInset),
-              child: AnimatedBuilder(
-                animation: _animation,
-                builder: (context, _) {
-                  final t = _animation.value;
-                  final enteringOffset = Offset(
-                    (_isForward ? 1 : -1) * (1 - t) * 0.08,
-                    0,
-                  );
-                  final leavingOffset = Offset(
-                    (_isForward ? -1 : 1) * t * 0.03,
-                    0,
-                  );
-                  return Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      if (t < 1)
-                        FractionalTranslation(
-                          translation: leavingOffset,
-                          child: Opacity(
-                            opacity: 1 - t,
-                            child: IgnorePointer(
-                              child: _pageForIndex(
-                                _previousIndex == currentIndex
-                                    ? currentIndex
-                                    : (_isForward
-                                          ? currentIndex - 1
-                                          : currentIndex + 1),
-                              ),
-                            ),
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        const BotanicalBackground(),
+        BottomInsetScope(
+          inset: bottomInset,
+          child: AnimatedBuilder(
+            animation: _animation,
+            builder: (context, _) {
+              final t = _animation.value;
+              final enteringOffset = Offset(
+                (_isForward ? 1 : -1) * (1 - t) * 0.08,
+                0,
+              );
+              final leavingOffset = Offset(
+                (_isForward ? -1 : 1) * t * 0.03,
+                0,
+              );
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  if (t < 1)
+                    FractionalTranslation(
+                      translation: leavingOffset,
+                      child: Opacity(
+                        opacity: 1 - t,
+                        child: IgnorePointer(
+                          child: _pageForIndex(
+                            _previousIndex == currentIndex
+                                ? currentIndex
+                                : (_isForward
+                                      ? currentIndex - 1
+                                      : currentIndex + 1),
                           ),
                         ),
-                      FractionalTranslation(
-                        translation: t < 1 ? enteringOffset : Offset.zero,
-                        child: Opacity(
-                          opacity: t.clamp(0.0, 1.0),
-                          child: widget.navigationShell,
-                        ),
                       ),
-                    ],
-                  );
-                },
-              ),
-            ),
+                    ),
+                  FractionalTranslation(
+                    translation: t < 1 ? enteringOffset : Offset.zero,
+                    child: Opacity(
+                      opacity: t.clamp(0.0, 1.0),
+                      child: widget.navigationShell,
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: NavigationDock(
-              destinations: _destinations,
-              selectedIndex: currentIndex,
-              onSelected: _handleTap,
-            ),
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: NavigationDock(
+            destinations: _destinations,
+            selectedIndex: currentIndex,
+            onSelected: _handleTap,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

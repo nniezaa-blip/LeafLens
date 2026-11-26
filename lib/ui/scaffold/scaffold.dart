@@ -177,7 +177,16 @@ class _ScaffoldState extends State<Scaffold> {
 
   @override
   Widget build(BuildContext context) {
-    final compact = isCompactBar(context, ViewScope.isMobileOf(context));
+    final scope = context.getInheritedWidgetOfExactType<ViewScope>();
+    final size = MediaQuery.sizeOf(context);
+    final isMobile = scope?.isMobile ?? size.width < 600;
+    final page = _buildPage(context, isMobile);
+    if (scope != null) return page;
+    return ViewScope(size: size, isMobile: isMobile, child: page);
+  }
+
+  Widget _buildPage(BuildContext context, bool isMobile) {
+    final compact = isCompactBar(context, isMobile);
     final bar = ScaffoldBar(
       isCompact: compact,
       listenable: _barRefresh,

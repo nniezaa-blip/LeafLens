@@ -355,4 +355,106 @@ abstract final class AppGlyphs {
     ], role: GlyphRole.line),
     GlyphCircle(12, 10.2, 1.2, role: GlyphRole.detail, solid: true),
   ]);
+
+  static const sprout = Glyph([
+    GlyphPath('M12 21V11', role: GlyphRole.line),
+    GlyphPath(
+      'M12 14C8.5 14 6 11.5 6 8c3.5 0 6 2.5 6 6Z',
+      role: GlyphRole.line,
+    ),
+    GlyphPath(
+      'M12 11c0-3.5 2.5-6 6-6 0 3.5-2.5 6-6 6Z',
+      role: GlyphRole.line,
+    ),
+  ]);
+
+  static const leaf = Glyph([
+    GlyphPath(
+      'M5 19C5 10 10 5 19 5c0 9-5 14-14 14Z',
+      role: GlyphRole.line,
+    ),
+    GlyphPath('M5 19 14 10', role: GlyphRole.detail),
+  ]);
+
+  static const waterTank = Glyph([
+    GlyphPath(
+      'M6 7h12v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7Z',
+      role: GlyphRole.line,
+    ),
+    GlyphPath(
+      'M6 11c2-1.5 4-1.5 6 0s4 1.5 6 0',
+      role: GlyphRole.detail,
+    ),
+    GlyphPath(
+      'M6 15c2-1.5 4-1.5 6 0s4 1.5 6 0',
+      role: GlyphRole.detail,
+    ),
+  ]);
+
+  static const pump = Glyph([
+    GlyphPath(
+      'M6 9h8l3 3v6H6V9Z',
+      role: GlyphRole.line,
+    ),
+    GlyphPath('M17 12h3', role: GlyphRole.line),
+    GlyphPath('M9 9V7h5', role: GlyphRole.line),
+    GlyphPath('M9 15h5', role: GlyphRole.detail),
+  ]);
+
+  static const mist = Glyph([
+    GlyphPath(
+      'M6 9c1.5-2 3-2 4.5 0s3 2 4.5 0 3-2 4.5 0',
+      role: GlyphRole.line,
+    ),
+    GlyphPath(
+      'M6 14c1.5-2 3-2 4.5 0s3 2 4.5 0 3-2 4.5 0',
+      role: GlyphRole.line,
+    ),
+    GlyphPath('M6 19h12', role: GlyphRole.line),
+  ]);
+
+  static const refill = Glyph([
+    GlyphPath(
+      'M6 7h12v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7Z',
+      role: GlyphRole.line,
+    ),
+    GlyphPath('M12 3v6', role: GlyphRole.line),
+    GlyphPath('M9 6l3 3 3-3', role: GlyphRole.line),
+  ]);
+
+  static const sun = Glyph([
+    GlyphCircle(12, 12, 4),
+    GlyphPolyline([
+      GlyphVertex(12, 2.5),
+      GlyphVertex(12, 5),
+    ], role: GlyphRole.line),
+    GlyphPolyline([
+      GlyphVertex(12, 19),
+      GlyphVertex(12, 21.5),
+    ], role: GlyphRole.line),
+    GlyphPolyline([
+      GlyphVertex(2.5, 12),
+      GlyphVertex(5, 12),
+    ], role: GlyphRole.line),
+    GlyphPolyline([
+      GlyphVertex(19, 12),
+      GlyphVertex(21.5, 12),
+    ], role: GlyphRole.line),
+    GlyphPolyline([
+      GlyphVertex(5.3, 5.3),
+      GlyphVertex(7, 7),
+    ], role: GlyphRole.line),
+    GlyphPolyline([
+      GlyphVertex(17, 17),
+      GlyphVertex(18.7, 18.7),
+    ], role: GlyphRole.line),
+    GlyphPolyline([
+      GlyphVertex(18.7, 5.3),
+      GlyphVertex(17, 7),
+    ], role: GlyphRole.line),
+    GlyphPolyline([
+      GlyphVertex(7, 17),
+      GlyphVertex(5.3, 18.7),
+    ], role: GlyphRole.line),
+  ]);
 }
