@@ -15,4 +15,20 @@ class DeviceApi {
         .map(DeviceSummary.fromJson)
         .toList(growable: false);
   }
+
+  Future<DeviceSummary> linkDevice({
+    required String platformDeviceId,
+    required String deviceName,
+    String deviceType = 'lextari-env',
+  }) async {
+    final response = await _client.post(
+      ApiEndpoints.linkDevice,
+      body: <String, dynamic>{
+        'platform_device_id': platformDeviceId,
+        'device_name': deviceName,
+        'device_type': deviceType,
+      },
+    );
+    return DeviceSummary.fromJson(response);
+  }
 }

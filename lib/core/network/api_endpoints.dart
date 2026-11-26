@@ -9,6 +9,7 @@ class ApiEndpoints {
   static const String me = '/auth/me';
 
   static const String devices = '/api/devices';
+  static const String linkDevice = '/api/v1/devices/link';
   static const String healthScore = '/api/health-score';
   static const String rpc = '/api/rpc';
   static String telemetryHistory(String key) => '/api/telemetry/$key';

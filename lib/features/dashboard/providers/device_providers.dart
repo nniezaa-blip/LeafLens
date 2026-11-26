@@ -9,6 +9,12 @@ final deviceApiProvider = Provider<DeviceApi>((ref) {
 
 final deviceListProvider = FutureProvider<List<DeviceSummary>>((ref) async {
   final session = ref.watch(authSessionProvider).value;
-  if (session == null) return const [];
+  if (session == null) return const <DeviceSummary>[];
   return ref.watch(deviceApiProvider).listDevices();
+});
+
+final hasLinkedDeviceProvider = Provider<AsyncValue<bool>>((ref) {
+  return ref
+      .watch(deviceListProvider)
+      .whenData((devices) => devices.isNotEmpty);
 });

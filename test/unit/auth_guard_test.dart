@@ -80,6 +80,8 @@ void main() {
         final result = AuthGuard.call(
           state: _state('/login'),
           isLoggedIn: true,
+          hasLinkedDevice: true,
+          deviceCheckResolved: true,
         );
         expect(result, '/dashboard');
       });
@@ -89,8 +91,19 @@ void main() {
           state: _state('/signup'),
           isLoggedIn: true,
           currentToken: 'token',
+          hasLinkedDevice: true,
+          deviceCheckResolved: true,
         );
         expect(result, '/dashboard');
+      });
+
+      test('redirects authenticated user without device to onboarding', () {
+        final result = AuthGuard.call(
+          state: _state('/login'),
+          isLoggedIn: true,
+          deviceCheckResolved: true,
+        );
+        expect(result, '/onboarding');
       });
     });
 
@@ -107,6 +120,8 @@ void main() {
         final result = AuthGuard.call(
           state: _state('/dashboard'),
           isLoggedIn: true,
+          hasLinkedDevice: true,
+          deviceCheckResolved: true,
         );
         expect(result, isNull);
       });
@@ -116,8 +131,19 @@ void main() {
           state: _state('/dashboard'),
           isLoggedIn: false,
           currentToken: 'token',
+          hasLinkedDevice: true,
+          deviceCheckResolved: true,
         );
         expect(result, isNull);
+      });
+
+      test('redirects authenticated user without device to onboarding', () {
+        final result = AuthGuard.call(
+          state: _state('/dashboard'),
+          isLoggedIn: true,
+          deviceCheckResolved: true,
+        );
+        expect(result, '/onboarding');
       });
     });
 
@@ -134,6 +160,8 @@ void main() {
         final result = AuthGuard.call(
           state: _state('/settings'),
           isLoggedIn: true,
+          hasLinkedDevice: true,
+          deviceCheckResolved: true,
         );
         expect(result, isNull);
       });

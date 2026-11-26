@@ -342,4 +342,17 @@ abstract final class AppGlyphs {
       GlyphVertex(12.8, 17),
     ], role: GlyphRole.line),
   ]);
+
+  static const device = Glyph([
+    GlyphBox(4.2, 5.2, 19.8, 15.2, 1.6),
+    GlyphPolyline([
+      GlyphVertex(9.2, 18.8),
+      GlyphVertex(14.8, 18.8),
+    ], role: GlyphRole.line),
+    GlyphPolyline([
+      GlyphVertex(12, 15.2),
+      GlyphVertex(12, 18.8),
+    ], role: GlyphRole.line),
+    GlyphCircle(12, 10.2, 1.2, role: GlyphRole.detail, solid: true),
+  ]);
 }

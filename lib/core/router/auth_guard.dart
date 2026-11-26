@@ -9,16 +9,34 @@ class AuthGuard {
     required GoRouterState state,
     required bool isLoggedIn,
     String? currentToken,
+    bool hasLinkedDevice = false,
+    bool deviceCheckResolved = false,
   }) {
     final path = state.matchedLocation;
     final authenticated = isLoggedIn || currentToken != null;
 
     if (path == AppRoutes.splash) return null;
 
-    final isPublic = path == AppRoutes.login || path == AppRoutes.signUp;
+    final isPublic = AppRoutes.publicRoutes.contains(path);
+    final isOnboarding = path == AppRoutes.onboarding;
 
     if (!authenticated && !isPublic) return AppRoutes.login;
-    if (authenticated && isPublic) return AppRoutes.dashboard;
+    if (authenticated && isPublic) {
+      if (!deviceCheckResolved) return null;
+      return hasLinkedDevice ? AppRoutes.dashboard : AppRoutes.onboarding;
+    }
+    if (authenticated &&
+        deviceCheckResolved &&
+        !hasLinkedDevice &&
+        !isOnboarding) {
+      return AppRoutes.onboarding;
+    }
+    if (authenticated &&
+        deviceCheckResolved &&
+        hasLinkedDevice &&
+        isOnboarding) {
+      return AppRoutes.dashboard;
+    }
     return null;
   }
 }

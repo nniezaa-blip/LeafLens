@@ -8,6 +8,8 @@ import 'package:lextari/features/auth/presentation/signup_page.dart';
 import 'package:lextari/features/auth/providers/auth_providers.dart';
 import 'package:lextari/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:lextari/features/dashboard/presentation/dashboard_shell.dart';
+import 'package:lextari/features/dashboard/providers/device_providers.dart';
+import 'package:lextari/features/onboarding/presentation/onboarding_screen.dart';
 import 'package:lextari/features/settings/presentation/settings_screen.dart';
 import 'package:lextari/features/splash/presentation/splash_screen.dart';
 import 'package:lextari/features/stats/presentation/stats_screen.dart';
@@ -21,16 +23,27 @@ class AppRouter {
 
   static final Provider<GoRouter> provider = Provider<GoRouter>((ref) {
     final authManager = ref.watch(authManagerProvider);
+    final deviceState = ref.watch(hasLinkedDeviceProvider);
+    final refresh = _RouterRefreshNotifier(authManager);
+    ref
+      ..onDispose(refresh.dispose)
+      ..listen(authManagerProvider, (_, _) => refresh.notify())
+      ..listen(hasLinkedDeviceProvider, (_, _) => refresh.notify());
     return GoRouter(
       navigatorKey: rootNavigatorKey,
       initialLocation: AppRoutes.splash,
-      refreshListenable: authManager,
+      refreshListenable: refresh,
       redirect: (context, state) {
         final session = authManager.currentSession;
+        final hasLinkedDevice = deviceState.value ?? false;
+        final deviceCheckResolved =
+            deviceState.hasValue || deviceState.hasError;
         return AuthGuard.call(
           state: state,
           isLoggedIn: session != null,
           currentToken: session?.accessToken,
+          hasLinkedDevice: hasLinkedDevice,
+          deviceCheckResolved: deviceCheckResolved,
         );
       },
       routes: <RouteBase>[
@@ -53,6 +66,13 @@ class AppRouter {
           pageBuilder: (context, state) => _fadeThroughPage(
             state: state,
             child: const SignUpPage(),
+          ),
+        ),
+        GoRoute(
+          path: AppRoutes.onboarding,
+          pageBuilder: (context, state) => _fadeThroughPage(
+            state: state,
+            child: const OnboardingScreen(),
           ),
         ),
         StatefulShellRoute.indexedStack(
@@ -114,5 +134,21 @@ class AppRouter {
         );
       },
     );
+  }
+}
+
+class _RouterRefreshNotifier extends ChangeNotifier {
+  _RouterRefreshNotifier(this._listenable) {
+    _listenable.addListener(notify);
+  }
+
+  final Listenable _listenable;
+
+  void notify() => notifyListeners();
+
+  @override
+  void dispose() {
+    _listenable.removeListener(notify);
+    super.dispose();
   }
 }
