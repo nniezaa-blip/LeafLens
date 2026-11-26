@@ -13,6 +13,8 @@ class HealthScoreCard extends StatelessWidget {
     required this.gaugeColor,
     super.key,
     this.warningText,
+    this.actionLabel,
+    this.onAction,
   });
 
   /// GHS score as a percentage (0 to 100).
@@ -24,8 +26,14 @@ class HealthScoreCard extends StatelessWidget {
   /// Colour of the gauge arc.
   final Color gaugeColor;
 
-  /// Optional warning line shown below the summary.
+  /// Optional warning line shown below the score.
   final String? warningText;
+
+  /// Optional action label for the single call to action.
+  final String? actionLabel;
+
+  /// Called when the call to action is pressed.
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
@@ -60,27 +68,22 @@ class HealthScoreCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      statusText,
+                      warningText ?? statusText,
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                       style: AppTextStyle.subheadline
                           .of(context, emphasized: true)
-                          .copyWith(color: scheme.onSurface),
+                          .copyWith(
+                            color: warningText != null
+                                ? scheme.error
+                                : scheme.onSurface,
+                          ),
                     ),
-                    const SizedBox(height: AppSpacing.s8),
-                    Text(
-                      'Overall score from soil moisture, temperature and humidity.',
-                      style: AppTextStyle.caption1
-                          .of(context)
-                          .copyWith(color: scheme.onSurfaceVariant),
-                    ),
-                    if (warningText != null) ...[
+                    if (actionLabel != null) ...[
                       const SizedBox(height: AppSpacing.s8),
-                      Text(
-                        warningText!,
-                        style: AppTextStyle.caption1
-                            .of(context, emphasized: true)
-                            .copyWith(color: scheme.error),
+                      TextButton(
+                        onPressed: onAction,
+                        child: Text(actionLabel!),
                       ),
                     ],
                   ],

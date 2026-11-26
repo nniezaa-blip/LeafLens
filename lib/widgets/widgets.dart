@@ -14,6 +14,7 @@ export 'notifications/app_dialog.dart';
 export 'notifications/lextari_notification_overlay.dart';
 export 'notifications/lextari_toast.dart';
 export 'offline_banner.dart';
+export 'profile_badge.dart';
 export 'sensor_error_boundary.dart';
 export 'sensor_tile.dart';
 export 'status_badge.dart';

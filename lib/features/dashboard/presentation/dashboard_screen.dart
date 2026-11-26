@@ -12,7 +12,6 @@ import 'package:lextari/features/dashboard/domain/sensor_reading.dart';
 import 'package:lextari/features/dashboard/presentation/dashboard_style.dart';
 import 'package:lextari/features/dashboard/presentation/dashboard_view_model.dart';
 import 'package:lextari/features/dashboard/presentation/widgets/care_controls_card.dart';
-import 'package:lextari/features/dashboard/presentation/widgets/dashboard_card.dart';
 import 'package:lextari/features/dashboard/presentation/widgets/dashboard_skeleton.dart';
 import 'package:lextari/features/dashboard/presentation/widgets/environment_card.dart';
 import 'package:lextari/features/dashboard/presentation/widgets/health_score_card.dart';
@@ -22,9 +21,8 @@ import 'package:lextari/features/dashboard/providers/device_providers.dart';
 import 'package:lextari/features/stats/presentation/trend_metric.dart';
 import 'package:lextari/features/stats/presentation/trend_metric_provider.dart';
 import 'package:lextari/ui/ui.dart';
-import 'package:lextari/widgets/last_update_time_text.dart';
 import 'package:lextari/widgets/notifications/app_dialog.dart';
-import 'package:lextari/widgets/user_avatar.dart';
+import 'package:lextari/widgets/profile_badge.dart';
 
 /// Main dashboard screen showing plant health, environment readings and care
 /// controls.
@@ -134,7 +132,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return Scaffold(
       title: 'Dashboard',
       actions: [
-        _LiveStatusChip(lastUpdatedAt: dashboard.lastUpdatedAt),
         IconTap(
           icon: GlyphIcon(
             AppGlyphs.autorenew,
@@ -143,10 +140,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ),
           onPressed: _refresh,
         ),
-        UserAvatar(
+        ProfileBadge(
           profile: profile,
-          size: AppSizes.barAvatar,
-          fontSize: AppSizes.barAvatarFont,
+          online: dashboard.lastUpdatedAt != null &&
+              DateTime.now().difference(dashboard.lastUpdatedAt!) <
+                  AppConfig.staleThreshold,
           onTap: _openSettings,
         ),
       ],
@@ -185,37 +183,43 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   }
 
   Widget _buildSkeletonBody(double side, double bottom) {
-    return CustomScrollView(
-      slivers: [
-        SliverPadding(
-          padding: EdgeInsets.fromLTRB(
-            side,
-            context.contentTopPadding,
-            side,
-            bottom,
+    return Padding(
+      padding: EdgeInsets.only(top: context.contentTopPadding),
+      child: CustomScrollView(
+        slivers: [
+          SliverPadding(
+            padding: EdgeInsets.fromLTRB(
+              side,
+              AppSpacing.s0,
+              side,
+              bottom,
+            ),
+            sliver: const SliverToBoxAdapter(child: DashboardSkeleton()),
           ),
-          sliver: const SliverToBoxAdapter(child: DashboardSkeleton()),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   Widget _buildEmptyBody() {
-    return CustomScrollView(
-      slivers: [
-        SliverFillRemaining(
-          hasScrollBody: false,
-          child: EmptyState(
-            label: 'No telemetry yet',
-            description:
-                'The dashboard will fill when the linked devices publish readings.',
-            action: TextButton(
-              onPressed: _refresh,
-              child: const Text('Refresh'),
+    return Padding(
+      padding: EdgeInsets.only(top: context.contentTopPadding),
+      child: CustomScrollView(
+        slivers: [
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: EmptyState(
+              label: 'No telemetry yet',
+              description:
+                  'The dashboard will fill when the linked devices publish readings.',
+              action: TextButton(
+                onPressed: _refresh,
+                child: const Text('Refresh'),
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -227,17 +231,19 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     HealthScoreResult? health,
     double? waterLevel,
   ) {
-    return CustomScrollView(
-      slivers: [
-        SliverPadding(
-          padding: EdgeInsets.fromLTRB(
-            side,
-            context.contentTopPadding,
-            side,
-            bottom,
-          ),
-          sliver: SliverToBoxAdapter(
-            child: Column(
+    return Padding(
+      padding: EdgeInsets.only(top: context.contentTopPadding),
+      child: CustomScrollView(
+        slivers: [
+          SliverPadding(
+            padding: EdgeInsets.fromLTRB(
+              side,
+              AppSpacing.s0,
+              side,
+              bottom,
+            ),
+            sliver: SliverToBoxAdapter(
+              child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 HealthScoreCard(
@@ -262,16 +268,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   onOpenTrend: _openTrend,
                 ),
                 const SizedBox(height: AppSpacing.s16),
-                WaterSystemCard(
-                  waterLevel: waterLevel,
-                  refillActive: dashboard.refillActive,
-                  safetyLockout: dashboard.safetyLockout,
-                ),
-              ],
+                  WaterSystemCard(
+                    waterLevel: waterLevel,
+                    refillActive: dashboard.refillActive,
+                    safetyLockout: dashboard.safetyLockout,
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -281,24 +288,5 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       HealthStatus.caution => AppColors.warning,
       HealthStatus.danger || HealthStatus.critical || null => AppColors.danger,
     };
-  }
-}
-
-class _LiveStatusChip extends StatelessWidget {
-  const _LiveStatusChip({required this.lastUpdatedAt});
-
-  final DateTime? lastUpdatedAt;
-
-  @override
-  Widget build(BuildContext context) {
-    final updated = lastUpdatedAt;
-    final stale =
-        updated == null ||
-        DateTime.now().difference(updated) > AppConfig.staleThreshold;
-    return DashboardChip(
-      label: updated == null ? 'Waiting' : formatLastUpdate(updated),
-      tone: stale ? DashboardChipTone.warn : DashboardChipTone.ok,
-      dot: !stale,
-    );
   }
 }

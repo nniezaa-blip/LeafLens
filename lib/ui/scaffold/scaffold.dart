@@ -180,15 +180,14 @@ class _ScaffoldState extends State<Scaffold> {
     final scope = context.getInheritedWidgetOfExactType<ViewScope>();
     final size = MediaQuery.sizeOf(context);
     final isMobile = scope?.isMobile ?? size.width < 600;
-    final page = _buildPage(context, isMobile);
+    final page = _buildPage(context);
     if (scope != null) return page;
     return ViewScope(size: size, isMobile: isMobile, child: page);
   }
 
-  Widget _buildPage(BuildContext context, bool isMobile) {
-    final compact = isCompactBar(context, isMobile);
+  Widget _buildPage(BuildContext context) {
     final bar = ScaffoldBar(
-      isCompact: compact,
+      isCompact: false,
       listenable: _barRefresh,
       loading: _loading,
       backgroundColor: widget.backgroundColor,

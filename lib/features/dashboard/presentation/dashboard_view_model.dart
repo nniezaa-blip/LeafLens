@@ -7,6 +7,7 @@ import 'package:lextari/features/dashboard/domain/dashboard_action.dart';
 import 'package:lextari/features/dashboard/domain/dashboard_actions.dart';
 import 'package:lextari/features/dashboard/domain/dashboard_update.dart';
 import 'package:lextari/features/dashboard/domain/growth_health_score.dart';
+import 'package:lextari/features/dashboard/domain/health_narrative.dart';
 import 'package:lextari/features/dashboard/domain/sensor_key.dart';
 import 'package:lextari/features/dashboard/domain/sensor_reading.dart';
 import 'package:lextari/features/dashboard/domain/ws_event.dart';
@@ -65,14 +66,15 @@ class DashboardViewModel extends Notifier<DashboardViewState> {
     });
     final cached = _readCachedTelemetry();
     final latest = _latestRecordedAt(cached);
+    final health = cached.isEmpty
+        ? null
+        : GrowthHealthScore.compute(cached, const HealthConfig());
     return DashboardViewState(
       telemetry: cached,
-      healthScore: cached.isEmpty
-          ? null
-          : GrowthHealthScore.compute(cached, const HealthConfig()),
-      statusText: cached.isEmpty
-          ? 'Waiting for telemetry...'
-          : 'Last known telemetry',
+      healthScore: health,
+      statusText: health == null
+          ? 'Waiting for the first reading.'
+          : healthNarrative(status: health.status, telemetry: cached),
       lastUpdatedAt: latest,
     );
   }
@@ -167,17 +169,26 @@ class DashboardViewModel extends Notifier<DashboardViewState> {
         state = state.copyWith(
           telemetry: nextTelemetry,
           healthScore: score,
-          statusText: score.status.name,
+          statusText: healthNarrative(
+            status: score.status,
+            telemetry: nextTelemetry,
+          ),
           waterLevelPercent: waterLevel ?? state.waterLevelPercent,
           lastUpdatedAt: now,
         );
-      case GHSUpdate(:final score, :final status):
+      case GHSUpdate(:final score):
         final existing = state.healthScore;
+        final status = _statusFromScore(score);
         state = state.copyWith(
-          statusText: status,
+          statusText: state.telemetry.isEmpty
+              ? 'Waiting for the first reading.'
+              : healthNarrative(
+                  status: status,
+                  telemetry: state.telemetry,
+                ),
           healthScore: HealthScoreResult(
             score: score,
-            status: existing?.status ?? _statusFromScore(score),
+            status: status,
             componentScores: existing?.componentScores ?? const {},
             computedAt: DateTime.now(),
           ),

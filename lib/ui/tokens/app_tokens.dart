@@ -63,6 +63,11 @@ class AppSizes {
   static const double line = 1;
   static const double barAvatar = 28;
   static const double barAvatarFont = 14;
+  static const double profileBadge = 30;
+  static const double profileBadgeFont = 13;
+  static const double profileRing = 2;
+  static const double statusDot = 9;
+  static const double statusDotBorder = 2;
   static const double tankWidth = 58;
   static const double tankHeight = 96;
 }

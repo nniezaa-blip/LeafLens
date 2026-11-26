@@ -12,6 +12,7 @@ const _componentFiles = <String>[
   'lib/features/dashboard/presentation/widgets/health_score_card.dart',
   'lib/features/dashboard/presentation/widgets/water_system_card.dart',
   'lib/ui/primitives/botanical_background.dart',
+  'lib/widgets/profile_badge.dart',
 ];
 
 final _checks = <(String, RegExp)>[
