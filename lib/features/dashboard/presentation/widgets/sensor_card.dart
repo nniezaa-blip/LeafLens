@@ -58,7 +58,7 @@ class SensorCard extends StatelessWidget {
           _InfoSection(
             sensorName: sensorName,
             statusText: statusText,
-            statusColor: gaugeColor,
+            statusColor: isStale ? AppColors.redAlert : gaugeColor,
           ),
           _UnitBadge(icon: unitIcon, unit: unit),
           if (onMoreTap != null) _MoreLink(onTap: onMoreTap!),
@@ -86,7 +86,7 @@ class _GaugeSection extends StatelessWidget {
       bottom: 0,
       child: Center(
         child: MiniGauge(
-          value: value / 100,
+          value: (value / 100).clamp(0.0, 1.0),
           color: gaugeColor,
         ),
       ),
