@@ -82,14 +82,20 @@ class _InitialAvatar extends StatelessWidget {
         color: AppColors.mediumGreen,
         shape: BoxShape.circle,
       ),
-      child: Text(
-        profile.initial,
-        style: TextStyle(
-          fontWeight: FontWeight.w500,
-          fontSize: fontSize,
-          color: AppColors.white,
-        ),
-      ),
+      child: emojiPattern.hasMatch(profile.name)
+          ? EmojiMonogram(
+              profile.name,
+              size: size,
+              color: AppColors.white,
+            )
+          : Text(
+              profile.initial,
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: fontSize,
+                color: AppColors.white,
+              ),
+            ),
     );
   }
 }
